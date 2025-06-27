@@ -58,9 +58,20 @@ export function CheckoutModal({
   const form = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
-      paymentMethod: "PIX",
+      whatsapp: "",
+      name: "",
+      email: "",
+      address: "",
+      number: "",
+      complement: "",
+      neighborhood: "",
       city: "São Paulo",
-      state: "SP"
+      state: "SP",
+      zipCode: "",
+      reference: "",
+      paymentMethod: "PIX",
+      observations: "",
+      couponCode: ""
     }
   });
 
