@@ -290,11 +290,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { order, items } = req.body;
       
+      // Get the establishment ID from database
+      const establishment = await storage.getEstablishment();
+      if (!establishment) {
+        return res.status(404).json({ error: "Establishment not found" });
+      }
+      
       // Generate order number
       const orderNumber = await storage.generateOrderNumber();
       
-      // Create order with generated number
-      const orderData = { ...order, orderNumber };
+      // Create order with correct establishment ID and generated number
+      const orderData = { 
+        ...order, 
+        orderNumber,
+        establishmentId: establishment.id
+      };
       const validatedOrder = insertOrderSchema.parse(orderData);
       const createdOrder = await storage.createOrder(validatedOrder);
       
