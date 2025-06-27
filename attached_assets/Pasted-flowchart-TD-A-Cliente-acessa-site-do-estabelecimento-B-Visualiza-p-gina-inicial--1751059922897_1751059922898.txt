@@ -1,0 +1,166 @@
+flowchart TD
+   A[🏠 Cliente acessa site do estabelecimento] --> B[📱 Visualiza página inicial]
+   
+   B --> C{🍕 Navega pelo cardápio}
+   C --> D[👁️ Visualiza categoria]
+   D --> E[🛒 Seleciona produto]
+   
+   E --> F{⚙️ Produto tem opções?}
+   F -->|Sim| G[🎛️ Modal personalização]
+   F -->|Não| H[📝 Campo observações]
+   
+   G --> I[✅ Confirma opções]
+   I --> H
+   H --> J[➕ Adiciona ao carrinho]
+   
+   J --> K{🛍️ Continuar comprando?}
+   K -->|Sim| C
+   K -->|Não| L[🛒 Visualiza carrinho]
+   
+   C --> M[🔍 Busca produto específico]
+   M --> E
+   
+   L --> N{📋 Carrinho tem itens?}
+   N -->|Não| O[❌ Carrinho vazio - volta ao cardápio]
+   O --> C
+   
+   N -->|Sim| P[✏️ Pode editar quantidades]
+   P --> Q[🗑️ Pode remover itens]
+   Q --> R[💰 Visualiza subtotal]
+   R --> S[🚚 Finalizar pedido]
+   
+   S --> T[📋 Formulário de checkout]
+   T --> U[📞 Insere WhatsApp]
+   
+   U --> V{🔍 WhatsApp existe no BD?}
+   V -->|Sim| W[✨ Preenche dados automaticamente]
+   V -->|Não| X[📝 Campos vazios para preencher]
+   
+   W --> Y[✏️ Cliente pode editar dados preenchidos]
+   Y --> Z[📍 Confirma/edita endereço]
+   X --> AA[👤 Preenche nome completo]
+   
+   AA --> AB[📍 Preenche endereço completo]
+   AB --> Z
+   
+   Z --> AC[💳 Seleciona forma de pagamento]
+   AC --> AD{💰 Tipo de pagamento?}
+   
+   AD -->|PIX/Cartão Online| AE[💻 Processo pagamento online]
+   AD -->|Dinheiro/Cartão na entrega| AF[🏠 Pagamento na entrega]
+   
+   AE --> AG{✅ Pagamento aprovado?}
+   AG -->|Não| AH[❌ Erro pagamento]
+   AH --> AI[🔄 Tentar novamente]
+   AI --> AC
+   
+   AG -->|Sim| AJ[✅ Pagamento confirmado]
+   AF --> AJ
+   
+   AJ --> AK[🎟️ Campo cupom de desconto]
+   AK --> AL{🏷️ Inseriu cupom?}
+   AL -->|Sim| AM{✅ Cupom válido?}
+   AM -->|Não| AN[❌ Erro: cupom inválido]
+   AN --> AK
+   AM -->|Sim| AO[💰 Aplica desconto]
+   AL -->|Não| AP[💰 Calcula total final]
+   AO --> AP
+   
+   AP --> AQ[📝 Campo observações do pedido]
+   AQ --> AR[⏱️ Mostra tempo estimado]
+   AR --> AS[📋 Resumo final do pedido]
+   AS --> AT[✅ Confirmar pedido]
+   
+   AT --> AU[🎊 Pedido confirmado!]
+   AU --> AV[📱 Página "Meus Pedidos"]
+   
+   AV --> AW[📊 Aba "Pedido Atual"]
+   AW --> AX[⏱️ Status em tempo real]
+   AX --> AY{📱 Status do pedido}
+   
+   AY -->|Confirmado| AZ[✅ Pedido confirmado pelo restaurante]
+   AY -->|Preparando| BA[👨‍🍳 Pedido em preparo]
+   AY -->|Pronto| BB[🍕 Pedido pronto]
+   AY -->|Saiu para entrega| BC[🚗 Pedido saiu para entrega]
+   AY -->|Entregue| BD[✅ Pedido entregue]
+   
+   AZ --> BE[🔄 Aguarda atualização]
+   BA --> BE
+   BB --> BE
+   BC --> BE
+   BE --> AY
+   
+   BD --> BF[⭐ Opção avaliar pedido]
+   BF --> BG{⭐ Quer avaliar?}
+   BG -->|Sim| BH[⭐ Seleciona nota 1-5]
+   BH --> BI[💬 Comentário opcional]
+   BI --> BJ[✅ Envia avaliação]
+   BG -->|Não| BK[📱 Continua na página]
+   BJ --> BK
+   
+   AV --> BL[📊 Aba "Histórico"]
+   BL --> BM[📋 Lista pedidos anteriores]
+   BM --> BN[👁️ Ver detalhes pedido antigo]
+   BN --> BO[🔄 Repetir pedido]
+   BO --> BQ{🛒 Adicionar ao carrinho atual?}
+   BQ -->|Sim| BR[➕ Itens adicionados]
+   BR --> L
+   BQ -->|Não| BS[🗑️ Limpa carrinho atual]
+   BS --> BT[🔄 Substitui por pedido antigo]
+   BT --> L
+   
+   BK --> BU{🔄 Quer fazer novo pedido?}
+   BU -->|Sim| C
+   BU -->|Não| BV[👋 Finaliza sessão]
+   
+   %% Estados de erro e validações
+   T --> BW{❌ Campos obrigatórios?}
+   BW -->|Faltando| BX[⚠️ Mostra campos obrigatórios]
+   BX --> T
+   BW -->|OK| U
+   
+   AC --> BY{🕐 Estabelecimento aberto?}
+   BY -->|Não| BZ[❌ Erro: estabelecimento fechado]
+   BZ --> CA[ℹ️ Mostra horários de funcionamento]
+   BY -->|Sim| AD
+   
+   AP --> CB{💰 Pedido mínimo atingido?}
+   CB -->|Não| CC[❌ Erro: valor mínimo não atingido]
+   CC --> L
+   CB -->|Sim| AQ
+   
+   %% Interações extras
+   B --> CD[ℹ️ Ver informações do estabelecimento]
+   CD --> CE[📞 Telefone, endereço, horários]
+   CE --> B
+   
+   L --> CF[🎟️ Campo cupom no carrinho]
+   CF --> CG{🏷️ Cupom válido?}
+   CG -->|Sim| CH[💰ução no subtotal]
+   CG -->|Não| CI[❌ Mensagem erro cupom]
+   CH --> L
+   CI --> L
+   
+   %% Responsividade e navegação
+   B --> CJ[🔄 Atualiza página]
+   CJ --> B
+   
+   L --> CK[🔙 Voltar ao cardápio]
+   CK --> C
+   
+   AV --> CL[🔙 Fazer novo pedido]
+   CL --> C
+   
+   %% Notificações
+   AX --> CM{🔔 Notificações ativas?}
+   CM -->|Sim| CN[📱 Push notification mudança status]
+   CM -->|Não| BE
+   CN --> BE
+   
+   style A fill:#e1f5fe
+   style AU fill:#c8e6c9
+   style BD fill:#4caf50
+   style BZ fill:#ffcdd2
+   style AH fill:#ffcdd2
+   style AN fill:#ffcdd2
+   style CC fill:#ffcdd2

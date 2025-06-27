@@ -1,0 +1,281 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+ provider = "prisma-client-js"
+}
+
+datasource db {
+ provider = "postgresql"
+ url      = env("DATABASE_URL")
+}
+
+// Modelo para configurações do estabelecimento
+model Establishment {
+ id                String   @id @default(cuid())
+ name              String
+ description       String?
+ phone             String
+ email             String?
+ address           String
+ logo              String?
+ banner            String?
+ primaryColor      String   @default("#FF6B35")
+ secondaryColor    String   @default("#F7931E")
+ 
+ // Configurações de funcionamento
+ isOpen            Boolean  @default(true)
+ openingHours      Json     // {"monday": {"open": "08:00", "close": "22:00"}, ...}
+ preparationTime   Int      @default(30) // em minutos
+ 
+ // Configurações de entrega
+ deliveryFee       Decimal  @db.Decimal(10,2)
+ minimumOrder      Decimal  @db.Decimal(10,2)
+ deliveryAreas     Json     // array de áreas de entrega com coordenadas
+ 
+ // Configurações de pagamento
+ acceptsCard       Boolean  @default(true)
+ acceptsPix        Boolean  @default(true)
+ acceptsCash       Boolean  @default(true)
+ pixKey            String?
+ 
+ createdAt         DateTime @default(now())
+ updatedAt         DateTime @updatedAt
+ 
+ // Relacionamentos
+ categories        Category[]
+ products          Product[]
+ orders            Order[]
+ coupons           Coupon[]
+ 
+ @@map("establishments")
+}
+
+// Modelo para clientes (identificados por WhatsApp)
+model Customer {
+ id          String   @id @default(cuid())
+ whatsapp    String   @unique
+ name        String
+ email       String?
+ 
+ // Endereço padrão
+ address     String
+ number      String
+ complement  String?
+ neighborhood String
+ city        String
+ state       String
+ zipCode     String
+ reference   String?
+ 
+ // Forma de pagamento padrão
+ defaultPaymentMethod PaymentMethod @default(CASH)
+ 
+ // Estatísticas
+ totalOrders Int      @default(0)
+ totalSpent  Decimal  @default(0) @db.Decimal(10,2)
+ lastOrderAt DateTime?
+ 
+ createdAt   DateTime @default(now())
+ updatedAt   DateTime @updatedAt
+ 
+ // Relacionamentos
+ orders      Order[]
+ 
+ @@map("customers")
+}
+
+// Modelo para categorias de produtos
+model Category {
+ id              String   @id @default(cuid())
+ name            String
+ description     String?
+ image           String?
+ isActive        Boolean  @default(true)
+ sortOrder       Int      @default(0)
+ 
+ establishmentId String
+ establishment   Establishment @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+ 
+ createdAt       DateTime @default(now())
+ updatedAt       DateTime @updatedAt
+ 
+ // Relacionamentos
+ products        Product[]
+ 
+ @@map("categories")
+}
+
+// Modelo para produtos
+model Product {
+ id              String   @id @default(cuid())
+ name            String
+ description     String?
+ price           Decimal  @db.Decimal(10,2)
+ image           String?
+ isActive        Boolean  @default(true)
+ isAvailable     Boolean  @default(true)
+ preparationTime Int?     // tempo específico do produto em minutos
+ sortOrder       Int      @default(0)
+ 
+ // Opções de personalização
+ hasOptions      Boolean  @default(false)
+ options         Json?    // {"sizes": [{"name": "Pequeno", "price": 0}], "extras": [...]}
+ 
+ categoryId      String
+ category        Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+ 
+ establishmentId String
+ establishment   Establishment @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+ 
+ createdAt       DateTime @default(now())
+ updatedAt       DateTime @updatedAt
+ 
+ // Relacionamentos
+ orderItems      OrderItem[]
+ 
+ @@map("products")
+}
+
+// Modelo para pedidos
+model Order {
+ id              String      @id @default(cuid())
+ orderNumber     String      @unique // número sequencial amigável
+ status          OrderStatus @default(PENDING)
+ 
+ // Dados do cliente no momento do pedido
+ customerName    String
+ customerPhone   String
+ customerEmail   String?
+ 
+ // Endereço de entrega
+ deliveryAddress String
+ deliveryNumber  String
+ deliveryComplement String?
+ deliveryNeighborhood String
+ deliveryCity    String
+ deliveryState   String
+ deliveryZipCode String
+ deliveryReference String?
+ 
+ // Valores
+ subtotal        Decimal @db.Decimal(10,2)
+ deliveryFee     Decimal @db.Decimal(10,2)
+ discount        Decimal @default(0) @db.Decimal(10,2)
+ total           Decimal @db.Decimal(10,2)
+ 
+ // Pagamento
+ paymentMethod   PaymentMethod
+ paymentStatus   PaymentStatus @default(PENDING)
+ 
+ // Observações e tempo
+ observations    String?
+ estimatedTime   Int? // em minutos
+ 
+ // Timestamps
+ confirmedAt     DateTime?
+ preparingAt     DateTime?
+ readyAt         DateTime?
+ deliveredAt     DateTime?
+ 
+ customerId      String
+ customer        Customer @relation(fields: [customerId], references: [id])
+ 
+ establishmentId String
+ establishment   Establishment @relation(fields: [establishmentId], references: [id])
+ 
+ // Cupom aplicado
+ couponId        String?
+ coupon          Coupon? @relation(fields: [couponId], references: [id])
+ 
+ createdAt       DateTime @default(now())
+ updatedAt       DateTime @updatedAt
+ 
+ // Relacionamentos
+ items           OrderItem[]
+ 
+ @@map("orders")
+}
+
+// Modelo para itens do pedido
+model OrderItem {
+ id              String  @id @default(cuid())
+ quantity        Int
+ unitPrice       Decimal @db.Decimal(10,2)
+ totalPrice      Decimal @db.Decimal(10,2)
+ 
+ // Personalizações aplicadas
+ selectedOptions Json?   // opções selecionadas no momento do pedido
+ observations    String?
+ 
+ orderId         String
+ order           Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+ 
+ productId       String
+ product         Product @relation(fields: [productId], references: [id])
+ 
+ createdAt       DateTime @default(now())
+ 
+ @@map("order_items")
+}
+
+// Modelo para cupons de desconto
+model Coupon {
+ id              String      @id @default(cuid())
+ code            String      @unique
+ description     String?
+ type            CouponType  @default(PERCENTAGE)
+ value           Decimal     @db.Decimal(10,2) // porcentagem ou valor fixo
+ minimumOrder    Decimal?    @db.Decimal(10,2)
+ maxDiscount     Decimal?    @db.Decimal(10,2) // limite máximo para desconto percentual
+ 
+ isActive        Boolean     @default(true)
+ usageLimit      Int?        // limite total de usos
+ usageCount      Int         @default(0)
+ 
+ validFrom       DateTime
+ validUntil      DateTime
+ 
+ establishmentId String
+ establishment   Establishment @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+ 
+ createdAt       DateTime    @default(now())
+ updatedAt       DateTime    @updatedAt
+ 
+ // Relacionamentos
+ orders          Order[]
+ 
+ @@map("coupons")
+}
+
+// Enums
+enum OrderStatus {
+ PENDING       // Pendente de confirmação
+ CONFIRMED     // Confirmado pelo estabelecimento
+ PREPARING     // Em preparo
+ READY         // Pronto para entrega
+ OUT_DELIVERY  // Saiu para entrega
+ DELIVERED     // Entregue
+ CANCELLED     // Cancelado
+}
+
+enum PaymentMethod {
+ CASH          // Dinheiro
+ CARD          // Cartão na entrega
+ PIX           // PIX
+ CREDIT_CARD   // Cartão de crédito online
+ DEBIT_CARD    // Cartão de débito online
+}
+
+enum PaymentStatus {
+ PENDING       // Pendente
+ PAID          // Pago
+ FAILED        // Falhou
+ REFUNDED      // Estornado
+}
+
+enum CouponType {
+ PERCENTAGE    // Desconto percentual
+ FIXED         // Valor fixo
+ FREE_DELIVERY // Entrega grátis
+}
