@@ -1,10 +1,12 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { History, X, RotateCcw, ShoppingCart } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { History, X, RotateCcw, ShoppingCart, Search } from "lucide-react";
 import { api } from "@/lib/api";
 import { Order } from "@shared/schema";
 
@@ -23,11 +25,39 @@ export function OrderHistoryModal({
   onRepeatOrder,
   onContinueShopping
 }: OrderHistoryModalProps) {
+  const [whatsapp, setWhatsapp] = useState("");
+  const [searchedCustomerId, setSearchedCustomerId] = useState<string | null>(null);
+  
+  const effectiveCustomerId = customerId || searchedCustomerId;
+  
   const { data: orders = [], isLoading } = useQuery({
-    queryKey: ["/api/orders/customer", customerId],
-    queryFn: () => customerId ? api.orders.getByCustomer(customerId) : Promise.resolve([]),
-    enabled: !!customerId && isOpen
+    queryKey: ["/api/orders/customer", effectiveCustomerId],
+    queryFn: () => effectiveCustomerId ? api.orders.getByCustomer(effectiveCustomerId) : Promise.resolve([]),
+    enabled: !!effectiveCustomerId && isOpen
   });
+
+  const handleSearchOrders = async () => {
+    if (!whatsapp) return;
+    
+    try {
+      const customer = await api.customers.getByWhatsapp(whatsapp);
+      if (customer) {
+        setSearchedCustomerId(customer.id);
+      } else {
+        setSearchedCustomerId("not-found");
+      }
+    } catch (error) {
+      console.error("Error searching customer:", error);
+      setSearchedCustomerId("not-found");
+    }
+  };
+
+  const handleClose = () => {
+    // Reset search state when modal closes
+    setWhatsapp("");
+    setSearchedCustomerId(null);
+    onClose();
+  };
 
   const formatCurrency = (value: number | string) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -72,7 +102,7 @@ export function OrderHistoryModal({
   const averageOrder = totalOrders > 0 ? totalSpent / totalOrders : 0;
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
@@ -80,7 +110,7 @@ export function OrderHistoryModal({
               <History className="w-5 h-5 mr-2 text-primary" />
               Meus Pedidos
             </DialogTitle>
-            <Button variant="ghost" size="sm" onClick={onClose}>
+            <Button variant="ghost" size="sm" onClick={handleClose}>
               <X className="w-5 h-5" />
             </Button>
           </div>
@@ -88,6 +118,40 @@ export function OrderHistoryModal({
 
         <ScrollArea className="max-h-[70vh]">
           <div className="space-y-6">
+            {/* WhatsApp Search (when no customerId provided) */}
+            {!customerId && !effectiveCustomerId && (
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="font-medium mb-3">Digite seu WhatsApp para ver seus pedidos</h3>
+                <div className="flex space-x-2">
+                  <Input
+                    placeholder="11999999999"
+                    value={whatsapp}
+                    onChange={(e) => setWhatsapp(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button onClick={handleSearchOrders} disabled={!whatsapp}>
+                    <Search className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* No Customer Found Message */}
+            {searchedCustomerId === "not-found" && (
+              <div className="text-center py-8">
+                <History className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum pedido encontrado</h3>
+                <p className="text-gray-500">Não encontramos pedidos para este WhatsApp</p>
+              </div>
+            )}
+
+            {/* Loading State */}
+            {isLoading && effectiveCustomerId && effectiveCustomerId !== "not-found" && (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                <p className="mt-2 text-gray-500">Carregando pedidos...</p>
+              </div>
+            )}
             {/* Current Order */}
             {currentOrder && (
               <div>

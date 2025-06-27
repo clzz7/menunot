@@ -122,8 +122,8 @@ export function OrderTrackingModal({
           {/* Estimated Time */}
           <div className="bg-primary bg-opacity-10 rounded-lg p-4 mb-6">
             <div className="flex items-center justify-center">
-              <Clock className="w-5 h-5 text-primary mr-2" />
-              <span className="font-medium text-primary">
+              <Clock className="w-5 h-5 text-gray-900 mr-2" />
+              <span className="font-medium text-gray-900">
                 Tempo estimado: {order.estimatedTime || 30}-{(order.estimatedTime || 30) + 10} min
               </span>
             </div>

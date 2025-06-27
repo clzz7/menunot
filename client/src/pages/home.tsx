@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, Search, Clock } from "lucide-react";
+import { ShoppingCart, Search, Clock, History } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import { CartSidebar } from "@/components/cart-sidebar";
 import { CheckoutModal } from "@/components/checkout-modal";
@@ -176,6 +176,10 @@ export default function Home() {
     setIsOrderHistoryOpen(false);
   };
 
+  const handleOpenOrderHistory = () => {
+    setIsOrderHistoryOpen(true);
+  };
+
   if (!establishment) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -217,6 +221,16 @@ export default function Home() {
                   {establishment.isOpen ? 'Aberto' : 'Fechado'}
                 </span>
               </div>
+              
+              {/* My Orders Button */}
+              <Button 
+                onClick={handleOpenOrderHistory}
+                variant="outline"
+                className="border-primary text-primary hover:bg-primary hover:text-white transition-colors"
+              >
+                <History className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Meus Pedidos</span>
+              </Button>
               
               {/* Cart Button */}
               <Button 
