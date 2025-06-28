@@ -189,14 +189,51 @@ export function CheckoutModal({
       const order = await api.orders.create({
         order: orderData,
         items: orderItems
-      });
+      }) as any;
+
+      // If payment method is online (CARD or PIX), create MercadoPago preference
+      if (data.paymentMethod === 'CARD' || data.paymentMethod === 'PIX') {
+        try {
+          const preference = await api.mercadopago.createPreference({
+            orderId: order.id,
+            items: cart.items.map(item => ({
+              title: item.name,
+              quantity: item.quantity,
+              unit_price: item.price
+            })),
+            payer: {
+              name: data.name,
+              email: data.email || `${data.whatsapp.replace(/\D/g, '')}@noemail.com`,
+              phone: {
+                area_code: data.whatsapp.substring(3, 5),
+                number: data.whatsapp.substring(5)
+              }
+            }
+          }) as any;
+
+          // Redirect to MercadoPago checkout
+          window.open(preference.initPoint, '_blank');
+          
+          toast({
+            title: "Redirecionando para pagamento",
+            description: "Você será direcionado para completar o pagamento",
+          });
+        } catch (error) {
+          console.error('Error creating payment preference:', error);
+          toast({
+            title: "Erro no pagamento",
+            description: "Não foi possível processar o pagamento online",
+            variant: "destructive"
+          });
+        }
+      } else {
+        toast({
+          title: "Pedido confirmado!",
+          description: `Pedido #${order.orderNumber || order.id} foi criado com sucesso`,
+        });
+      }
 
       onOrderComplete(order);
-      
-      toast({
-        title: "Pedido confirmado!",
-        description: `Pedido #${order.orderNumber} foi criado com sucesso`,
-      });
 
     } catch (error: any) {
       console.error("Error creating order:", error);

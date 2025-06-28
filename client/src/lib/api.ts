@@ -63,5 +63,11 @@ export const api = {
   // Dashboard
   dashboard: {
     getStats: () => fetch("/api/dashboard/stats").then(res => res.json())
+  },
+
+  // MercadoPago
+  mercadopago: {
+    getPublicKey: () => fetch("/api/mercadopago/public-key").then(res => res.json()),
+    createPreference: (data: any) => apiRequest("POST", "/api/mercadopago/create-preference", data)
   }
 };

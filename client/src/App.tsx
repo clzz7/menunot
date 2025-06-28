@@ -6,12 +6,18 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "@/pages/home";
 import Admin from "@/pages/admin";
 import NotFound from "@/pages/not-found";
+import PaymentSuccess from "@/pages/payment-success";
+import PaymentFailure from "@/pages/payment-failure";
+import PaymentPending from "@/pages/payment-pending";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/admin" component={Admin} />
+      <Route path="/payment/success" component={PaymentSuccess} />
+      <Route path="/payment/failure" component={PaymentFailure} />
+      <Route path="/payment/pending" component={PaymentPending} />
       <Route component={NotFound} />
     </Switch>
   );

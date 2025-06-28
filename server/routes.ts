@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { z } from "zod";
+import { mercadoPagoService } from "./mercadopago";
 import {
   insertCustomerSchema,
   insertOrderSchema,
@@ -500,6 +501,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching dashboard stats:", error);
       res.status(500).json({ error: "Failed to fetch dashboard statistics" });
+    }
+  });
+
+  // MercadoPago routes
+  app.get("/api/mercadopago/public-key", (req, res) => {
+    res.json({ publicKey: process.env.MERCADOPAGO_PUBLIC_KEY });
+  });
+
+  app.post("/api/mercadopago/create-preference", async (req, res) => {
+    try {
+      const { orderId, items, payer } = req.body;
+      
+      const baseUrl = process.env.NODE_ENV === 'production' 
+        ? `https://${req.get('host')}`
+        : `http://${req.get('host')}`;
+
+      const paymentRequest = {
+        orderId,
+        items: items.map((item: any, index: number) => ({
+          id: `item_${index}`,
+          title: item.title,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+          currency_id: 'BRL'
+        })),
+        payer,
+        back_urls: {
+          success: `${baseUrl}/payment/success`,
+          failure: `${baseUrl}/payment/failure`,
+          pending: `${baseUrl}/payment/pending`
+        },
+        auto_return: 'approved' as const,
+        external_reference: orderId,
+        notification_url: `${baseUrl}/api/mercadopago/webhook`
+      };
+
+      const preference = await mercadoPagoService.createPreference(paymentRequest);
+      res.json({ preferenceId: preference.id, initPoint: preference.init_point });
+    } catch (error) {
+      console.error("Error creating MercadoPago preference:", error);
+      res.status(500).json({ error: "Failed to create payment preference" });
+    }
+  });
+
+  app.post("/api/mercadopago/webhook", async (req, res) => {
+    try {
+      const webhookData = await mercadoPagoService.processWebhook(req.body);
+      
+      if (webhookData && webhookData.externalReference) {
+        // Update order payment status
+        const order = await storage.getOrder(webhookData.externalReference);
+        if (order) {
+          let orderStatus = 'PENDING';
+          if (webhookData.status === 'approved') {
+            orderStatus = 'CONFIRMED';
+          } else if (webhookData.status === 'rejected' || webhookData.status === 'cancelled') {
+            orderStatus = 'CANCELLED';
+          }
+          
+          await storage.updateOrderStatus(order.id, orderStatus);
+          
+          // Broadcast status update
+          broadcast({
+            type: 'ORDER_STATUS_UPDATE',
+            orderId: order.id,
+            status: orderStatus,
+            timestamp: new Date()
+          });
+        }
+      }
+      
+      res.status(200).send('OK');
+    } catch (error) {
+      console.error("Error processing MercadoPago webhook:", error);
+      res.status(500).json({ error: "Failed to process webhook" });
     }
   });
 
