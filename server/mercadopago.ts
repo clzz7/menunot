@@ -62,10 +62,9 @@ export class MercadoPagoService {
           }
         },
         external_reference: paymentData.orderId,
-        notification_url: `${process.env.REPLIT_DOMAIN || 'http://localhost:5000'}/api/mercadopago/webhook`
+        notification_url: `https://acbb8d33-a7a3-4a99-b51d-e6f19111da87-00-3n70zkq2snyy7.riker.replit.dev/api/mercadopago/webhook`
       };
 
-      console.log('Creating PIX payment with data:', paymentRequest);
       const result = await payment.create({ body: paymentRequest });
       
       return {

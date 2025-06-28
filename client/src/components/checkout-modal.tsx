@@ -198,7 +198,7 @@ export function CheckoutModal({
       if (data.paymentMethod === 'PIX') {
         setCurrentOrder({
           id: order.id,
-          orderNumber: order.orderNumber || order.id,
+          orderNumber: order.orderNumber || `PED${Date.now().toString().slice(-6)}`,
           total: cart.total,
           customerName: data.name,
           customerPhone: data.whatsapp,
