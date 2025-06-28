@@ -25,7 +25,7 @@ export default function Home() {
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
   const [currentCustomerId, setCurrentCustomerId] = useState<string | null>(null);
 
-  const { cart, addToCart, updateQuantity, removeFromCart, applyDiscount, clearCart } = useCart();
+  const { cart, addToCart, updateQuantity, removeFromCart, applyDiscount, applyCoupon, clearCart } = useCart();
   const { toast } = useToast();
 
   // Fetch data
@@ -132,7 +132,14 @@ export default function Home() {
     try {
       const coupon = await api.coupons.validate(code);
       
+      // Check minimum order first
+      if (coupon.minimumOrder && cart.subtotal < Number(coupon.minimumOrder)) {
+        throw new Error(`Pedido mínimo de ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(coupon.minimumOrder))} necessário`);
+      }
+      
       let discount = 0;
+      let freeDelivery = false;
+      
       if (coupon.type === "PERCENTAGE") {
         discount = cart.subtotal * (Number(coupon.value) / 100);
         if (coupon.maxDiscount) {
@@ -140,16 +147,15 @@ export default function Home() {
         }
       } else if (coupon.type === "FIXED") {
         discount = Number(coupon.value);
+      } else if (coupon.type === "FREE_DELIVERY") {
+        freeDelivery = true;
+        discount = 0; // No discount on subtotal, just free delivery
       }
       
-      // Check minimum order
-      if (coupon.minimumOrder && cart.subtotal < Number(coupon.minimumOrder)) {
-        throw new Error(`Pedido mínimo de ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(coupon.minimumOrder))} necessário`);
-      }
-      
-      applyDiscount(discount, code);
+      applyCoupon(discount, code, freeDelivery);
     } catch (error: any) {
-      throw new Error(error.message || "Cupom inválido");
+      // Re-throw the exact error from the API
+      throw error;
     }
   };
 

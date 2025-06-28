@@ -122,6 +122,21 @@ export function useCart() {
     });
   }, [calculateTotals]);
 
+  const applyCoupon = useCallback((discount: number, couponCode?: string, freeDelivery?: boolean) => {
+    setCart(prevCart => {
+      const deliveryFee = freeDelivery ? 0 : prevCart.deliveryFee;
+      const totals = calculateTotals(prevCart.items, deliveryFee, discount);
+      
+      return {
+        ...prevCart,
+        discount,
+        couponCode,
+        deliveryFee,
+        ...totals
+      };
+    });
+  }, [calculateTotals]);
+
   const clearCart = useCallback(() => {
     setCart(initialCart);
   }, []);
@@ -132,6 +147,7 @@ export function useCart() {
     updateQuantity,
     removeFromCart,
     applyDiscount,
+    applyCoupon,
     clearCart
   };
 }

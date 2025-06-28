@@ -41,7 +41,14 @@ export const api = {
   // Coupons
   coupons: {
     getAll: () => fetch("/api/coupons").then(res => res.json()),
-    validate: (code: string) => fetch(`/api/coupons/validate/${code}`).then(res => res.json()),
+    validate: async (code: string) => {
+      const response = await fetch(`/api/coupons/validate/${code}`);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Cupom inválido");
+      }
+      return response.json();
+    },
     create: (data: any) => apiRequest("POST", "/api/coupons", data),
     update: (id: string, data: any) => apiRequest("PUT", `/api/coupons/${id}`, data),
     delete: (id: string) => apiRequest("DELETE", `/api/coupons/${id}`)
