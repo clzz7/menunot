@@ -164,12 +164,46 @@ export default function Home() {
   };
 
   const handleRepeatOrder = async (order: Order) => {
-    // This would need to fetch order items and add them to cart
-    // For now, just show a message
-    toast({
-      title: "Funcionalidade em desenvolvimento",
-      description: "A repetição de pedidos será implementada em breve",
-    });
+    try {
+      // Fetch order items from the API
+      const response = await fetch(`/api/orders/${order.id}/items`);
+      if (!response.ok) {
+        throw new Error('Erro ao buscar itens do pedido');
+      }
+      
+      const orderItems = await response.json();
+      
+      // Clear current cart and add items from the order
+      clearCart();
+      
+      for (const item of orderItems) {
+        // Find the product to get current details
+        const product = products.find((p: Product) => p.id === item.productId);
+        if (product) {
+          addToCart({
+            ...product,
+            selectedOptions: item.selectedOptions,
+            observations: item.observations
+          }, item.quantity);
+        }
+      }
+      
+      toast({
+        title: "Pedido repetido!",
+        description: `${orderItems.length} itens foram adicionados ao carrinho`,
+      });
+      
+      // Close order history and open cart
+      setIsOrderHistoryOpen(false);
+      setIsCartOpen(true);
+      
+    } catch (error: any) {
+      toast({
+        title: "Erro ao repetir pedido",
+        description: error.message || "Erro interno do servidor",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleContinueShopping = () => {

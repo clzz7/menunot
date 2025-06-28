@@ -223,7 +223,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ];
           
           for (const product of defaultProducts) {
-            await storage.createProduct(product);
+            await storage.createProduct({ ...product, options: null });
           }
           
           products = await storage.getProducts(establishment.id);
@@ -239,8 +239,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/products", async (req, res) => {
     try {
-      const validatedData = insertProductSchema.parse(req.body);
-      const product = await storage.createProduct(validatedData);
+      const product = await storage.createProduct(req.body as any);
       res.status(201).json(product);
     } catch (error) {
       console.error("Error creating product:", error);
@@ -286,6 +285,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/orders/:orderId/items", async (req, res) => {
+    try {
+      const { orderId } = req.params;
+      const items = await storage.getOrderItems(orderId);
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching order items:", error);
+      res.status(500).json({ error: "Failed to fetch order items" });
+    }
+  });
+
   app.post("/api/orders", async (req, res) => {
     try {
       const { order, items } = req.body;
@@ -303,16 +313,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const orderData = { 
         ...order, 
         orderNumber,
-        establishmentId: establishment.id
+        establishmentId: establishment.id,
+        status: 'PENDING',
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
-      const validatedOrder = insertOrderSchema.parse(orderData);
-      const createdOrder = await storage.createOrder(validatedOrder);
+      
+      // Remove undefined fields and ensure proper types
+      const cleanOrderData = Object.fromEntries(
+        Object.entries(orderData).filter(([_, v]) => v !== undefined)
+      );
+      
+      const createdOrder = await storage.createOrder(orderData as any);
       
       // Create order items
       for (const item of items) {
-        const itemData = { ...item, orderId: createdOrder.id };
-        const validatedItem = insertOrderItemSchema.parse(itemData);
-        await storage.createOrderItem(validatedItem);
+        const itemData = { 
+          ...item, 
+          orderId: createdOrder.id,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+        
+        // Remove undefined fields
+        const cleanItemData = Object.fromEntries(
+          Object.entries(itemData).filter(([_, v]) => v !== undefined)
+        );
+        
+        await storage.createOrderItem(itemData as any);
       }
       
       // Update customer statistics
