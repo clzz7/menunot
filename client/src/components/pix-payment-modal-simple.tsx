@@ -112,7 +112,7 @@ export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: P
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md mx-auto">
+      <DialogContent className="max-w-lg mx-auto max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <QrCode className="h-5 w-5" />
@@ -120,7 +120,7 @@ export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: P
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-4">
           {/* Order Summary */}
           <Card>
             <CardHeader className="pb-3">
@@ -164,11 +164,11 @@ export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: P
               <CardContent className="space-y-4">
                 {/* QR Code */}
                 {pixPayment.qr_code_base64 && (
-                  <div className="flex justify-center">
+                  <div className="flex justify-center py-4">
                     <img 
                       src={`data:image/png;base64,${pixPayment.qr_code_base64}`}
                       alt="QR Code PIX"
-                      className="w-48 h-48 border rounded"
+                      className="w-48 h-48 sm:w-56 sm:h-56 border rounded-lg shadow-sm"
                     />
                   </div>
                 )}
@@ -191,8 +191,10 @@ export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: P
                 </div>
 
                 {/* PIX Code Display */}
-                <div className="bg-muted p-3 rounded text-xs break-all max-h-20 overflow-y-auto">
-                  {pixPayment.qr_code}
+                <div className="bg-muted p-4 rounded-lg text-xs break-all max-h-24 overflow-y-auto border">
+                  <div className="font-mono leading-relaxed">
+                    {pixPayment.qr_code}
+                  </div>
                 </div>
               </CardContent>
             </Card>
