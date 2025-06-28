@@ -79,8 +79,8 @@ export function OrderTrackingModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
-        <div className="p-6">
+      <DialogContent className="max-w-lg w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-4 sm:p-6">
           {/* Success Header */}
           <div className="text-center mb-6">
             <div className="w-16 h-16 bg-success text-white rounded-full flex items-center justify-center mx-auto mb-4">
@@ -130,10 +130,10 @@ export function OrderTrackingModal({
           </div>
 
           {/* Action Buttons */}
-          <div className="space-y-3">
+          <div className="space-y-3 pt-2">
             <Button 
               onClick={onViewHistory}
-              className="w-full bg-primary text-white hover:bg-orange-600 transition-colors"
+              className="w-full bg-primary text-white hover:bg-orange-600 transition-colors h-12"
             >
               <History className="w-4 h-4 mr-2" />
               Ver Meus Pedidos
@@ -141,7 +141,7 @@ export function OrderTrackingModal({
             <Button 
               onClick={onNewOrder}
               variant="outline"
-              className="w-full"
+              className="w-full h-12"
             >
               <Plus className="w-4 h-4 mr-2" />
               Fazer Novo Pedido
