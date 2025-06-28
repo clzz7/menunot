@@ -37,6 +37,50 @@ export interface PaymentRequest {
 
 export class MercadoPagoService {
   
+  async createPixPayment(paymentData: {
+    orderId: string;
+    amount: number;
+    payer: {
+      name: string;
+      email: string;
+      phone: string;
+    };
+    description: string;
+  }) {
+    try {
+      const paymentRequest = {
+        transaction_amount: paymentData.amount,
+        description: paymentData.description,
+        payment_method_id: 'pix',
+        payer: {
+          email: paymentData.payer.email,
+          first_name: paymentData.payer.name.split(' ')[0],
+          last_name: paymentData.payer.name.split(' ').slice(1).join(' ') || 'Cliente',
+          phone: {
+            area_code: paymentData.payer.phone.substring(2, 4),
+            number: paymentData.payer.phone.substring(4)
+          }
+        },
+        external_reference: paymentData.orderId,
+        notification_url: `${process.env.REPLIT_DOMAIN || 'http://localhost:5000'}/api/mercadopago/webhook`
+      };
+
+      console.log('Creating PIX payment with data:', paymentRequest);
+      const result = await payment.create({ body: paymentRequest });
+      
+      return {
+        id: result.id,
+        status: result.status,
+        qr_code: result.point_of_interaction?.transaction_data?.qr_code,
+        qr_code_base64: result.point_of_interaction?.transaction_data?.qr_code_base64,
+        ticket_url: result.point_of_interaction?.transaction_data?.ticket_url
+      };
+    } catch (error) {
+      console.error('Error creating PIX payment:', error);
+      throw error;
+    }
+  }
+  
   async createPreference(paymentData: PaymentRequest) {
     try {
       const preferenceData = {

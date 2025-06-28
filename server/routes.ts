@@ -315,6 +315,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...order, 
         orderNumber,
         establishmentId: establishment.id,
+        customerId: order.customerId, // Ensure customerId is preserved
         status: 'PENDING',
         createdAt: new Date(),
         updatedAt: new Date()
@@ -542,6 +543,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error creating MercadoPago preference:", error);
       res.status(500).json({ error: "Failed to create payment preference" });
+    }
+  });
+
+  app.post("/api/mercadopago/create-pix", async (req, res) => {
+    try {
+      const { orderId, amount, payer, description } = req.body;
+      
+      const pixPayment = await mercadoPagoService.createPixPayment({
+        orderId,
+        amount,
+        payer,
+        description
+      });
+      
+      res.json(pixPayment);
+    } catch (error) {
+      console.error("Error creating PIX payment:", error);
+      res.status(500).json({ error: "Failed to create PIX payment" });
+    }
+  });
+
+  app.get("/api/mercadopago/payment/:paymentId", async (req, res) => {
+    try {
+      const { paymentId } = req.params;
+      const payment = await mercadoPagoService.getPayment(paymentId);
+      res.json(payment);
+    } catch (error) {
+      console.error("Error fetching payment:", error);
+      res.status(500).json({ error: "Failed to fetch payment status" });
     }
   });
 

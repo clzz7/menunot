@@ -14,6 +14,7 @@ import { ArrowLeft, Check, Clock } from "lucide-react";
 import { Cart, CustomerData } from "@/types";
 import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { PixPaymentModal } from "./pix-payment-modal-simple";
 
 const checkoutSchema = z.object({
   whatsapp: z.string().min(1, "WhatsApp é obrigatório"),
@@ -53,6 +54,8 @@ export function CheckoutModal({
 }: CheckoutModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [autoFillNotification, setAutoFillNotification] = useState(false);
+  const [showPixModal, setShowPixModal] = useState(false);
+  const [currentOrder, setCurrentOrder] = useState<any>(null);
   const { toast } = useToast();
 
   const form = useForm<CheckoutFormData>({
@@ -191,8 +194,18 @@ export function CheckoutModal({
         items: orderItems
       }) as any;
 
-      // If payment method is online (CARD or PIX), create MercadoPago preference
-      if (data.paymentMethod === 'CARD' || data.paymentMethod === 'PIX') {
+      // If payment method is PIX, show PIX modal
+      if (data.paymentMethod === 'PIX') {
+        setCurrentOrder({
+          id: order.id,
+          orderNumber: order.orderNumber || order.id,
+          total: cart.total,
+          customerName: data.name,
+          customerPhone: data.whatsapp,
+          customerEmail: data.email
+        });
+        setShowPixModal(true);
+      } else if (data.paymentMethod === 'CARD') {
         try {
           const preference = await api.mercadopago.createPreference({
             orderId: order.id,
@@ -586,6 +599,23 @@ export function CheckoutModal({
           </form>
         </Form>
       </DialogContent>
+      
+      {/* PIX Payment Modal */}
+      {showPixModal && currentOrder && (
+        <PixPaymentModal
+          isOpen={showPixModal}
+          onClose={() => {
+            setShowPixModal(false);
+            onClose();
+          }}
+          order={currentOrder}
+          onPaymentComplete={() => {
+            setShowPixModal(false);
+            onOrderComplete(currentOrder);
+            onClose();
+          }}
+        />
+      )}
     </Dialog>
   );
 }
