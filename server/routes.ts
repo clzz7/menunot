@@ -404,9 +404,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/coupons/validate/:code", async (req, res) => {
+  app.post("/api/coupons/validate", async (req, res) => {
     try {
-      const { code } = req.params;
+      const { code, customerPhone } = req.body;
       const establishment = await storage.getEstablishment();
       
       if (!establishment) {
@@ -428,6 +428,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check usage limit
       if (coupon.usageLimit && coupon.usageCount >= coupon.usageLimit) {
         return res.status(400).json({ error: "Cupom esgotado" });
+      }
+      
+      // Special validation for first-time customer coupons
+      if (coupon.code === "PRIMEIRACOMPRA" && customerPhone) {
+        const customer = await storage.getCustomerByWhatsapp(customerPhone);
+        if (customer && customer.totalOrders > 0) {
+          return res.status(400).json({ error: "Este cupom é válido apenas para primeira compra" });
+        }
       }
       
       res.json(coupon);

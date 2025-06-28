@@ -41,8 +41,14 @@ export const api = {
   // Coupons
   coupons: {
     getAll: () => fetch("/api/coupons").then(res => res.json()),
-    validate: async (code: string) => {
-      const response = await fetch(`/api/coupons/validate/${code}`);
+    validate: async (code: string, customerPhone?: string) => {
+      const response = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ code, customerPhone })
+      });
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || "Cupom inválido");

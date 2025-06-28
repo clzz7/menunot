@@ -128,9 +128,9 @@ export default function Home() {
     clearCart();
   };
 
-  const handleApplyCoupon = async (code: string) => {
+  const handleApplyCoupon = async (code: string, customerPhone?: string) => {
     try {
-      const coupon = await api.coupons.validate(code);
+      const coupon = await api.coupons.validate(code, customerPhone);
       
       // Check minimum order first
       if (coupon.minimumOrder && cart.subtotal < Number(coupon.minimumOrder)) {

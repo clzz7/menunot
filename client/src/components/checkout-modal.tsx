@@ -39,7 +39,7 @@ interface CheckoutModalProps {
   onClose: () => void;
   cart: Cart;
   onOrderComplete: (order: any) => void;
-  onApplyCoupon: (code: string) => Promise<void>;
+  onApplyCoupon: (code: string, customerPhone?: string) => Promise<void>;
   onBackToCart: () => void;
 }
 
@@ -111,10 +111,11 @@ export function CheckoutModal({
 
   const handleApplyCoupon = async () => {
     const couponCode = form.getValues("couponCode");
+    const customerPhone = form.getValues("whatsapp");
     if (!couponCode) return;
 
     try {
-      await onApplyCoupon(couponCode);
+      await onApplyCoupon(couponCode, customerPhone);
       toast({
         title: "Cupom aplicado!",
         description: "Desconto aplicado com sucesso",
