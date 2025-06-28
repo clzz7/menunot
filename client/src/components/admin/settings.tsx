@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -119,7 +119,7 @@ export function SettingsPage() {
   });
 
   // Set form values when establishment data loads
-  useState(() => {
+  useEffect(() => {
     if (establishment) {
       form.reset({
         name: establishment.name,
@@ -132,16 +132,16 @@ export function SettingsPage() {
         primaryColor: establishment.primaryColor,
         secondaryColor: establishment.secondaryColor,
         isOpen: establishment.isOpen,
-        preparationTime: establishment.preparationTime.toString(),
-        deliveryFee: establishment.deliveryFee.toString(),
-        minimumOrder: establishment.minimumOrder.toString(),
+        preparationTime: establishment.preparationTime?.toString() || "30",
+        deliveryFee: establishment.deliveryFee?.toString() || "5.00",
+        minimumOrder: establishment.minimumOrder?.toString() || "20.00",
         acceptsCard: establishment.acceptsCard,
         acceptsPix: establishment.acceptsPix,
         acceptsCash: establishment.acceptsCash,
         pixKey: establishment.pixKey || ""
       });
     }
-  });
+  }, [establishment]);
 
   const updateEstablishmentMutation = useMutation({
     mutationFn: (data: any) => establishment ? api.establishment.update(establishment.id, data) : Promise.reject(),

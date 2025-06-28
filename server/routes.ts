@@ -361,6 +361,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Coupons
+  app.get("/api/coupons", async (req, res) => {
+    try {
+      const establishment = await storage.getEstablishment();
+      if (!establishment) {
+        return res.status(404).json({ error: "Establishment not found" });
+      }
+      
+      const coupons = await storage.getCoupons(establishment.id);
+      res.json(coupons);
+    } catch (error) {
+      console.error("Error fetching coupons:", error);
+      res.status(500).json({ error: "Failed to fetch coupons" });
+    }
+  });
+
   app.get("/api/coupons/validate/:code", async (req, res) => {
     try {
       const { code } = req.params;
@@ -396,12 +411,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/coupons", async (req, res) => {
     try {
-      const validatedData = insertCouponSchema.parse(req.body);
+      const establishment = await storage.getEstablishment();
+      if (!establishment) {
+        return res.status(404).json({ error: "Establishment not found" });
+      }
+
+      const validatedData = insertCouponSchema.parse({
+        ...req.body,
+        establishmentId: establishment.id
+      });
       const coupon = await storage.createCoupon(validatedData);
       res.status(201).json(coupon);
     } catch (error) {
       console.error("Error creating coupon:", error);
       res.status(400).json({ error: "Invalid coupon data" });
+    }
+  });
+
+  app.put("/api/coupons/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateCoupon(id, req.body);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating coupon:", error);
+      res.status(500).json({ error: "Failed to update coupon" });
+    }
+  });
+
+  app.delete("/api/coupons/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      // Note: We don't have a delete method in storage, so we'll mark as inactive
+      const updated = await storage.updateCoupon(id, { isActive: false });
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting coupon:", error);
+      res.status(500).json({ error: "Failed to delete coupon" });
     }
   });
 

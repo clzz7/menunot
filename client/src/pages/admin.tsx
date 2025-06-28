@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Package, Users, Settings, LogOut, Bell } from "lucide-react";
+import { BarChart3, Package, Users, Settings, LogOut, Bell, Ticket } from "lucide-react";
 import { Dashboard } from "@/components/admin/dashboard";
 import { OrdersManagement } from "@/components/admin/orders-management";
 import { ProductsManagement } from "@/components/admin/products-management";
 import { CustomersManagement } from "@/components/admin/customers-management";
+import { CouponsManagement } from "@/components/admin/coupons-management";
 import { SettingsPage } from "@/components/admin/settings";
 import { useWebSocket } from "@/hooks/use-websocket";
 import { useToast } from "@/hooks/use-toast";
@@ -71,7 +72,7 @@ export default function Admin() {
       {/* Admin Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="dashboard" className="flex items-center">
               <BarChart3 className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">Dashboard</span>
@@ -93,6 +94,10 @@ export default function Admin() {
               <Users className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">Clientes</span>
             </TabsTrigger>
+            <TabsTrigger value="coupons" className="flex items-center">
+              <Ticket className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">Cupons</span>
+            </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center">
               <Settings className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">Configurações</span>
@@ -113,6 +118,10 @@ export default function Admin() {
 
           <TabsContent value="customers" className="space-y-6">
             <CustomersManagement />
+          </TabsContent>
+
+          <TabsContent value="coupons" className="space-y-6">
+            <CouponsManagement />
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">

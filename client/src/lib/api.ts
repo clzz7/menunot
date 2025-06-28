@@ -40,8 +40,11 @@ export const api = {
 
   // Coupons
   coupons: {
+    getAll: () => fetch("/api/coupons").then(res => res.json()),
     validate: (code: string) => fetch(`/api/coupons/validate/${code}`).then(res => res.json()),
-    create: (data: any) => apiRequest("POST", "/api/coupons", data)
+    create: (data: any) => apiRequest("POST", "/api/coupons", data),
+    update: (id: string, data: any) => apiRequest("PUT", `/api/coupons/${id}`, data),
+    delete: (id: string) => apiRequest("DELETE", `/api/coupons/${id}`)
   },
 
   // Dashboard
