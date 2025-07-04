@@ -62,7 +62,7 @@ export class MercadoPagoService {
           }
         },
         external_reference: paymentData.orderId,
-        notification_url: `https://acbb8d33-a7a3-4a99-b51d-e6f19111da87-00-3n70zkq2snyy7.riker.replit.dev/api/mercadopago/webhook`
+        notification_url: `${(globalThis as any).process?.env?.BASE_URL || 'http://localhost:5000'}/api/mercadopago/webhook`
       };
 
       const result = await payment.create({ body: paymentRequest });
