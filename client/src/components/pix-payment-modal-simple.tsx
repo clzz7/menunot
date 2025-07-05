@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog.js";
+import { Button } from "@/components/ui/button.js";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.js";
+import { Badge } from "@/components/ui/badge.js";
+import { Separator } from "@/components/ui/separator.js";
+import { useToast } from "@/hooks/use-toast.js";
 import { Copy, Clock, QrCode, CheckCircle2, Loader2 } from "lucide-react";
 
 interface PixPaymentModalProps {

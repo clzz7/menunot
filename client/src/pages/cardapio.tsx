@@ -1,15 +1,15 @@
 import * as React from "react";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query.js";
+import { Input } from "@/components/ui/input.js";
+import { Button } from "@/components/ui/button.js";
 import { Search, Clock } from "lucide-react";
-import { ProductCard } from "@/components/product-card";
-import { CartSidebar } from "@/components/cart-sidebar";
-import { useCart } from "@/hooks/use-cart";
-import { useToast } from "@/hooks/use-toast";
-import { api } from "@/lib/api";
-import { Product, Category } from "@shared/schema";
+import { ProductCard } from "@/components/product-card.js";
+import { CartSidebar } from "@/components/cart-sidebar.js";
+import { useCart } from "@/hooks/use-cart.js";
+import { useToast } from "@/hooks/use-toast.js";
+import { api } from "@/lib/api.js";
+import { Product, Category } from "@shared/schema.js";
 
 export default function Cardapio() {
   const [searchTerm, setSearchTerm] = useState("");

@@ -1,15 +1,15 @@
 import { useState } from "react";
-import { useCart } from "@/hooks/use-cart";
-import { useToast } from "@/hooks/use-toast";
-import { CheckoutModal } from "@/components/checkout-modal";
-import { OrderTrackingModal } from "@/components/order-tracking-modal";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { useCart } from "@/hooks/use-cart.js";
+import { useToast } from "@/hooks/use-toast.js";
+import { CheckoutModal } from "@/components/checkout-modal.js";
+import { OrderTrackingModal } from "@/components/order-tracking-modal.js";
+import { Button } from "@/components/ui/button.js";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.js";
+import { Badge } from "@/components/ui/badge.js";
+import { Separator } from "@/components/ui/separator.js";
 import { ShoppingCart, Plus, Minus, Trash2, ArrowLeft, Clock } from "lucide-react";
-import { Order } from "@shared/schema";
-import { api } from "@/lib/api";
+import { Order } from "@shared/schema.js";
+import { api } from "@/lib/api.js";
 
 export default function Checkout() {
   const { cart, updateQuantity, removeFromCart, applyCoupon, clearCart } = useCart();

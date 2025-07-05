@@ -1,15 +1,15 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query.js";
+import { Button } from "@/components/ui/button.js";
+import { Input } from "@/components/ui/input.js";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.js";
+import { Badge } from "@/components/ui/badge.js";
 import { Search, Package, Clock, CheckCircle, XCircle, RefreshCw } from "lucide-react";
-import { OrderHistoryModal } from "@/components/order-history-modal";
-import { useCart } from "@/hooks/use-cart";
-import { useToast } from "@/hooks/use-toast";
-import { api } from "@/lib/api";
-import { Order, Product } from "@shared/schema";
+import { OrderHistoryModal } from "@/components/order-history-modal.js";
+import { useCart } from "@/hooks/use-cart.js";
+import { useToast } from "@/hooks/use-toast.js";
+import { api } from "@/lib/api.js";
+import { Order, Product } from "@shared/schema.js";
 
 export default function Pedidos() {
   const [customerPhone, setCustomerPhone] = useState("");

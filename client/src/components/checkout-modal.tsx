@@ -1,20 +1,20 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { zodResolver } from "@hookform/resolvers/zod.js";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button.js";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog.js";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form.js";
+import { Input } from "@/components/ui/input.js";
+import { Textarea } from "@/components/ui/textarea.js";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group.js";
+import { Label } from "@/components/ui/label.js";
+import { Separator } from "@/components/ui/separator.js";
 import { ArrowLeft, Check, Clock } from "lucide-react";
-import { Cart, CustomerData } from "@/types";
-import { api } from "@/lib/api";
-import { useToast } from "@/hooks/use-toast";
-import { PixPaymentModal } from "./pix-payment-modal-simple";
+import { Cart, CustomerData } from "@/types.js";
+import { api } from "@/lib/api.js";
+import { useToast } from "@/hooks/use-toast.js";
+import { PixPaymentModal } from "./pix-payment-modal-simple.js";
 
 const checkoutSchema = z.object({
   whatsapp: z.string().min(1, "WhatsApp é obrigatório"),

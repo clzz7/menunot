@@ -1,11 +1,11 @@
 import { Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query.js";
+import { Button } from "@/components/ui/button.js";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.js";
+import { Badge } from "@/components/ui/badge.js";
 import { UtensilsCrossed, Package, Clock, Star, ArrowRight, Phone, MapPin, Globe } from "lucide-react";
-import { api } from "@/lib/api";
-import { Establishment } from "@shared/schema";
+import { api } from "@/lib/api.js";
+import { Establishment } from "@shared/schema.js";
 
 export default function Home() {
   const { data: establishment } = useQuery({

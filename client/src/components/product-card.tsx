@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button.js";
+import { Badge } from "@/components/ui/badge.js";
 import { Clock, Plus } from "lucide-react";
-import { Product } from "@shared/schema";
+import { Product } from "@shared/schema.js";
 
 interface ProductCardProps {
   product: Product;

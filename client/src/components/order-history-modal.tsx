@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
+import { useQuery } from "@tanstack/react-query.js";
+import { Button } from "@/components/ui/button.js";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog.js";
+import { ScrollArea } from "@/components/ui/scroll-area.js";
+import { Badge } from "@/components/ui/badge.js";
+import { Separator } from "@/components/ui/separator.js";
+import { Input } from "@/components/ui/input.js";
 import { History, X, RotateCcw, ShoppingCart, Search } from "lucide-react";
-import { api } from "@/lib/api";
-import { Order } from "@shared/schema";
+import { api } from "@/lib/api.js";
+import { Order } from "@shared/schema.js";
 
 interface OrderHistoryModalProps {
   isOpen: boolean;

@@ -1,5 +1,5 @@
 import { useState, useCallback, createContext, useContext, ReactNode } from "react";
-import { Cart, CartItem } from "@/types";
+import { Cart, CartItem } from "@/types.js";
 
 // ---------------------------------------------------------------
 // Initial cart shape

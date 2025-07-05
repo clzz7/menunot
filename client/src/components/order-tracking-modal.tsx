@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button.js";
+import { Dialog, DialogContent } from "@/components/ui/dialog.js";
+import { Badge } from "@/components/ui/badge.js";
 import { Check, Clock, Utensils, Bell, Truck, Home, History, Plus } from "lucide-react";
-import { Order } from "@shared/schema";
+import { Order } from "@shared/schema.js";
 
 interface OrderTrackingModalProps {
   isOpen: boolean;

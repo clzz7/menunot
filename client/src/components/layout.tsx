@@ -1,11 +1,11 @@
 import { ReactNode, useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button.js";
+import { Badge } from "@/components/ui/badge.js";
 import { ShoppingCart, Menu, Home, UtensilsCrossed, Package, History, X } from "lucide-react";
-import { useCart } from "@/hooks/use-cart";
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api";
+import { useCart } from "@/hooks/use-cart.js";
+import { useQuery } from "@tanstack/react-query.js";
+import { api } from "@/lib/api.js";
 
 interface LayoutProps {
   children: ReactNode;

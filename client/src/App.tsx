@@ -1,20 +1,20 @@
 import { Switch, Route } from "wouter";
-import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import Layout from "@/components/layout";
-import Home from "@/pages/home";
-import Cardapio from "@/pages/cardapio";
-import Pedidos from "@/pages/pedidos";
-import Checkout from "@/pages/checkout";
-import Rastreamento from "@/pages/rastreamento";
-import Admin from "@/pages/admin";
-import NotFound from "@/pages/not-found";
-import PaymentSuccess from "@/pages/payment-success";
-import PaymentFailure from "@/pages/payment-failure";
-import PaymentPending from "@/pages/payment-pending";
-import { CartProvider } from "@/hooks/use-cart";
+import { queryClient } from "./lib/queryClient.js";
+import { QueryClientProvider } from "@tanstack/react-query.js";
+import { Toaster } from "@/components/ui/toaster.js";
+import { TooltipProvider } from "@/components/ui/tooltip.js";
+import Layout from "@/components/layout.js";
+import Home from "@/pages/home.js";
+import Cardapio from "@/pages/cardapio.js";
+import Pedidos from "@/pages/pedidos.js";
+import Checkout from "@/pages/checkout.js";
+import Rastreamento from "@/pages/rastreamento.js";
+import Admin from "@/pages/admin.js";
+import NotFound from "@/pages/not-found.js";
+import PaymentSuccess from "@/pages/payment-success.js";
+import PaymentFailure from "@/pages/payment-failure.js";
+import PaymentPending from "@/pages/payment-pending.js";
+import { CartProvider } from "@/hooks/use-cart.js";
 
 function Router() {
   return (
