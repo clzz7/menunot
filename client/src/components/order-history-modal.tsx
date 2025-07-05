@@ -88,17 +88,17 @@ export function OrderHistoryModal({
     return statusMap[status] || { label: status, variant: 'secondary' as const };
   };
 
-  const currentOrder = orders.find(order => 
+  const currentOrder = Array.isArray(orders) ? orders.find(order => 
     ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'OUT_DELIVERY'].includes(order.status)
-  );
+  ) : null;
   
-  const pastOrders = orders.filter(order => 
+  const pastOrders = Array.isArray(orders) ? orders.filter(order => 
     ['DELIVERED', 'CANCELLED'].includes(order.status)
-  );
+  ) : [];
 
   // Calculate statistics
-  const totalOrders = orders.length;
-  const totalSpent = orders.reduce((sum, order) => sum + Number(order.total), 0);
+  const totalOrders = Array.isArray(orders) ? orders.length : 0;
+  const totalSpent = Array.isArray(orders) ? orders.reduce((sum, order) => sum + Number(order.total), 0) : 0;
   const averageOrder = totalOrders > 0 ? totalSpent / totalOrders : 0;
 
   return (

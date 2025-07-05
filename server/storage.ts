@@ -241,8 +241,8 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(orders)
-      .where(eq(orders.customerId, customerId))
-      .orderBy(desc(orders.createdAt));
+      .where(eq(orders.customer_id, customerId))
+      .orderBy(desc(orders.created_at));
   }
 
   async createOrder(order: InsertOrder): Promise<Order> {
