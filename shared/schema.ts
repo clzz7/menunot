@@ -4,7 +4,7 @@ import {
   integer, 
   real
 } from "drizzle-orm/sqlite-core";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -19,34 +19,32 @@ export const establishments = sqliteTable("establishments", {
   logo: text("logo"),
   delivery_fee: real("delivery_fee").notNull().default(0),
   minimum_order: real("minimum_order").notNull().default(0),
-  delivery_time: text("delivery_time").notNull().default("30-45 min"),
   is_open: integer("is_open", { mode: "boolean" }).notNull().default(true),
-  opening_hours: text("opening_hours"),
-  payment_methods: text("payment_methods"),
-  created_at: text("created_at").notNull(),
-  updated_at: text("updated_at").notNull()
+  is_active: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  created_at: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updated_at: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`)
 });
 
 // Customers table
 export const customers = sqliteTable("customers", {
   id: text("id").primaryKey(),
-  whatsapp: text("whatsapp").notNull().unique(),
+  number: text("number").notNull().unique(),
   name: text("name").notNull(),
+  whatsapp: text("whatsapp").notNull().unique(),
   email: text("email"),
   address: text("address").notNull(),
-  number: text("number").notNull(),
   complement: text("complement"),
   neighborhood: text("neighborhood").notNull(),
   city: text("city").notNull(),
   state: text("state").notNull(),
   zip_code: text("zip_code").notNull(),
-  reference: text("reference"),
-  default_payment_method: text("default_payment_method").notNull().default("CASH"),
+  default_payment_method: text("default_payment_method").notNull().default("pix"),
   total_orders: integer("total_orders").notNull().default(0),
   total_spent: real("total_spent").notNull().default(0),
   last_order_at: text("last_order_at"),
-  created_at: text("created_at").notNull(),
-  updated_at: text("updated_at").notNull()
+  is_active: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  created_at: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updated_at: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`)
 });
 
 // Categories table
@@ -54,12 +52,11 @@ export const categories = sqliteTable("categories", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   description: text("description"),
-  image: text("image"),
+  establishment_id: text("establishment_id").notNull(),
   is_active: integer("is_active", { mode: "boolean" }).notNull().default(true),
   sort_order: integer("sort_order").notNull().default(0),
-  establishment_id: text("establishment_id").notNull(),
-  created_at: text("created_at").notNull(),
-  updated_at: text("updated_at").notNull()
+  created_at: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updated_at: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`)
 });
 
 // Products table
@@ -73,10 +70,10 @@ export const products = sqliteTable("products", {
   establishment_id: text("establishment_id").notNull(),
   is_active: integer("is_active", { mode: "boolean" }).notNull().default(true),
   sort_order: integer("sort_order").notNull().default(0),
-  preparation_time: text("preparation_time").notNull().default("15 min"),
+  preparation_time: text("preparation_time"),
   options: text("options"),
-  created_at: text("created_at").notNull(),
-  updated_at: text("updated_at").notNull()
+  created_at: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updated_at: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`)
 });
 
 // Orders table
@@ -85,23 +82,23 @@ export const orders = sqliteTable("orders", {
   order_number: text("order_number").notNull().unique(),
   customer_id: text("customer_id").notNull(),
   establishment_id: text("establishment_id").notNull(),
-  status: text("status").notNull().default("PENDING"),
+  status: text("status").notNull().default("pending"),
   total_amount: real("total_amount").notNull(),
   delivery_fee: real("delivery_fee").notNull().default(0),
   discount_amount: real("discount_amount").notNull().default(0),
-  coupon_code: text("coupon_code"),
-  payment_method: text("payment_method").notNull(),
+  payment_method: text("payment_method").notNull().default("pix"),
+  customer_notes: text("customer_notes"),
   delivery_address: text("delivery_address").notNull(),
-  observations: text("observations"),
+  delivery_time: text("delivery_time"),
   estimated_delivery: text("estimated_delivery"),
-  confirmed_at: text("confirmed_at"),
   prepared_at: text("prepared_at"),
+  dispatched_at: text("dispatched_at"),
   delivered_at: text("delivered_at"),
-  created_at: text("created_at").notNull(),
-  updated_at: text("updated_at").notNull()
+  created_at: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updated_at: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`)
 });
 
-// Order Items table
+// Order items table
 export const orderItems = sqliteTable("order_items", {
   id: text("id").primaryKey(),
   order_id: text("order_id").notNull(),
@@ -109,39 +106,37 @@ export const orderItems = sqliteTable("order_items", {
   quantity: integer("quantity").notNull(),
   unit_price: real("unit_price").notNull(),
   total_price: real("total_price").notNull(),
+  product_options: text("product_options"),
   observations: text("observations"),
-  options: text("options"),
-  created_at: text("created_at").notNull(),
-  updated_at: text("updated_at").notNull()
+  created_at: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updated_at: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`)
 });
 
 // Coupons table
 export const coupons = sqliteTable("coupons", {
   id: text("id").primaryKey(),
   code: text("code").notNull().unique(),
+  name: text("name").notNull(),
   description: text("description"),
-  type: text("type").notNull().default("PERCENTAGE"),
-  value: real("value").notNull(),
-  minimum_order: real("minimum_order"),
-  max_discount: real("max_discount"),
-  is_active: integer("is_active", { mode: "boolean" }).notNull().default(true),
-  usage_limit: integer("usage_limit"),
-  usage_count: integer("usage_count").notNull().default(0),
-  valid_from: text("valid_from").notNull(),
-  valid_until: text("valid_until").notNull(),
+  discount_type: text("discount_type").notNull().default("percentage"),
+  discount_value: real("discount_value").notNull(),
+  minimum_order: real("minimum_order").notNull().default(0),
+  max_uses: integer("max_uses"),
+  current_uses: integer("current_uses").notNull().default(0),
   establishment_id: text("establishment_id").notNull(),
-  created_at: text("created_at").notNull(),
-  updated_at: text("updated_at").notNull()
+  expires_at: text("expires_at"),
+  is_active: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  created_at: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updated_at: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`)
 });
 
-// Users table
+// Users table (for authentication)
 export const users = sqliteTable("users", {
   id: text("id").primaryKey(),
   username: text("username").notNull().unique(),
-  email: text("email").notNull().unique(),
-  password_hash: text("password_hash").notNull(),
-  created_at: text("created_at").notNull(),
-  updated_at: text("updated_at").notNull()
+  password: text("password").notNull(),
+  created_at: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updated_at: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`)
 });
 
 // Relations
@@ -203,8 +198,7 @@ export const couponsRelations = relations(coupons, ({ one, many }) => ({
   establishment: one(establishments, {
     fields: [coupons.establishment_id],
     references: [establishments.id]
-  }),
-  orders: many(orders)
+  })
 }));
 
 // Zod schemas
@@ -229,7 +223,7 @@ export const selectOrderItemSchema = createSelectSchema(orderItems);
 export const insertCouponSchema = createInsertSchema(coupons);
 export const selectCouponSchema = createSelectSchema(coupons);
 
-// Types
+// TypeScript types
 export type Establishment = typeof establishments.$inferSelect;
 export type InsertEstablishment = typeof establishments.$inferInsert;
 
@@ -251,11 +245,10 @@ export type InsertOrderItem = typeof orderItems.$inferInsert;
 export type Coupon = typeof coupons.$inferSelect;
 export type InsertCoupon = typeof coupons.$inferInsert;
 
-// User types
+// User-related schemas and types
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
-  email: true,
-  password_hash: true
+  password: true,
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

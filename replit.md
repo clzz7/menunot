@@ -97,10 +97,33 @@ This is a full-stack delivery platform designed for individual restaurants to ha
 
 The architecture prioritizes simplicity, real-time functionality, and a seamless customer experience while providing restaurant owners with complete control over their delivery platform.
 
+## Database Configuration
+
+### Current Setup
+- **Database**: SQLite (local development)
+- **File**: `database.sqlite` 
+- **ORM**: Drizzle ORM with better-sqlite3
+- **Schema**: Located in `shared/schema.ts`
+
+### PostgreSQL Migration Ready
+The application is prepared for PostgreSQL migration when needed:
+- PostgreSQL schema ready in development
+- Drizzle configuration supports both SQLite and PostgreSQL
+- Environment variable `DATABASE_URL` can switch between databases
+
+### Migration Steps (When PostgreSQL is Available)
+1. Provision PostgreSQL database in Replit
+2. Update `drizzle.config.ts` to use PostgreSQL dialect
+3. Update `server/db.ts` to use Neon serverless
+4. Run `npm run db:push` to create PostgreSQL tables
+5. Migrate data if needed
+
 ## Changelog
 ```
 Changelog:
-- June 27, 2025. Initial setup
+- July 5, 2025: Migration from Replit Agent to Replit completed
+- July 5, 2025: Database preparation for PostgreSQL migration
+- June 27, 2025: Initial setup
 ```
 
 ## User Preferences
