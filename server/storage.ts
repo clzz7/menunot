@@ -96,7 +96,7 @@ export class DatabaseStorage implements IStorage {
   async updateEstablishment(id: string, data: Partial<InsertEstablishment>): Promise<Establishment> {
     const [updated] = await db
       .update(establishments)
-      .set({ ...data, updatedAt: new Date() })
+      .set({ ...data, updated_at: new Date().toISOString() })
       .where(eq(establishments.id, id))
       .returning();
     return updated;

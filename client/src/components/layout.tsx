@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button.js";
 import { Badge } from "@/components/ui/badge.js";
 import { ShoppingCart, Menu, Home, UtensilsCrossed, Package, History, X } from "lucide-react";
 import { useCart } from "@/hooks/use-cart.js";
-import { useQuery } from "@tanstack/react-query.js";
+import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api.js";
 
 interface LayoutProps {

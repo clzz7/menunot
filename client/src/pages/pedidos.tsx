@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query.js";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button.js";
 import { Input } from "@/components/ui/input.js";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.js";

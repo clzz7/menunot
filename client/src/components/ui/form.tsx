@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-import * as LabelPrimitive from "@radix-ui/react-label.js"
-import { Slot } from "@radix-ui/react-slot.js"
+import * as LabelPrimitive from "@radix-ui/react-label"
+import { Slot } from "@radix-ui/react-slot"
 import {
   Controller,
   FormProvider,

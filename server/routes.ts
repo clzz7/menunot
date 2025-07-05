@@ -43,21 +43,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!establishment) {
         // Create default establishment if none exists
         const defaultEstablishment = await storage.createEstablishment({
+          id: "est_1",
           name: "Bella Pasta",
           description: "Italiana Autêntica",
           phone: "(11) 99999-9999",
           address: "Rua das Flores, 123 - Centro",
-          deliveryFee: "5.00",
-          minimumOrder: "20.00",
-          openingHours: {
-            monday: { open: "18:00", close: "23:00" },
-            tuesday: { open: "18:00", close: "23:00" },
-            wednesday: { open: "18:00", close: "23:00" },
-            thursday: { open: "18:00", close: "23:00" },
-            friday: { open: "18:00", close: "23:30" },
-            saturday: { open: "18:00", close: "23:30" },
-            sunday: { open: "18:00", close: "22:00" }
-          }
+          delivery_fee: 5.00,
+          minimum_order: 20.00,
+          delivery_time: "30-45 min",
+          is_open: true,
+          opening_hours: "18:00-23:00",
+          payment_methods: "PIX,Cartão,Dinheiro",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         });
         res.json(defaultEstablishment);
       } else {

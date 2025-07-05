@@ -1,5 +1,5 @@
 import * as React from "react"
-import * as SwitchPrimitives from "@radix-ui/react-switch.js"
+import * as SwitchPrimitives from "@radix-ui/react-switch"
 
 import { cn } from "@/lib/utils.js"
 

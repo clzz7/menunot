@@ -1,208 +1,147 @@
 import { 
-  pgTable, 
+  sqliteTable, 
   text, 
-  serial, 
   integer, 
-  boolean, 
-  decimal, 
-  timestamp, 
-  json,
-  varchar
-} from "drizzle-orm/pg-core";
+  real
+} from "drizzle-orm/sqlite-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
 // Establishments table
-export const establishments = pgTable("establishments", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+export const establishments = sqliteTable("establishments", {
+  id: text("id").primaryKey(),
   name: text("name").notNull(),
   description: text("description"),
   phone: text("phone").notNull(),
   email: text("email"),
   address: text("address").notNull(),
   logo: text("logo"),
-  banner: text("banner"),
-  primaryColor: text("primary_color").notNull().default("#FF6B35"),
-  secondaryColor: text("secondary_color").notNull().default("#F7931E"),
-  
-  // Operating settings
-  isOpen: boolean("is_open").notNull().default(true),
-  openingHours: json("opening_hours").$type<Record<string, { open: string; close: string }>>(),
-  preparationTime: integer("preparation_time").notNull().default(30),
-  
-  // Delivery settings
-  deliveryFee: decimal("delivery_fee", { precision: 10, scale: 2 }).notNull(),
-  minimumOrder: decimal("minimum_order", { precision: 10, scale: 2 }).notNull(),
-  deliveryAreas: json("delivery_areas").$type<string[]>(),
-  
-  // Payment settings
-  acceptsCard: boolean("accepts_card").notNull().default(true),
-  acceptsPix: boolean("accepts_pix").notNull().default(true),
-  acceptsCash: boolean("accepts_cash").notNull().default(true),
-  pixKey: text("pix_key"),
-  
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow()
+  delivery_fee: real("delivery_fee").notNull().default(0),
+  minimum_order: real("minimum_order").notNull().default(0),
+  delivery_time: text("delivery_time").notNull().default("30-45 min"),
+  is_open: integer("is_open", { mode: "boolean" }).notNull().default(true),
+  opening_hours: text("opening_hours"),
+  payment_methods: text("payment_methods"),
+  created_at: text("created_at").notNull(),
+  updated_at: text("updated_at").notNull()
 });
 
 // Customers table
-export const customers = pgTable("customers", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+export const customers = sqliteTable("customers", {
+  id: text("id").primaryKey(),
   whatsapp: text("whatsapp").notNull().unique(),
   name: text("name").notNull(),
   email: text("email"),
-  
-  // Default address
   address: text("address").notNull(),
   number: text("number").notNull(),
   complement: text("complement"),
   neighborhood: text("neighborhood").notNull(),
   city: text("city").notNull(),
   state: text("state").notNull(),
-  zipCode: text("zip_code").notNull(),
+  zip_code: text("zip_code").notNull(),
   reference: text("reference"),
-  
-  // Default payment method
-  defaultPaymentMethod: text("default_payment_method").notNull().default("CASH"),
-  
-  // Statistics
-  totalOrders: integer("total_orders").notNull().default(0),
-  totalSpent: decimal("total_spent", { precision: 10, scale: 2 }).notNull().default("0"),
-  lastOrderAt: timestamp("last_order_at"),
-  
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow()
+  default_payment_method: text("default_payment_method").notNull().default("CASH"),
+  total_orders: integer("total_orders").notNull().default(0),
+  total_spent: real("total_spent").notNull().default(0),
+  last_order_at: text("last_order_at"),
+  created_at: text("created_at").notNull(),
+  updated_at: text("updated_at").notNull()
 });
 
 // Categories table
-export const categories = pgTable("categories", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+export const categories = sqliteTable("categories", {
+  id: text("id").primaryKey(),
   name: text("name").notNull(),
   description: text("description"),
   image: text("image"),
-  isActive: boolean("is_active").notNull().default(true),
-  sortOrder: integer("sort_order").notNull().default(0),
-  
-  establishmentId: text("establishment_id").notNull().references(() => establishments.id, { onDelete: "cascade" }),
-  
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow()
+  is_active: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  sort_order: integer("sort_order").notNull().default(0),
+  establishment_id: text("establishment_id").notNull(),
+  created_at: text("created_at").notNull(),
+  updated_at: text("updated_at").notNull()
 });
 
 // Products table
-export const products = pgTable("products", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+export const products = sqliteTable("products", {
+  id: text("id").primaryKey(),
   name: text("name").notNull(),
   description: text("description"),
-  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  price: real("price").notNull(),
   image: text("image"),
-  isActive: boolean("is_active").notNull().default(true),
-  isAvailable: boolean("is_available").notNull().default(true),
-  preparationTime: integer("preparation_time"),
-  sortOrder: integer("sort_order").notNull().default(0),
-  
-  // Product options
-  hasOptions: boolean("has_options").notNull().default(false),
-  options: json("options").$type<{
-    sizes?: Array<{ name: string; price: number }>;
-    extras?: Array<{ name: string; price: number }>;
-  }>(),
-  
-  categoryId: text("category_id").notNull().references(() => categories.id, { onDelete: "cascade" }),
-  establishmentId: text("establishment_id").notNull().references(() => establishments.id, { onDelete: "cascade" }),
-  
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow()
+  category_id: text("category_id").notNull(),
+  establishment_id: text("establishment_id").notNull(),
+  is_active: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  sort_order: integer("sort_order").notNull().default(0),
+  preparation_time: text("preparation_time").notNull().default("15 min"),
+  options: text("options"),
+  created_at: text("created_at").notNull(),
+  updated_at: text("updated_at").notNull()
 });
 
 // Orders table
-export const orders = pgTable("orders", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
-  orderNumber: text("order_number").notNull().unique(),
+export const orders = sqliteTable("orders", {
+  id: text("id").primaryKey(),
+  order_number: text("order_number").notNull().unique(),
+  customer_id: text("customer_id").notNull(),
+  establishment_id: text("establishment_id").notNull(),
   status: text("status").notNull().default("PENDING"),
-  
-  // Customer data at time of order
-  customerName: text("customer_name").notNull(),
-  customerPhone: text("customer_phone").notNull(),
-  customerEmail: text("customer_email"),
-  
-  // Delivery address
-  deliveryAddress: text("delivery_address").notNull(),
-  deliveryNumber: text("delivery_number").notNull(),
-  deliveryComplement: text("delivery_complement"),
-  deliveryNeighborhood: text("delivery_neighborhood").notNull(),
-  deliveryCity: text("delivery_city").notNull(),
-  deliveryState: text("delivery_state").notNull(),
-  deliveryZipCode: text("delivery_zip_code").notNull(),
-  deliveryReference: text("delivery_reference"),
-  
-  // Financial
-  subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
-  deliveryFee: decimal("delivery_fee", { precision: 10, scale: 2 }).notNull(),
-  discount: decimal("discount", { precision: 10, scale: 2 }).notNull().default("0"),
-  total: decimal("total", { precision: 10, scale: 2 }).notNull(),
-  
-  // Payment
-  paymentMethod: text("payment_method").notNull(),
-  paymentStatus: text("payment_status").notNull().default("PENDING"),
-  
-  // Additional info
+  total_amount: real("total_amount").notNull(),
+  delivery_fee: real("delivery_fee").notNull().default(0),
+  discount_amount: real("discount_amount").notNull().default(0),
+  coupon_code: text("coupon_code"),
+  payment_method: text("payment_method").notNull(),
+  delivery_address: text("delivery_address").notNull(),
   observations: text("observations"),
-  estimatedTime: integer("estimated_time"),
-  
-  // Status timestamps
-  confirmedAt: timestamp("confirmed_at"),
-  preparingAt: timestamp("preparing_at"),
-  readyAt: timestamp("ready_at"),
-  deliveredAt: timestamp("delivered_at"),
-  
-  customerId: text("customer_id").notNull().references(() => customers.id),
-  establishmentId: text("establishment_id").notNull().references(() => establishments.id),
-  couponId: text("coupon_id").references(() => coupons.id),
-  
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow()
+  estimated_delivery: text("estimated_delivery"),
+  confirmed_at: text("confirmed_at"),
+  prepared_at: text("prepared_at"),
+  delivered_at: text("delivered_at"),
+  created_at: text("created_at").notNull(),
+  updated_at: text("updated_at").notNull()
 });
 
-// Order items table
-export const orderItems = pgTable("order_items", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+// Order Items table
+export const orderItems = sqliteTable("order_items", {
+  id: text("id").primaryKey(),
+  order_id: text("order_id").notNull(),
+  product_id: text("product_id").notNull(),
   quantity: integer("quantity").notNull(),
-  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
-  totalPrice: decimal("total_price", { precision: 10, scale: 2 }).notNull(),
-  
-  // Selected options at time of order
-  selectedOptions: json("selected_options").$type<Record<string, any>>(),
+  unit_price: real("unit_price").notNull(),
+  total_price: real("total_price").notNull(),
   observations: text("observations"),
-  
-  orderId: text("order_id").notNull().references(() => orders.id, { onDelete: "cascade" }),
-  productId: text("product_id").notNull().references(() => products.id),
-  
-  createdAt: timestamp("created_at").notNull().defaultNow()
+  options: text("options"),
+  created_at: text("created_at").notNull(),
+  updated_at: text("updated_at").notNull()
 });
 
 // Coupons table
-export const coupons = pgTable("coupons", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+export const coupons = sqliteTable("coupons", {
+  id: text("id").primaryKey(),
   code: text("code").notNull().unique(),
   description: text("description"),
   type: text("type").notNull().default("PERCENTAGE"),
-  value: decimal("value", { precision: 10, scale: 2 }).notNull(),
-  minimumOrder: decimal("minimum_order", { precision: 10, scale: 2 }),
-  maxDiscount: decimal("max_discount", { precision: 10, scale: 2 }),
-  
-  isActive: boolean("is_active").notNull().default(true),
-  usageLimit: integer("usage_limit"),
-  usageCount: integer("usage_count").notNull().default(0),
-  
-  validFrom: timestamp("valid_from").notNull(),
-  validUntil: timestamp("valid_until").notNull(),
-  
-  establishmentId: text("establishment_id").notNull().references(() => establishments.id, { onDelete: "cascade" }),
-  
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow()
+  value: real("value").notNull(),
+  minimum_order: real("minimum_order"),
+  max_discount: real("max_discount"),
+  is_active: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  usage_limit: integer("usage_limit"),
+  usage_count: integer("usage_count").notNull().default(0),
+  valid_from: text("valid_from").notNull(),
+  valid_until: text("valid_until").notNull(),
+  establishment_id: text("establishment_id").notNull(),
+  created_at: text("created_at").notNull(),
+  updated_at: text("updated_at").notNull()
+});
+
+// Users table
+export const users = sqliteTable("users", {
+  id: text("id").primaryKey(),
+  username: text("username").notNull().unique(),
+  email: text("email").notNull().unique(),
+  password_hash: text("password_hash").notNull(),
+  created_at: text("created_at").notNull(),
+  updated_at: text("updated_at").notNull()
 });
 
 // Relations
@@ -219,7 +158,7 @@ export const customersRelations = relations(customers, ({ many }) => ({
 
 export const categoriesRelations = relations(categories, ({ one, many }) => ({
   establishment: one(establishments, {
-    fields: [categories.establishmentId],
+    fields: [categories.establishment_id],
     references: [establishments.id]
   }),
   products: many(products)
@@ -227,11 +166,11 @@ export const categoriesRelations = relations(categories, ({ one, many }) => ({
 
 export const productsRelations = relations(products, ({ one, many }) => ({
   category: one(categories, {
-    fields: [products.categoryId],
+    fields: [products.category_id],
     references: [categories.id]
   }),
   establishment: one(establishments, {
-    fields: [products.establishmentId],
+    fields: [products.establishment_id],
     references: [establishments.id]
   }),
   orderItems: many(orderItems)
@@ -239,34 +178,30 @@ export const productsRelations = relations(products, ({ one, many }) => ({
 
 export const ordersRelations = relations(orders, ({ one, many }) => ({
   customer: one(customers, {
-    fields: [orders.customerId],
+    fields: [orders.customer_id],
     references: [customers.id]
   }),
   establishment: one(establishments, {
-    fields: [orders.establishmentId],
+    fields: [orders.establishment_id],
     references: [establishments.id]
-  }),
-  coupon: one(coupons, {
-    fields: [orders.couponId],
-    references: [coupons.id]
   }),
   items: many(orderItems)
 }));
 
 export const orderItemsRelations = relations(orderItems, ({ one }) => ({
   order: one(orders, {
-    fields: [orderItems.orderId],
+    fields: [orderItems.order_id],
     references: [orders.id]
   }),
   product: one(products, {
-    fields: [orderItems.productId],
+    fields: [orderItems.product_id],
     references: [products.id]
   })
 }));
 
 export const couponsRelations = relations(coupons, ({ one, many }) => ({
   establishment: one(establishments, {
-    fields: [coupons.establishmentId],
+    fields: [coupons.establishment_id],
     references: [establishments.id]
   }),
   orders: many(orders)
@@ -316,16 +251,11 @@ export type InsertOrderItem = typeof orderItems.$inferInsert;
 export type Coupon = typeof coupons.$inferSelect;
 export type InsertCoupon = typeof coupons.$inferInsert;
 
-// Legacy user table (keeping for compatibility)
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-});
-
+// User types
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
-  password: true,
+  email: true,
+  password_hash: true
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

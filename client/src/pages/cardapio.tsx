@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query.js";
+import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input.js";
 import { Button } from "@/components/ui/button.js";
 import { Search, Clock } from "lucide-react";
