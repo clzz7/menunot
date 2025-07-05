@@ -71,11 +71,9 @@ export default function Pedidos() {
         // Find the product to get current details
         const product = products.find((p: Product) => p.id === item.productId);
         if (product) {
-          addToCart({
-            ...product,
-            selectedOptions: item.selectedOptions,
-            observations: item.observations
-          }, item.quantity);
+          for (let i = 0; i < item.quantity; i++) {
+            addToCart(product, item.selectedOptions, item.observations);
+          }
         }
       }
       

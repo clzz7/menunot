@@ -14,6 +14,7 @@ import NotFound from "@/pages/not-found";
 import PaymentSuccess from "@/pages/payment-success";
 import PaymentFailure from "@/pages/payment-failure";
 import PaymentPending from "@/pages/payment-pending";
+import { CartProvider } from "@/hooks/use-cart";
 
 function Router() {
   return (
@@ -35,12 +36,14 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Layout>
-          <Router />
-        </Layout>
-      </TooltipProvider>
+      <CartProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Layout>
+            <Router />
+          </Layout>
+        </TooltipProvider>
+      </CartProvider>
     </QueryClientProvider>
   );
 }

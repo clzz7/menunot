@@ -18,16 +18,16 @@ export default function Checkout() {
   const [isOrderTrackingOpen, setIsOrderTrackingOpen] = useState(false);
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
 
-  const handleUpdateQuantity = (productId: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(productId);
+  const handleUpdateQuantity = (item: typeof cart.items[number], change: number) => {
+    if (item.quantity + change <= 0) {
+      removeFromCart(item.id, item.selectedOptions);
     } else {
-      updateQuantity(productId, quantity);
+      updateQuantity(item.id, change, item.selectedOptions);
     }
   };
 
-  const handleRemoveItem = (productId: string) => {
-    removeFromCart(productId);
+  const handleRemoveItem = (item: typeof cart.items[number]) => {
+    removeFromCart(item.id, item.selectedOptions);
     toast({
       title: "Item removido",
       description: "O item foi removido do carrinho",
@@ -154,12 +154,12 @@ export default function Checkout() {
                         <p className="text-sm text-gray-600 mt-1">{item.description}</p>
                       )}
                       
-                      {item.selectedOptions && item.selectedOptions.length > 0 && (
+                      {item.selectedOptions && Object.keys(item.selectedOptions).length > 0 && (
                         <div className="mt-2">
                           <div className="flex flex-wrap gap-1">
-                            {item.selectedOptions.map((option: any, index: number) => (
-                              <Badge key={index} variant="secondary" className="text-xs">
-                                {option.name}: {option.value}
+                            {Object.entries(item.selectedOptions).map(([key, value], idx) => (
+                              <Badge key={idx} variant="secondary" className="text-xs">
+                                {key}: {value}
                               </Badge>
                             ))}
                           </div>
@@ -177,7 +177,7 @@ export default function Checkout() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
+                            onClick={() => handleUpdateQuantity(item, -1)}
                             className="h-8 w-8 p-0"
                           >
                             <Minus className="w-3 h-3" />
@@ -186,7 +186,7 @@ export default function Checkout() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
+                            onClick={() => handleUpdateQuantity(item, 1)}
                             className="h-8 w-8 p-0"
                           >
                             <Plus className="w-3 h-3" />
@@ -200,7 +200,7 @@ export default function Checkout() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleRemoveItem(item.id)}
+                            onClick={() => handleRemoveItem(item)}
                             className="text-red-500 hover:text-red-700 h-8 w-8 p-0"
                           >
                             <Trash2 className="w-3 h-3" />
