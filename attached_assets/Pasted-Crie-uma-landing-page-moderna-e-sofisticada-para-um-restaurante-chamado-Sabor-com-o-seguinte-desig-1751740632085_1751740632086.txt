@@ -1,0 +1,78 @@
+Crie uma landing page moderna e sofisticada para um restaurante chamado "Sabor" com o seguinte design e estrutura:
+**DESIGN SYSTEM:**
+* Paleta principal: Laranja caloroso (#f97316) como cor primária, tons terrosos e dourados como acentos
+* Estilo: Glassmorphism moderno com elementos orgânicos
+* Tipografia: Font display elegante para títulos, sans-serif clean para corpo
+* Animações suaves: Fade-in, parallax sutil, hover effects elegantes
+**ESTRUTURA DA PÁGINA:**
+1. **Hero Section:**
+   * Título impactante: "Sabor: Where Tradition Meets Innovation"
+   * Subtítulo: "Experience culinary artistry where every dish tells a story of passion and creativity"
+   * CTA principal: "Reserve Your Table"
+   * Background: Imagem atmosférica de pratos gourmet
+   * Elemento visual: Animação Lottie de utensílios culinários ou ingredientes
+2. **Why Fine Dining Section:**
+   * Título: "Why Choose Artisanal Cuisine?"
+   * 3 cards com ícones:
+      * "Curated Ingredients" - Ingredientes selecionados de produtores locais
+      * "Master Chefs" - Equipe de chefs com experiência internacional
+      * "Unique Experience" - Ambiente intimista e serviço personalizado
+3. **Menu Highlights:**
+   * Showcase dos pratos principais com fotos profissionais
+   * Descrições poéticas dos sabores e técnicas
+   * Preços elegantemente apresentados
+   * Categorias: Entradas, Pratos Principais, Sobremesas
+4. **Details Section:**
+   * "The Sabor Experience"
+   * Informações sobre:
+      * Filosofia culinária
+      * Ingredientes sazonais
+      * Técnicas de preparo artesanais
+      * Carta de vinhos selecionados
+5. **Gallery Showcase:**
+   * Fotos do ambiente interno
+   * Pratos em preparação na cozinha aberta
+   * Momentos especiais dos clientes
+   * Design de interiores e atmosfera
+6. **Features:**
+   * "What Makes Us Special"
+   * Ícones com descrições:
+      * Chef's Table Experience
+      * Wine Pairing Expert
+      * Private Events
+      * Seasonal Menu
+7. **Testimonials:**
+   * Depoimentos de clientes sobre experiências gastronômicas
+   * Reviews de críticos culinários
+   * Fotos dos clientes em momentos especiais
+8. **Newsletter:**
+   * "Stay Updated with Seasonal Menus"
+   * Inscrição para receber novidades sobre eventos especiais e novos pratos
+9. **Made by Chefs:**
+   * Seção sobre a equipe de chefes
+   * Histórias pessoais e trajetórias culinárias
+   * Filosofia da cozinha
+**FUNCIONALIDADES TÉCNICAS:**
+* Responsivo (mobile-first)
+* Animações triggered por scroll
+* Efeitos parallax sutis
+* Hover effects em cards e botões
+* Loading states elegantes
+* Performance otimizada
+**ASSETS NECESSÁRIOS:**
+* Fotos profissionais de pratos gourmet
+* Imagens do ambiente interno
+* Ícones culinários minimalistas
+* Animação Lottie de elementos gastronômicos
+* Background patterns sutis
+**PALETA DE CORES:**
+* Primário: Laranja caloroso (#f97316)
+* Secundário: Dourado elegante (#fbbf24)
+* Neutros: Tons terrosos e cremes
+* Acentos: Verde oliva e burgundy
+**COPY/TEXTOS:**
+* Tom sofisticado mas acessível
+* Foco na experiência sensorial
+* Storytelling sobre ingredientes e técnicas
+* Call-to-actions convidativos ("Reserve Your Table", "Discover Our Menu")
+Este prompt mantém a mesma qualidade e detalhamento do original, mas adaptado para o contexto gastronômico.

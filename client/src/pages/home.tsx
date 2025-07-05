@@ -1,15 +1,22 @@
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button.js";
 import { Card } from "@/components/ui/card.js";
-import { UtensilsCrossed, Package, Star, Clock } from "lucide-react";
-import { api } from "@/lib/api.js";
-import { useCart } from "@/hooks/use-cart.js";
+import { Badge } from "@/components/ui/badge.js";
+import { Input } from "@/components/ui/input.js";
 import { CartSidebar } from "@/components/cart-sidebar.js";
-import { useState } from "react";
+import { api } from "@/lib/api.js";
+import { useQuery } from "@tanstack/react-query";
+import { useCart } from "@/hooks/use-cart.js";
+import { 
+  ShoppingBag, Star, Clock, MapPin, ChefHat, Leaf, 
+  Wine, Award, Users, Calendar, ArrowRight, Sparkles 
+} from "lucide-react";
+import { motion } from "framer-motion";
 
-export default function Home() {
+function Home() {
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [email, setEmail] = useState("");
   const { cart, updateQuantity, removeFromCart } = useCart();
   
   const { data: establishment } = useQuery({
@@ -22,238 +29,400 @@ export default function Home() {
     queryFn: api.products.getAll
   });
 
-  // Get featured products (first 3)
-  const featuredProducts = Array.isArray(products) ? products.slice(0, 3) : [];
+  // Get featured products (first 6)
+  const featuredProducts = Array.isArray(products) ? products.slice(0, 6) : [];
+
+  const handleCheckout = () => {
+    window.location.href = "/checkout";
+  };
+
+  const handleNewsletterSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Handle newsletter subscription
+    setEmail("");
+  };
 
   if (!establishment) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando...</p>
+          <p className="mt-4 text-muted-foreground">Carregando...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-50 to-yellow-50">
+    <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative pt-20 pb-32 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
-            <div className="grid lg:grid-cols-2 gap-0">
-              {/* Left Content */}
-              <div className="p-12 lg:p-16 flex flex-col justify-center">
-                <h1 className="text-5xl lg:text-7xl font-bold text-gray-900 mb-6">
-                  Comida saudável e deliciosa.
-                </h1>
-                
-                <div className="flex items-center gap-4 mb-8">
-                  <div className="flex items-center">
-                    <span className="text-xl font-semibold mr-2">4.7</span>
-                    <div className="flex">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 hero-pattern opacity-50"></div>
+        
+        {/* Hero Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 py-20 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="space-y-6"
+          >
+            <Badge className="mb-4 px-6 py-2 text-sm bg-primary/10 text-primary border-primary/20">
+              <Sparkles className="w-4 h-4 mr-2" />
+              Experiência Gastronômica Única
+            </Badge>
+            
+            <h1 className="text-5xl md:text-7xl font-bold text-foreground">
+              {establishment.name}: Onde a<br />
+              <span className="text-gradient">Tradição Encontra a Inovação</span>
+            </h1>
+            
+            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto">
+              Experimente a arte culinária onde cada prato conta uma história de paixão e criatividade
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+              <Link href="/cardapio">
+                <Button 
+                  size="lg" 
+                  className="btn-glow bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-6 text-lg rounded-full"
+                >
+                  Reserve Sua Mesa
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+              <Link href="/cardapio">
+                <Button 
+                  size="lg"
+                  variant="outline"
+                  className="border-primary/20 hover:bg-primary/5 px-8 py-6 text-lg rounded-full"
+                >
+                  Explorar Cardápio
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Floating Elements */}
+        <motion.div
+          className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl"
+          animate={{
+            x: [0, 30, 0],
+            y: [0, -30, 0],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+        <motion.div
+          className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl"
+          animate={{
+            x: [0, -30, 0],
+            y: [0, 30, 0],
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+      </section>
+
+      {/* Why Choose Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Por Que Escolher <span className="text-gradient">Culinária Artesanal?</span>
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Uma experiência gastronômica que transcende o comum
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: <Leaf className="w-8 h-8" />,
+                title: "Ingredientes Selecionados",
+                description: "Ingredientes frescos e orgânicos de produtores locais cuidadosamente escolhidos"
+              },
+              {
+                icon: <ChefHat className="w-8 h-8" />,
+                title: "Chefs Mestres",
+                description: "Equipe de chefs renomados com experiência internacional e paixão pela arte"
+              },
+              {
+                icon: <Award className="w-8 h-8" />,
+                title: "Experiência Única",
+                description: "Ambiente intimista e serviço personalizado que torna cada visita memorável"
+              }
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.2 }}
+                viewport={{ once: true }}
+              >
+                <Card className="glass-card p-8 h-full card-hover">
+                  <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 text-primary">
+                    {item.icon}
+                  </div>
+                  <h3 className="text-2xl font-semibold mb-4">{item.title}</h3>
+                  <p className="text-muted-foreground">{item.description}</p>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Menu Highlights */}
+      <section className="py-20 px-4 bg-muted/30">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Destaques do <span className="text-gradient">Nosso Menu</span>
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Pratos cuidadosamente elaborados para despertar seus sentidos
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {featuredProducts.map((product, index) => (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <Card className="glass-card overflow-hidden card-hover group">
+                  {product.imageUrl && (
+                    <div className="relative h-64 overflow-hidden">
+                      <img 
+                        src={product.imageUrl} 
+                        alt={product.name}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    </div>
+                  )}
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-3">
+                      <h3 className="text-xl font-semibold">{product.name}</h3>
+                      <span className="text-gradient text-xl font-bold">
+                        R$ {product.price.toFixed(2)}
+                      </span>
+                    </div>
+                    <p className="text-muted-foreground mb-4 line-clamp-2">
+                      {product.description}
+                    </p>
+                    <Link href="/cardapio">
+                      <Button className="w-full rounded-full">
+                        Ver Detalhes
+                      </Button>
+                    </Link>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link href="/cardapio">
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="rounded-full px-8"
+              >
+                Ver Menu Completo
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Experience Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="grid lg:grid-cols-2 gap-16 items-center"
+          >
+            <div className="space-y-6">
+              <h2 className="text-4xl md:text-5xl font-bold">
+                A Experiência <span className="text-gradient">{establishment.name}</span>
+              </h2>
+              <p className="text-xl text-muted-foreground">
+                Descubra uma jornada culinária onde cada detalhe é pensado para criar momentos inesquecíveis.
+              </p>
+              
+              <div className="space-y-4">
+                {[
+                  { icon: <Wine />, text: "Carta de vinhos selecionados por sommeliers" },
+                  { icon: <Users />, text: "Chef's Table - Experiência exclusiva" },
+                  { icon: <Calendar />, text: "Eventos privados e celebrações especiais" },
+                  { icon: <Clock />, text: "Menu sazonal com ingredientes frescos" }
+                ].map((item, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                    className="flex items-center gap-4"
+                  >
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+                      {item.icon}
+                    </div>
+                    <span className="text-lg">{item.text}</span>
+                  </motion.div>
+                ))}
+              </div>
+
+              <Button size="lg" className="rounded-full px-8">
+                Fazer Reserva
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </div>
+
+            <div className="relative">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+                className="relative z-10"
+              >
+                <Card className="glass-card p-8">
+                  <div className="text-center space-y-4">
+                    <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary">
+                      <Star className="w-12 h-12 fill-current" />
+                    </div>
+                    <h3 className="text-3xl font-bold">4.9/5.0</h3>
+                    <p className="text-muted-foreground">Avaliação média</p>
+                    <div className="flex justify-center gap-1">
                       {[...Array(5)].map((_, i) => (
-                        <Star 
-                          key={i}
-                          className={`w-5 h-5 ${i < 4 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300 fill-gray-300'}`} 
-                        />
+                        <Star key={i} className="w-5 h-5 fill-primary text-primary" />
                       ))}
                     </div>
-                  </div>
-                  <span className="text-gray-600">3.2k+ Avaliações</span>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-4 mb-12">
-                  <Link href="/cardapio">
-                    <Button 
-                      size="lg" 
-                      className="bg-black text-white hover:bg-gray-800 rounded-full px-8 py-6 text-lg font-medium"
-                    >
-                      Fazer pedido
-                    </Button>
-                  </Link>
-                  <Link href="/pedidos">
-                    <Button 
-                      size="lg" 
-                      variant="outline"
-                      className="border-2 border-gray-300 rounded-full px-8 py-6 text-lg font-medium hover:bg-gray-50"
-                    >
-                      Meus pedidos
-                    </Button>
-                  </Link>
-                </div>
-
-                {/* Testimonial */}
-                <Card className="bg-gray-50 border-0 p-6">
-                  <p className="text-gray-700 mb-4 italic">
-                    "A comida é simplesmente incrível! O sabor é perfeito e a entrega sempre rápida. 
-                    Com certeza o melhor restaurante da região!"
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <img 
-                      src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces" 
-                      alt="Maria" 
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                    <div>
-                      <p className="font-semibold">Maria Silva</p>
-                      <div className="flex">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                        ))}
-                      </div>
-                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Baseado em mais de 2.000 avaliações
+                    </p>
                   </div>
                 </Card>
-              </div>
-
-              {/* Right Image */}
-              <div className="relative h-[400px] lg:h-auto">
-                <img 
-                  src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=800&q=80"
-                  alt="Delicious food"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-              </div>
+              </motion.div>
+              
+              {/* Decorative elements */}
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl" />
+              <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-secondary/20 rounded-full blur-3xl" />
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Status Bar */}
-      <section className="bg-white/80 backdrop-blur-sm py-4 sticky top-0 z-40 shadow-sm">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className={`h-3 w-3 rounded-full ${establishment.is_open ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}></div>
-              <span className={`font-medium ${establishment.is_open ? 'text-green-600' : 'text-red-600'}`}>
-                {establishment.is_open ? 'Aberto agora' : 'Fechado'}
-              </span>
-            </div>
-            <div className="flex items-center gap-4 text-sm text-gray-600">
-              <span className="flex items-center gap-1">
-                <Clock className="w-4 h-4" />
-                Entrega: 30-45 min
-              </span>
-              <span>•</span>
-              <span>Taxa: R$ {establishment.delivery_fee.toFixed(2)}</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Products */}
-      {featuredProducts.length > 0 && (
-        <section className="py-16 px-4">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-              Mais pedidos
+      {/* Newsletter Section */}
+      <section className="py-20 px-4 bg-muted/30">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="space-y-6"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold">
+              Fique Por Dentro das <span className="text-gradient">Novidades</span>
             </h2>
-            <div className="grid md:grid-cols-3 gap-6">
-              {featuredProducts.map((product: any) => (
-                <Card key={product.id} className="overflow-hidden hover:shadow-xl transition-shadow">
-                  <img 
-                    src={product.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop"} 
-                    alt={product.name}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="p-6">
-                    <h3 className="font-semibold text-lg mb-2">{product.name}</h3>
-                    <p className="text-gray-600 text-sm mb-4">{product.description}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-primary">
-                        {new Intl.NumberFormat('pt-BR', {
-                          style: 'currency',
-                          currency: 'BRL'
-                        }).format(Number(product.price))}
-                      </span>
-                      <Link href="/cardapio">
-                        <Button className="bg-black text-white hover:bg-gray-800 rounded-full">
-                          Ver cardápio
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Features */}
-      <section className="py-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <UtensilsCrossed className="w-10 h-10 text-yellow-600" />
-              </div>
-              <h3 className="font-semibold text-xl mb-2">Ingredientes frescos</h3>
-              <p className="text-gray-600">Selecionamos os melhores ingredientes diariamente</p>
-            </div>
+            <p className="text-xl text-muted-foreground">
+              Receba em primeira mão nosso menu sazonal e eventos exclusivos
+            </p>
             
-            <div className="text-center">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Clock className="w-10 h-10 text-green-600" />
+            <form onSubmit={handleNewsletterSubmit} className="max-w-md mx-auto">
+              <div className="flex gap-2">
+                <Input
+                  type="email"
+                  placeholder="Seu melhor e-mail"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="rounded-full px-6"
+                  required
+                />
+                <Button type="submit" className="rounded-full px-8">
+                  Inscrever
+                </Button>
               </div>
-              <h3 className="font-semibold text-xl mb-2">Entrega rápida</h3>
-              <p className="text-gray-600">Seu pedido quentinho em até 45 minutos</p>
-            </div>
+            </form>
             
-            <div className="text-center">
-              <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Package className="w-10 h-10 text-purple-600" />
-              </div>
-              <h3 className="font-semibold text-xl mb-2">Embalagem segura</h3>
-              <p className="text-gray-600">Cuidado especial para manter a qualidade</p>
-            </div>
-          </div>
+            <p className="text-sm text-muted-foreground">
+              Prometemos enviar apenas conteúdo relevante e delicioso!
+            </p>
+          </motion.div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-8">
-            <div>
-              <h3 className="font-bold text-xl mb-4">{establishment.name}</h3>
-              <p className="text-gray-400">{establishment.description}</p>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-4">Links rápidos</h4>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="/cardapio" className="text-gray-400 hover:text-white transition-colors">
-                    Cardápio
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/pedidos" className="text-gray-400 hover:text-white transition-colors">
-                    Meus pedidos
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-4">Contato</h4>
-              <p className="text-gray-400">
-                {establishment.phone}<br />
-                {establishment.email}<br />
-                {establishment.address}
+      {/* CTA Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <Card className="hero-gradient p-12 text-center text-primary-foreground">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                Pronto para uma Experiência Inesquecível?
+              </h2>
+              <p className="text-xl mb-8 opacity-90">
+                Reserve sua mesa e descubra por que somos referência em gastronomia
               </p>
-            </div>
-          </div>
-          
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 {establishment.name}. Todos os direitos reservados.</p>
-          </div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link href="/cardapio">
+                  <Button 
+                    size="lg" 
+                    variant="secondary"
+                    className="rounded-full px-8 py-6 text-lg"
+                  >
+                    Fazer Pedido Online
+                  </Button>
+                </Link>
+                <Button 
+                  size="lg"
+                  variant="outline" 
+                  className="rounded-full px-8 py-6 text-lg border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
+                >
+                  <MapPin className="w-5 h-5 mr-2" />
+                  Ver Localização
+                </Button>
+              </div>
+            </Card>
+          </motion.div>
         </div>
-      </footer>
+      </section>
 
       {/* Cart Sidebar */}
       <CartSidebar
@@ -262,11 +431,25 @@ export default function Home() {
         onClose={() => setIsCartOpen(false)}
         onUpdateQuantity={updateQuantity}
         onRemoveItem={removeFromCart}
-        onCheckout={() => {
-          setIsCartOpen(false);
-          window.location.href = '/carrinho';
-        }}
+        onCheckout={handleCheckout}
       />
+
+      {/* Floating Cart Button */}
+      {cart.items.length > 0 && (
+        <motion.button
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="fixed bottom-8 right-8 bg-primary text-primary-foreground rounded-full p-4 shadow-2xl z-50 btn-glow"
+          onClick={() => setIsCartOpen(true)}
+        >
+          <ShoppingBag className="w-6 h-6" />
+          <span className="absolute -top-2 -right-2 bg-secondary text-secondary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">
+            {cart.items.reduce((acc, item) => acc + item.quantity, 0)}
+          </span>
+        </motion.button>
+      )}
     </div>
   );
 }
+
+export default Home;
