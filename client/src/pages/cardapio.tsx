@@ -1,10 +1,8 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
-import { Clock } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Search, Clock } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import { CartSidebar } from "@/components/cart-sidebar";
 import { useCart } from "@/hooks/use-cart";
