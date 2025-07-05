@@ -68,6 +68,8 @@ async function setupDatabase() {
         is_available INTEGER NOT NULL DEFAULT 1,
         is_active INTEGER NOT NULL DEFAULT 1,
         sort_order INTEGER NOT NULL DEFAULT 0,
+        preparation_time TEXT,
+        options TEXT,
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
       );
@@ -161,21 +163,21 @@ async function setupDatabase() {
 
     // Insert products
     const products = [
-      { id: '1', categoryId: '1', name: 'Margherita', description: 'Fresh tomatoes, mozzarella, basil', price: 35.0 },
-      { id: '2', categoryId: '1', name: 'Pepperoni', description: 'Pepperoni, mozzarella, tomato sauce', price: 40.0 },
-      { id: '3', categoryId: '1', name: 'Quattro Stagioni', description: 'Ham, mushrooms, artichokes, olives', price: 45.0 },
-      { id: '4', categoryId: '2', name: 'Spaghetti Carbonara', description: 'Eggs, bacon, parmesan, black pepper', price: 28.0 },
-      { id: '5', categoryId: '2', name: 'Penne Arrabiata', description: 'Spicy tomato sauce, garlic, chili', price: 25.0 },
-      { id: '6', categoryId: '3', name: 'Bruschetta', description: 'Toasted bread, tomatoes, basil', price: 15.0 },
-      { id: '7', categoryId: '3', name: 'Mozzarella Sticks', description: 'Breaded mozzarella with marinara', price: 18.0 },
-      { id: '8', categoryId: '4', name: 'Coca-Cola', description: 'Classic cola drink', price: 8.0 },
-      { id: '9', categoryId: '4', name: 'Fresh Orange Juice', description: 'Freshly squeezed orange juice', price: 12.0 }
+      { id: '1', categoryId: '1', name: 'Margherita', description: 'Fresh tomatoes, mozzarella, basil', price: 35.0, prepTime: '25-30 min' },
+      { id: '2', categoryId: '1', name: 'Pepperoni', description: 'Pepperoni, mozzarella, tomato sauce', price: 40.0, prepTime: '25-30 min' },
+      { id: '3', categoryId: '1', name: 'Quattro Stagioni', description: 'Ham, mushrooms, artichokes, olives', price: 45.0, prepTime: '30-35 min' },
+      { id: '4', categoryId: '2', name: 'Spaghetti Carbonara', description: 'Eggs, bacon, parmesan, black pepper', price: 28.0, prepTime: '20-25 min' },
+      { id: '5', categoryId: '2', name: 'Penne Arrabiata', description: 'Spicy tomato sauce, garlic, chili', price: 25.0, prepTime: '20-25 min' },
+      { id: '6', categoryId: '3', name: 'Bruschetta', description: 'Toasted bread, tomatoes, basil', price: 15.0, prepTime: '10-15 min' },
+      { id: '7', categoryId: '3', name: 'Mozzarella Sticks', description: 'Breaded mozzarella with marinara', price: 18.0, prepTime: '15-20 min' },
+      { id: '8', categoryId: '4', name: 'Coca-Cola', description: 'Classic cola drink', price: 8.0, prepTime: '2-3 min' },
+      { id: '9', categoryId: '4', name: 'Fresh Orange Juice', description: 'Freshly squeezed orange juice', price: 12.0, prepTime: '5-8 min' }
     ];
 
     for (const product of products) {
       sqlite.exec(`
-        INSERT OR IGNORE INTO products (id, establishment_id, category_id, name, description, price, created_at, updated_at)
-        VALUES ('${product.id}', '${establishmentId}', '${product.categoryId}', '${product.name}', '${product.description}', ${product.price}, '${timestamp}', '${timestamp}');
+        INSERT OR IGNORE INTO products (id, establishment_id, category_id, name, description, price, preparation_time, created_at, updated_at)
+        VALUES ('${product.id}', '${establishmentId}', '${product.categoryId}', '${product.name}', '${product.description}', ${product.price}, '${product.prepTime}', '${timestamp}', '${timestamp}');
       `);
     }
 
@@ -191,6 +193,43 @@ async function setupDatabase() {
       VALUES ('1', '${establishmentId}', 'WELCOME10', 'Welcome discount 10%', 'percentage', 10.0, 30.0, '${timestamp}', '${timestamp}');
     `);
 
+    // Insert recurring customer for testing
+    const customerId = 'customer-1';
+    const customerNumber = '0001';
+    sqlite.exec(`
+      INSERT OR IGNORE INTO customers (id, number, name, whatsapp, email, address, complement, neighborhood, city, state, zip_code, default_payment_method, total_orders, total_spent, last_order_at, created_at, updated_at)
+      VALUES ('${customerId}', '${customerNumber}', 'João Silva', '+5511999887766', 'joao@email.com', 'Rua das Palmeiras, 456', 'Apto 302', 'Jardim Paulista', 'São Paulo', 'SP', '01234-567', 'pix', 3, 127.50, '${timestamp}', '${timestamp}', '${timestamp}');
+    `);
+
+    // Insert sample orders for the recurring customer
+    const orders = [
+      { id: 'order-1', orderNumber: '001', total: 42.50, status: 'delivered', deliveredAt: new Date(Date.now() - 86400000 * 7).toISOString() },
+      { id: 'order-2', orderNumber: '002', total: 35.00, status: 'delivered', deliveredAt: new Date(Date.now() - 86400000 * 3).toISOString() },
+      { id: 'order-3', orderNumber: '003', total: 50.00, status: 'preparing', deliveredAt: null }
+    ];
+
+    for (const order of orders) {
+      sqlite.exec(`
+        INSERT OR IGNORE INTO orders (id, establishment_id, customer_id, order_number, status, total, subtotal, delivery_fee, discount, payment_method, payment_status, delivery_address, created_at, updated_at, delivered_at)
+        VALUES ('${order.id}', '${establishmentId}', '${customerId}', '${order.orderNumber}', '${order.status}', ${order.total}, ${order.total - 5.0}, 5.0, 0, 'pix', 'approved', 'Rua das Palmeiras, 456, Apto 302', '${timestamp}', '${timestamp}', ${order.deliveredAt ? `'${order.deliveredAt}'` : 'NULL'});
+      `);
+    }
+
+    // Insert order items for the orders
+    const orderItems = [
+      { id: 'item-1', orderId: 'order-1', productId: '1', quantity: 1, unitPrice: 35.0, total: 35.0 },
+      { id: 'item-2', orderId: 'order-1', productId: '8', quantity: 1, unitPrice: 8.0, total: 8.0 },
+      { id: 'item-3', orderId: 'order-2', productId: '2', quantity: 1, unitPrice: 40.0, total: 40.0 },
+      { id: 'item-4', orderId: 'order-3', productId: '3', quantity: 1, unitPrice: 45.0, total: 45.0 }
+    ];
+
+    for (const item of orderItems) {
+      sqlite.exec(`
+        INSERT OR IGNORE INTO order_items (id, order_id, product_id, quantity, unit_price, total, created_at)
+        VALUES ('${item.id}', '${item.orderId}', '${item.productId}', ${item.quantity}, ${item.unitPrice}, ${item.total}, '${timestamp}');
+      `);
+    }
+
     console.log('Database setup completed successfully!');
     console.log('Sample data inserted:');
     console.log('- 1 establishment');
@@ -198,6 +237,8 @@ async function setupDatabase() {
     console.log('- 9 products');
     console.log('- 1 user');
     console.log('- 1 coupon');
+    console.log('- 1 recurring customer (João Silva)');
+    console.log('- 3 sample orders with items');
 
   } catch (error) {
     console.error('Error setting up database:', error);

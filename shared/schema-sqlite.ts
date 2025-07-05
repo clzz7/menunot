@@ -72,6 +72,8 @@ export const products = sqliteTable("products", {
   is_available: integer("is_available", { mode: "boolean" }).notNull().default(true),
   is_active: integer("is_active", { mode: "boolean" }).notNull().default(true),
   sort_order: integer("sort_order").notNull().default(0),
+  preparation_time: text("preparation_time"),
+  options: text("options"),
   created_at: text("created_at").notNull().default(new Date().toISOString()),
   updated_at: text("updated_at").notNull().default(new Date().toISOString())
 });
