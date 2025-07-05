@@ -35,8 +35,11 @@ export default function Cardapio() {
     queryFn: api.establishment.get,
   });
 
+  // Ensure products is always an array
+  const productsArray = Array.isArray(products) ? products : [];
+
   // Filter products
-  const filteredProducts = products.filter((product: Product) => {
+  const filteredProducts = productsArray.filter((product: Product) => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()));
     
@@ -44,7 +47,7 @@ export default function Cardapio() {
       return matchesSearch;
     }
     
-    const category = categories.find((cat: Category) => cat.id === product.categoryId);
+    const category = categories.find((cat: Category) => cat.id === product.category_id);
     const matchesCategory = category?.name.toLowerCase() === selectedCategory.toLowerCase();
     
     return matchesSearch && matchesCategory;
@@ -52,7 +55,7 @@ export default function Cardapio() {
 
   // Group products by category
   const productsByCategory = categories.reduce((acc: Record<string, Product[]>, category: Category) => {
-    acc[category.id] = filteredProducts.filter((product: Product) => product.categoryId === category.id);
+    acc[category.id] = filteredProducts.filter((product: Product) => product.category_id === category.id);
     return acc;
   }, {});
 

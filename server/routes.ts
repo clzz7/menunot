@@ -211,49 +211,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (pizzaCategory && pastaCategory && drinkCategory) {
           const defaultProducts = [
             {
+              id: "prod_1",
               name: "Pizza Margherita",
               description: "Molho de tomate, mozzarella fresca, manjericão e azeite extra virgem",
-              price: "32.90",
+              price: 32.90,
               image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
-              categoryId: pizzaCategory.id,
-              establishmentId: establishment.id,
-              preparationTime: 25
+              category_id: pizzaCategory.id,
+              establishment_id: establishment.id,
+              preparation_time: "25 min",
+              is_active: true,
+              sort_order: 1,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
             },
             {
+              id: "prod_2",
               name: "Pizza Pepperoni",
               description: "Molho de tomate, mozzarella, pepperoni e orégano",
-              price: "38.90",
+              price: 38.90,
               image: "https://images.unsplash.com/photo-1628840042765-356cda07504e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
-              categoryId: pizzaCategory.id,
-              establishmentId: establishment.id,
-              preparationTime: 25
+              category_id: pizzaCategory.id,
+              establishment_id: establishment.id,
+              preparation_time: "25 min",
+              is_active: true,
+              sort_order: 2,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
             },
             {
+              id: "prod_3",
               name: "Spaghetti Carbonara",
               description: "Spaghetti al dente com molho cremoso, bacon, ovos e parmesão",
-              price: "28.90",
+              price: 28.90,
               image: "https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
-              categoryId: pastaCategory.id,
-              establishmentId: establishment.id,
-              preparationTime: 15
+              category_id: pastaCategory.id,
+              establishment_id: establishment.id,
+              preparation_time: "15 min",
+              is_active: true,
+              sort_order: 3,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
             },
             {
+              id: "prod_4",
               name: "Lasanha Bolonhesa",
               description: "Camadas de massa, molho bolonhesa, bechamel e queijo gratinado",
-              price: "34.90",
+              price: 34.90,
               image: "https://images.unsplash.com/photo-1574894709920-11b28e7367e3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
-              categoryId: pastaCategory.id,
-              establishmentId: establishment.id,
-              preparationTime: 30
+              category_id: pastaCategory.id,
+              establishment_id: establishment.id,
+              preparation_time: "30 min",
+              is_active: true,
+              sort_order: 4,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
             },
             {
+              id: "prod_5",
               name: "Coca-Cola 350ml",
               description: "Refrigerante gelado tradicional",
-              price: "5.90",
+              price: 5.90,
               image: "https://images.unsplash.com/photo-1629203851122-3726ecdf080e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
-              categoryId: drinkCategory.id,
-              establishmentId: establishment.id,
-              preparationTime: 0
+              category_id: drinkCategory.id,
+              establishment_id: establishment.id,
+              preparation_time: "0 min",
+              is_active: true,
+              sort_order: 5,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
             }
           ];
           
