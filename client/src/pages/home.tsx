@@ -1,34 +1,13 @@
-import { useState } from "react";
+import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, Search, Clock, History } from "lucide-react";
-import { ProductCard } from "@/components/product-card";
-import { CartSidebar } from "@/components/cart-sidebar";
-import { CheckoutModal } from "@/components/checkout-modal";
-import { OrderTrackingModal } from "@/components/order-tracking-modal";
-import { OrderHistoryModal } from "@/components/order-history-modal";
-import { useCart } from "@/hooks/use-cart";
-import { useWebSocket } from "@/hooks/use-websocket";
+import { UtensilsCrossed, Package, Clock, Star, ArrowRight, Phone, MapPin, Globe } from "lucide-react";
 import { api } from "@/lib/api";
-import { useToast } from "@/hooks/use-toast";
-import { Product, Category, Establishment, Order } from "@shared/schema";
+import { Establishment } from "@shared/schema";
 
 export default function Home() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [isOrderTrackingOpen, setIsOrderTrackingOpen] = useState(false);
-  const [isOrderHistoryOpen, setIsOrderHistoryOpen] = useState(false);
-  const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
-  const [currentCustomerId, setCurrentCustomerId] = useState<string | null>(null);
-
-  const { cart, addToCart, updateQuantity, removeFromCart, applyDiscount, applyCoupon, clearCart } = useCart();
-  const { toast } = useToast();
-
-  // Fetch data
   const { data: establishment } = useQuery({
     queryKey: ["/api/establishment"],
     queryFn: api.establishment.get
@@ -44,181 +23,8 @@ export default function Home() {
     queryFn: api.products.getAll
   });
 
-  // WebSocket for real-time updates
-  useWebSocket((message) => {
-    if (message.type === 'ORDER_STATUS_UPDATE' && currentOrder?.id === message.orderId) {
-      setCurrentOrder(prev => prev ? { ...prev, status: message.status || prev.status } : null);
-      
-      toast({
-        title: "Status do pedido atualizado",
-        description: `Seu pedido está: ${getStatusLabel(message.status || "")}`,
-      });
-    }
-  });
-
-  const getStatusLabel = (status: string) => {
-    const statusMap: Record<string, string> = {
-      'PENDING': 'Pendente',
-      'CONFIRMED': 'Confirmado',
-      'PREPARING': 'Preparando',
-      'READY': 'Pronto',
-      'OUT_DELIVERY': 'Saiu para entrega',
-      'DELIVERED': 'Entregue',
-      'CANCELLED': 'Cancelado'
-    };
-    return statusMap[status] || status;
-  };
-
-  // Filter products
-  const filteredProducts = products.filter((product: Product) => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    if (selectedCategory === "all") {
-      return matchesSearch;
-    }
-    
-    const category = categories.find((cat: Category) => cat.id === product.categoryId);
-    const matchesCategory = category?.name.toLowerCase() === selectedCategory.toLowerCase();
-    
-    return matchesSearch && matchesCategory;
-  });
-
-  // Group products by category
-  const productsByCategory = categories.reduce((acc: Record<string, Product[]>, category: Category) => {
-    acc[category.id] = filteredProducts.filter((product: Product) => product.categoryId === category.id);
-    return acc;
-  }, {});
-
-  const handleAddToCart = (product: Product) => {
-    addToCart(product);
-    
-    toast({
-      title: "Produto adicionado!",
-      description: `${product.name} foi adicionado ao carrinho`,
-    });
-  };
-
-  const handleOpenCart = () => {
-    setIsCartOpen(true);
-  };
-
-  const handleCloseCart = () => {
-    setIsCartOpen(false);
-  };
-
-  const handleCheckout = () => {
-    if (cart.items.length === 0) {
-      toast({
-        title: "Carrinho vazio",
-        description: "Adicione produtos antes de finalizar o pedido",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    setIsCartOpen(false);
-    setIsCheckoutOpen(true);
-  };
-
-  const handleOrderComplete = (order: Order) => {
-    setCurrentOrder(order);
-    setIsCheckoutOpen(false);
-    setIsOrderTrackingOpen(true);
-    clearCart();
-  };
-
-  const handleApplyCoupon = async (code: string, customerPhone?: string) => {
-    try {
-      const coupon = await api.coupons.validate(code, customerPhone);
-      
-      // Check minimum order first
-      if (coupon.minimumOrder && cart.subtotal < Number(coupon.minimumOrder)) {
-        throw new Error(`Pedido mínimo de ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(coupon.minimumOrder))} necessário`);
-      }
-      
-      let discount = 0;
-      let freeDelivery = false;
-      
-      if (coupon.type === "PERCENTAGE") {
-        discount = cart.subtotal * (Number(coupon.value) / 100);
-        if (coupon.maxDiscount) {
-          discount = Math.min(discount, Number(coupon.maxDiscount));
-        }
-      } else if (coupon.type === "FIXED") {
-        discount = Number(coupon.value);
-      } else if (coupon.type === "FREE_DELIVERY") {
-        freeDelivery = true;
-        discount = 0; // No discount on subtotal, just free delivery
-      }
-      
-      applyCoupon(discount, code, freeDelivery);
-    } catch (error: any) {
-      // Re-throw the exact error from the API
-      throw error;
-    }
-  };
-
-  const handleViewOrderHistory = () => {
-    setIsOrderTrackingOpen(false);
-    setIsOrderHistoryOpen(true);
-  };
-
-  const handleNewOrder = () => {
-    setIsOrderTrackingOpen(false);
-    setCurrentOrder(null);
-  };
-
-  const handleRepeatOrder = async (order: Order) => {
-    try {
-      // Fetch order items from the API
-      const response = await fetch(`/api/orders/${order.id}/items`);
-      if (!response.ok) {
-        throw new Error('Erro ao buscar itens do pedido');
-      }
-      
-      const orderItems = await response.json();
-      
-      // Clear current cart and add items from the order
-      clearCart();
-      
-      for (const item of orderItems) {
-        // Find the product to get current details
-        const product = products.find((p: Product) => p.id === item.productId);
-        if (product) {
-          addToCart({
-            ...product,
-            selectedOptions: item.selectedOptions,
-            observations: item.observations
-          }, item.quantity);
-        }
-      }
-      
-      toast({
-        title: "Pedido repetido!",
-        description: `${orderItems.length} itens foram adicionados ao carrinho`,
-      });
-      
-      // Close order history and open cart
-      setIsOrderHistoryOpen(false);
-      setIsCartOpen(true);
-      
-    } catch (error: any) {
-      toast({
-        title: "Erro ao repetir pedido",
-        description: error.message || "Erro interno do servidor",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleContinueShopping = () => {
-    setIsOrderHistoryOpen(false);
-  };
-
-  const handleOpenOrderHistory = () => {
-    setIsOrderHistoryOpen(true);
-  };
+  // Get featured products (first 3 products)
+  const featuredProducts = products.slice(0, 3);
 
   if (!establishment) {
     return (
@@ -233,191 +39,237 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-40">
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-r from-primary to-orange-600 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
+          <div className="text-center">
+            <div className="flex items-center justify-center mb-6">
               {establishment.logo && (
                 <img 
                   src={establishment.logo}
                   alt={`Logo ${establishment.name}`}
-                  className="h-10 w-10 rounded-full object-cover"
+                  className="h-20 w-20 rounded-full object-cover mr-4"
                 />
               )}
-              <div>
-                <h1 className="text-lg font-semibold text-gray-900">{establishment.name}</h1>
-                {establishment.description && (
-                  <p className="text-sm text-gray-500">{establishment.description}</p>
-                )}
-              </div>
+              <h1 className="text-4xl md:text-6xl font-bold">
+                {establishment.name}
+              </h1>
             </div>
             
-            <div className="flex items-center space-x-4">
-              {/* Status */}
-              <div className="hidden sm:flex items-center space-x-2">
-                <div className={`h-2 w-2 rounded-full ${establishment.isOpen ? 'bg-success' : 'bg-red-500'}`}></div>
-                <span className={`text-sm font-medium ${establishment.isOpen ? 'text-success' : 'text-red-500'}`}>
-                  {establishment.isOpen ? 'Aberto' : 'Fechado'}
-                </span>
-              </div>
-              
-              {/* My Orders Button */}
-              <Button 
-                onClick={handleOpenOrderHistory}
-                variant="outline"
-                className="border-primary text-primary hover:bg-primary hover:text-white transition-colors"
-              >
-                <History className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Meus Pedidos</span>
-              </Button>
-              
-              {/* Cart Button */}
-              <Button 
-                onClick={handleOpenCart}
-                className="relative bg-primary text-white hover:bg-orange-600 transition-colors"
-              >
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Carrinho</span>
-                {cart.itemCount > 0 && (
-                  <Badge className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center p-0">
-                    {cart.itemCount}
-                  </Badge>
-                )}
-              </Button>
+            <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
+              {establishment.description || "Sabores únicos e experiências inesquecíveis"}
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/cardapio">
+                <Button size="lg" className="bg-white text-primary hover:bg-gray-100">
+                  <UtensilsCrossed className="w-5 h-5 mr-2" />
+                  Ver Cardápio
+                </Button>
+              </Link>
+              <Link href="/pedidos">
+                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary">
+                  <Package className="w-5 h-5 mr-2" />
+                  Meus Pedidos
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
-      </header>
+      </section>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Category Navigation */}
-        <div className="mb-6">
-          <div className="flex space-x-4 overflow-x-auto pb-2">
-            <Button
-              variant={selectedCategory === "all" ? "default" : "outline"}
-              onClick={() => setSelectedCategory("all")}
-              className={`flex-shrink-0 ${selectedCategory === "all" ? 'bg-primary text-white' : ''}`}
-            >
-              Todos
-            </Button>
-            {categories.map((category: Category) => (
-              <Button
-                key={category.id}
-                variant={selectedCategory === category.name ? "default" : "outline"}
-                onClick={() => setSelectedCategory(category.name)}
-                className={`flex-shrink-0 whitespace-nowrap ${selectedCategory === category.name ? 'bg-primary text-white' : ''}`}
-              >
-                {category.name}
+      {/* Status Section */}
+      <section className="py-8 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="flex items-center justify-center space-x-2 mb-4">
+              <div className={`h-3 w-3 rounded-full ${establishment.isOpen ? 'bg-green-500' : 'bg-red-500'}`}></div>
+              <span className={`text-lg font-medium ${establishment.isOpen ? 'text-green-500' : 'text-red-500'}`}>
+                {establishment.isOpen ? 'Aberto agora' : 'Fechado'}
+              </span>
+            </div>
+            <p className="text-gray-600">
+              {establishment.isOpen ? 'Estamos prontos para receber seu pedido!' : 'Voltamos em breve para atendê-lo!'}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Products */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Produtos em Destaque</h2>
+            <p className="text-gray-600">Conheça alguns dos nossos produtos mais populares</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {featuredProducts.map((product: any) => (
+              <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                <div className="aspect-w-16 aspect-h-9">
+                  {product.image && (
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-48 object-cover"
+                    />
+                  )}
+                </div>
+                <CardHeader>
+                  <CardTitle className="text-lg">{product.name}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                    {product.description}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xl font-bold text-primary">
+                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)}
+                    </span>
+                    <Badge variant="secondary">
+                      {product.preparationTime}min
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link href="/cardapio">
+              <Button size="lg" className="bg-primary hover:bg-orange-600">
+                Ver Todos os Produtos
+                <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Categories */}
+      <section className="py-16 bg-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Nossas Categorias</h2>
+            <p className="text-gray-600">Explore nossa variedade de produtos</p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {categories.map((category: any) => (
+              <Link key={category.id} href="/cardapio">
+                <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                  <CardContent className="p-6 text-center">
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <UtensilsCrossed className="w-6 h-6 text-primary" />
+                    </div>
+                    <h3 className="font-semibold text-gray-900">{category.name}</h3>
+                    <p className="text-sm text-gray-600 mt-1">{category.description}</p>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>
+      </section>
 
-        {/* Search Bar */}
-        <div className="mb-6">
-          <div className="relative">
-            <Input
-              type="text"
-              placeholder="Buscar produtos..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-3"
-            />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+      {/* Quick Actions */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Ações Rápidas</h2>
+            <p className="text-gray-600">Acesse rapidamente suas funcionalidades favoritas</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Link href="/cardapio">
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                <CardHeader className="text-center">
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <UtensilsCrossed className="w-8 h-8 text-primary" />
+                  </div>
+                  <CardTitle>Fazer Pedido</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-gray-600">Explore nosso cardápio e faça seu pedido</p>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/pedidos">
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                <CardHeader className="text-center">
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Package className="w-8 h-8 text-primary" />
+                  </div>
+                  <CardTitle>Meus Pedidos</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-gray-600">Veja o histórico dos seus pedidos</p>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/rastreamento">
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                <CardHeader className="text-center">
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Clock className="w-8 h-8 text-primary" />
+                  </div>
+                  <CardTitle>Rastreamento</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-gray-600">Acompanhe seu pedido em tempo real</p>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
         </div>
+      </section>
 
-        {/* Products Grid */}
-        <div className="space-y-6">
-          {selectedCategory === "all" ? (
-            // Show all categories
-            categories.map((category: Category) => {
-              const categoryProducts = productsByCategory[category.id] || [];
-              if (categoryProducts.length === 0) return null;
-              
-              return (
-                <div key={category.id} className="category-section">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    {category.name}
-                  </h2>
-                  
-                  <div className="grid gap-4">
-                    {categoryProducts.map((product: Product) => (
-                      <ProductCard
-                        key={product.id}
-                        product={product}
-                        onAddToCart={handleAddToCart}
-                      />
-                    ))}
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            // Show filtered products
-            <div className="grid gap-4">
-              {filteredProducts.map((product: Product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onAddToCart={handleAddToCart}
-                />
-              ))}
+      {/* Contact Info */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Informações de Contato</h2>
+            <p className="text-gray-600">Entre em contato conosco</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Phone className="w-8 h-8 text-primary" />
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">Telefone</h3>
+              <p className="text-gray-600">{establishment.phone}</p>
             </div>
-          )}
-          
-          {filteredProducts.length === 0 && (
-            <div className="text-center py-12">
-              <Search className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum produto encontrado</h3>
-              <p className="text-gray-500">Tente buscar por outro termo ou categoria</p>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <MapPin className="w-8 h-8 text-primary" />
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">Endereço</h3>
+              <p className="text-gray-600">{establishment.address}</p>
             </div>
-          )}
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Globe className="w-8 h-8 text-primary" />
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">Horário de Funcionamento</h3>
+              <p className="text-gray-600">
+                {establishment.openingHours ? 
+                  Object.entries(establishment.openingHours).map(([day, hours]: [string, any]) => (
+                    <span key={day} className="block text-sm">
+                      {day}: {hours.open} - {hours.close}
+                    </span>
+                  ))
+                  : "Consulte nossos horários"
+                }
+              </p>
+            </div>
+          </div>
         </div>
-      </main>
-
-      {/* Cart Sidebar */}
-      <CartSidebar
-        cart={cart}
-        isOpen={isCartOpen}
-        onClose={handleCloseCart}
-        onUpdateQuantity={updateQuantity}
-        onRemoveItem={removeFromCart}
-        onCheckout={handleCheckout}
-      />
-
-      {/* Checkout Modal */}
-      <CheckoutModal
-        isOpen={isCheckoutOpen}
-        onClose={() => setIsCheckoutOpen(false)}
-        cart={cart}
-        onOrderComplete={handleOrderComplete}
-        onApplyCoupon={handleApplyCoupon}
-        onBackToCart={() => {
-          setIsCheckoutOpen(false);
-          setIsCartOpen(true);
-        }}
-      />
-
-      {/* Order Tracking Modal */}
-      <OrderTrackingModal
-        isOpen={isOrderTrackingOpen}
-        onClose={() => setIsOrderTrackingOpen(false)}
-        order={currentOrder}
-        onViewHistory={handleViewOrderHistory}
-        onNewOrder={handleNewOrder}
-      />
-
-      {/* Order History Modal */}
-      <OrderHistoryModal
-        isOpen={isOrderHistoryOpen}
-        onClose={() => setIsOrderHistoryOpen(false)}
-        customerId={currentCustomerId}
-        onRepeatOrder={handleRepeatOrder}
-        onContinueShopping={handleContinueShopping}
-      />
+      </section>
     </div>
   );
 }
