@@ -180,7 +180,7 @@ export default function Pedidos() {
                 type="tel"
                 placeholder="Digite seu número de telefone (ex: 11999999999)"
                 value={customerPhone}
-                onChange={(e) => setCustomerPhone(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomerPhone(e.target.value)}
                 className="flex-1"
               />
               <Button onClick={handleSearchOrders} className="bg-primary hover:bg-orange-600">
