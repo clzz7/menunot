@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ShoppingCart, Plus, Minus, Trash2, ArrowLeft } from "lucide-react";
+import { ShoppingCart, Plus, Minus, Trash2, ArrowLeft, Clock } from "lucide-react";
 import { Order } from "@shared/schema";
 import { api } from "@/lib/api";
 
@@ -109,187 +109,209 @@ export default function Checkout() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      {/* Page Header */}
-      <div className="mb-8">
-        <Button
-          variant="ghost"
-          onClick={handleGoBack}
-          className="mb-4 text-gray-600 hover:text-gray-900"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Voltar ao Cardápio
-        </Button>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Checkout</h1>
-        <p className="text-gray-600">Revise seus itens e finalize o pedido</p>
-      </div>
+    <>
+      {/* Hero Banner */}
+      <section
+        className="relative w-full h-44 sm:h-56 md:h-64 lg:h-72 flex items-center justify-center text-center text-white mb-10"
+        style={{
+          backgroundImage:
+            "url(https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=1200&q=60)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="absolute inset-0 bg-black/60" />
+        <div className="relative z-10 px-4">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">Checkout</h1>
+          <p className="text-sm sm:text-base opacity-90 mt-2">
+            Revise seus itens e finalize o pedido
+          </p>
+        </div>
+      </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Cart Items */}
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <ShoppingCart className="w-5 h-5" />
-                <span>Seus Itens ({cart.itemCount})</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {cart.items.map((item) => (
-                  <div key={item.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                    <div className="flex-shrink-0">
-                      {item.image && (
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-16 h-16 object-cover rounded-lg"
-                        />
-                      )}
-                    </div>
-                    
-                    <div className="flex-1">
-                      <h3 className="font-medium text-gray-900">{item.name}</h3>
-                      {item.description && (
-                        <p className="text-sm text-gray-600 mt-1">{item.description}</p>
-                      )}
+      {/* Main */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Page Header */}
+        <div className="mb-8">
+          <Button
+            variant="ghost"
+            onClick={handleGoBack}
+            className="mb-4 text-gray-600 hover:text-gray-900"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Voltar ao Cardápio
+          </Button>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Checkout</h1>
+          <p className="text-gray-600">Revise seus itens e finalize o pedido</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Cart Items */}
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <ShoppingCart className="w-5 h-5" />
+                  <span>Seus Itens ({cart.itemCount})</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {cart.items.map((item) => (
+                    <div key={item.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                      <div className="flex-shrink-0">
+                        {item.image && (
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-16 h-16 object-cover rounded-lg"
+                          />
+                        )}
+                      </div>
                       
-                      {item.selectedOptions && Object.keys(item.selectedOptions).length > 0 && (
-                        <div className="mt-2">
-                          <div className="flex flex-wrap gap-1">
-                            {Object.entries(item.selectedOptions).map(([key, value], idx) => (
-                              <Badge key={idx} variant="secondary" className="text-xs">
-                                {key}: {value}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      
-                      {item.observations && (
-                        <p className="text-sm text-gray-500 mt-2">
-                          <strong>Observações:</strong> {item.observations}
-                        </p>
-                      )}
-                      
-                      <div className="flex items-center justify-between mt-3">
-                        <div className="flex items-center space-x-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleUpdateQuantity(item, -1)}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Minus className="w-3 h-3" />
-                          </Button>
-                          <span className="text-sm font-medium w-8 text-center">{item.quantity}</span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleUpdateQuantity(item, 1)}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Plus className="w-3 h-3" />
-                          </Button>
-                        </div>
+                      <div className="flex-1">
+                        <h3 className="font-medium text-gray-900">{item.name}</h3>
+                        {item.description && (
+                          <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+                        )}
                         
-                        <div className="flex items-center space-x-2">
-                          <span className="font-medium">
-                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price * item.quantity)}
-                          </span>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleRemoveItem(item)}
-                            className="text-red-500 hover:text-red-700 h-8 w-8 p-0"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </Button>
+                        {item.selectedOptions && Object.keys(item.selectedOptions).length > 0 && (
+                          <div className="mt-2">
+                            <div className="flex flex-wrap gap-1">
+                              {Object.entries(item.selectedOptions).map(([key, value], idx) => (
+                                <Badge key={idx} variant="secondary" className="text-xs">
+                                  {key}: {value}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {item.observations && (
+                          <p className="text-sm text-gray-500 mt-2">
+                            <strong>Observações:</strong> {item.observations}
+                          </p>
+                        )}
+                        
+                        <div className="flex items-center justify-between mt-3">
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleUpdateQuantity(item, -1)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Minus className="w-3 h-3" />
+                            </Button>
+                            <span className="text-sm font-medium w-8 text-center">{item.quantity}</span>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleUpdateQuantity(item, 1)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Plus className="w-3 h-3" />
+                            </Button>
+                          </div>
+                          
+                          <div className="flex items-center space-x-2">
+                            <span className="font-medium">
+                              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price * item.quantity)}
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleRemoveItem(item)}
+                              className="text-red-500 hover:text-red-700 h-8 w-8 p-0"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Order Summary */}
-        <div className="lg:col-span-1">
-          <Card className="sticky top-6">
-            <CardHeader>
-              <CardTitle>Resumo do Pedido</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between text-sm">
-                <span>Subtotal</span>
-                <span>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cart.subtotal)}</span>
-              </div>
-              
-              {cart.couponCode && (
-                <div className="flex justify-between text-sm text-green-600">
-                  <span>Desconto ({cart.couponCode})</span>
-                  <span>-{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cart.discount)}</span>
+                  ))}
                 </div>
-              )}
-              
-              <div className="flex justify-between text-sm">
-                <span>Taxa de entrega</span>
-                <span>
-                  {cart.freeDelivery ? (
-                    <span className="text-green-600">Grátis</span>
-                  ) : (
-                    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cart.deliveryFee)
-                  )}
-                </span>
-              </div>
-              
-              <Separator />
-              
-              <div className="flex justify-between font-medium">
-                <span>Total</span>
-                <span>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cart.total)}</span>
-              </div>
-              
-              <Button
-                onClick={handleCheckout}
-                className="w-full bg-primary hover:bg-orange-600"
-                size="lg"
-              >
-                Finalizar Pedido
-              </Button>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Order Summary */}
+          <div className="lg:col-span-1">
+            <Card className="sticky top-6">
+              <CardHeader>
+                <CardTitle>Resumo do Pedido</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-between text-sm">
+                  <span>Subtotal</span>
+                  <span>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cart.subtotal)}</span>
+                </div>
+                
+                {cart.couponCode && (
+                  <div className="flex justify-between text-sm text-green-600">
+                    <span>Desconto ({cart.couponCode})</span>
+                    <span>-{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cart.discount)}</span>
+                  </div>
+                )}
+                
+                <div className="flex justify-between text-sm">
+                  <span>Taxa de entrega</span>
+                  <span>
+                    {cart.freeDelivery ? (
+                      <span className="text-green-600">Grátis</span>
+                    ) : (
+                      new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cart.deliveryFee)
+                    )}
+                  </span>
+                </div>
+                
+                <Separator />
+                
+                <div className="flex justify-between font-medium">
+                  <span>Total</span>
+                  <span>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cart.total)}</span>
+                </div>
+                
+                <Button
+                  onClick={handleCheckout}
+                  className="w-full bg-primary hover:bg-orange-600"
+                  size="lg"
+                >
+                  Finalizar Pedido
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
+
+        {/* Checkout Modal */}
+        <CheckoutModal
+          isOpen={isCheckoutOpen}
+          onClose={() => setIsCheckoutOpen(false)}
+          cart={cart}
+          onOrderComplete={handleOrderComplete}
+          onApplyCoupon={handleApplyCoupon}
+          onBackToCart={() => {
+            setIsCheckoutOpen(false);
+          }}
+        />
+
+        {/* Order Tracking Modal */}
+        <OrderTrackingModal
+          isOpen={isOrderTrackingOpen}
+          onClose={() => setIsOrderTrackingOpen(false)}
+          order={currentOrder}
+          onViewHistory={() => {
+            setIsOrderTrackingOpen(false);
+            window.location.href = '/pedidos';
+          }}
+          onNewOrder={() => {
+            setIsOrderTrackingOpen(false);
+            window.location.href = '/cardapio';
+          }}
+        />
       </div>
-
-      {/* Checkout Modal */}
-      <CheckoutModal
-        isOpen={isCheckoutOpen}
-        onClose={() => setIsCheckoutOpen(false)}
-        cart={cart}
-        onOrderComplete={handleOrderComplete}
-        onApplyCoupon={handleApplyCoupon}
-        onBackToCart={() => {
-          setIsCheckoutOpen(false);
-        }}
-      />
-
-      {/* Order Tracking Modal */}
-      <OrderTrackingModal
-        isOpen={isOrderTrackingOpen}
-        onClose={() => setIsOrderTrackingOpen(false)}
-        order={currentOrder}
-        onViewHistory={() => {
-          setIsOrderTrackingOpen(false);
-          window.location.href = '/pedidos';
-        }}
-        onNewOrder={() => {
-          setIsOrderTrackingOpen(false);
-          window.location.href = '/cardapio';
-        }}
-      />
-    </div>
+    </>
   );
 }
