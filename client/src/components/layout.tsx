@@ -33,7 +33,6 @@ export default function Layout({ children }: LayoutProps) {
     { name: 'Início', href: '/', icon: Home },
     { name: 'Cardápio', href: '/cardapio', icon: UtensilsCrossed },
     { name: 'Meus Pedidos', href: '/pedidos', icon: Package },
-    { name: 'Rastreamento', href: '/rastreamento', icon: History },
   ];
 
   return (
@@ -99,9 +98,9 @@ export default function Layout({ children }: LayoutProps) {
             <div className="flex items-center space-x-4">
               {/* Status */}
               <div className="hidden sm:flex items-center space-x-2">
-                <div className={`h-2 w-2 rounded-full ${establishment?.isOpen ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                <span className={`text-sm font-medium ${establishment?.isOpen ? 'text-green-500' : 'text-red-500'}`}>
-                  {establishment?.isOpen ? 'Aberto' : 'Fechado'}
+                <div className={`h-2 w-2 rounded-full ${establishment?.is_open ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                <span className={`text-sm font-medium ${establishment?.is_open ? 'text-green-500' : 'text-red-500'}`}>
+                  {establishment?.is_open ? 'Aberto' : 'Fechado'}
                 </span>
               </div>
 

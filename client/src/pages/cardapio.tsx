@@ -60,7 +60,7 @@ export default function Cardapio() {
   }, {});
 
   const handleAddToCart = (product: Product) => {
-    addToCart(product);
+    addToCart(product, {}, "");
     
     toast({
       title: "Produto adicionado!",
@@ -78,40 +78,28 @@ export default function Cardapio() {
 
   return (
     <>
-      {/* Hero Banner */}
-      <section
-        className="relative w-full h-52 sm:h-60 md:h-72 lg:h-80 flex items-center justify-center text-center text-white mb-10"
-        style={{
-          backgroundImage:
-            "url(https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=60)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <div className="absolute inset-0 bg-black/60" />
-        <div className="relative z-10 max-w-2xl px-4">
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">Cardápio</h1>
-          <p className="text-sm sm:text-base opacity-90 mt-2">
-            Explore nossos produtos e sabores únicos
-          </p>
-          {establishment && (
-            <div className="flex items-center justify-center gap-2 mt-4">
-              <span
-                className={`flex h-3 w-3 rounded-full ${
-                  establishment.isOpen ? "bg-green-400" : "bg-red-500"
-                }`}
-              />
-              <span className="text-sm">
-                {establishment.isOpen ? "Aceitando Pedidos" : "Fechado no momento"}
-              </span>
-              {establishment.estimatedWaitTime && (
-                <span className="flex items-center gap-1 text-sm opacity-90">
-                  <Clock className="w-3 h-3" />
-                  {establishment.estimatedWaitTime} min
+      {/* Hero Section */}
+      <section className="bg-gradient-to-br from-pink-100 via-purple-50 to-yellow-50 pt-20 pb-10">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center">
+            <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-4">Cardápio</h1>
+            <p className="text-xl text-gray-600 mb-8">
+              Explore nossos pratos deliciosos
+            </p>
+            {establishment && (
+              <div className="flex items-center justify-center gap-2">
+                <span className={`flex h-3 w-3 rounded-full ${establishment.is_open ? "bg-green-500" : "bg-red-500"} animate-pulse`} />
+                <span className={`font-medium ${establishment.is_open ? 'text-green-600' : 'text-red-600'}`}>
+                  {establishment.is_open ? "Aceitando Pedidos" : "Fechado no momento"}
                 </span>
-              )}
-            </div>
-          )}
+                <span className="text-gray-600">|</span>
+                <span className="flex items-center gap-1 text-gray-600">
+                  <Clock className="w-4 h-4" />
+                  30-45 min
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
