@@ -142,7 +142,7 @@ export class DatabaseStorage implements IStorage {
       .from(categories)
       .where(and(
         eq(categories.establishment_id, establishmentId),
-        eq(categories.is_active, true)
+        eq(categories.is_active, 1)
       ))
       .orderBy(categories.sort_order);
   }
@@ -175,7 +175,7 @@ export class DatabaseStorage implements IStorage {
       .from(products)
       .where(and(
         eq(products.establishment_id, establishmentId),
-        eq(products.is_active, true)
+        eq(products.is_active, 1)
       ))
       .orderBy(products.sort_order);
   }
@@ -186,7 +186,7 @@ export class DatabaseStorage implements IStorage {
       .from(products)
       .where(and(
         eq(products.category_id, categoryId),
-        eq(products.is_active, true)
+        eq(products.is_active, 1)
       ))
       .orderBy(products.sort_order);
   }
@@ -301,7 +301,7 @@ export class DatabaseStorage implements IStorage {
       .from(coupons)
       .where(and(
         eq(coupons.establishmentId, establishmentId),
-        eq(coupons.isActive, true)
+        eq(coupons.isActive, 1)
       ))
       .orderBy(desc(coupons.createdAt));
   }
@@ -313,7 +313,7 @@ export class DatabaseStorage implements IStorage {
       .where(and(
         eq(coupons.code, code.toUpperCase()),
         eq(coupons.establishmentId, establishmentId),
-        eq(coupons.isActive, true)
+        eq(coupons.isActive, 1)
       ));
     return coupon || undefined;
   }
