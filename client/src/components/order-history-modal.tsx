@@ -105,15 +105,10 @@ export function OrderHistoryModal({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="flex items-center">
-              <History className="w-5 h-5 mr-2 text-primary" />
-              Meus Pedidos
-            </DialogTitle>
-            <Button variant="ghost" size="sm" onClick={handleClose}>
-              <X className="w-5 h-5" />
-            </Button>
-          </div>
+          <DialogTitle className="flex items-center">
+            <History className="w-5 h-5 mr-2 text-primary" />
+            Meus Pedidos
+          </DialogTitle>
         </DialogHeader>
 
         <ScrollArea className="max-h-[70vh]">

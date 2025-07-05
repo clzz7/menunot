@@ -76,23 +76,34 @@ async function setupDatabase() {
 
       CREATE TABLE IF NOT EXISTS orders (
         id TEXT PRIMARY KEY,
-        establishment_id TEXT NOT NULL,
-        customer_id TEXT NOT NULL,
         order_number TEXT NOT NULL UNIQUE,
-        status TEXT NOT NULL DEFAULT 'pending',
-        total REAL NOT NULL,
+        customer_id TEXT NOT NULL,
+        establishment_id TEXT NOT NULL,
+        customer_name TEXT NOT NULL,
+        customer_phone TEXT NOT NULL,
+        customer_email TEXT,
+        customer_address TEXT NOT NULL,
+        customer_complement TEXT,
+        customer_neighborhood TEXT NOT NULL,
+        customer_city TEXT NOT NULL,
+        customer_state TEXT NOT NULL,
+        customer_zip_code TEXT NOT NULL,
         subtotal REAL NOT NULL,
         delivery_fee REAL NOT NULL DEFAULT 0,
-        discount REAL NOT NULL DEFAULT 0,
+        discount_amount REAL NOT NULL DEFAULT 0,
         coupon_code TEXT,
+        total REAL NOT NULL,
         payment_method TEXT NOT NULL DEFAULT 'pix',
         payment_status TEXT NOT NULL DEFAULT 'pending',
-        notes TEXT,
-        delivery_address TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        observations TEXT,
+        estimated_delivery_time TEXT,
+        mercadopago_payment_id TEXT,
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        accepted_at TEXT,
-        prepared_at TEXT,
+        confirmed_at TEXT,
+        preparing_at TEXT,
+        ready_at TEXT,
         delivered_at TEXT,
         cancelled_at TEXT
       );
@@ -210,8 +221,19 @@ async function setupDatabase() {
 
     for (const order of orders) {
       sqlite.exec(`
-        INSERT OR IGNORE INTO orders (id, establishment_id, customer_id, order_number, status, total, subtotal, delivery_fee, discount, payment_method, payment_status, delivery_address, created_at, updated_at, delivered_at)
-        VALUES ('${order.id}', '${establishmentId}', '${customerId}', '${order.orderNumber}', '${order.status}', ${order.total}, ${order.total - 5.0}, 5.0, 0, 'pix', 'approved', 'Rua das Palmeiras, 456, Apto 302', '${timestamp}', '${timestamp}', ${order.deliveredAt ? `'${order.deliveredAt}'` : 'NULL'});
+        INSERT OR IGNORE INTO orders (
+          id, establishment_id, customer_id, order_number, customer_name, customer_phone, 
+          customer_email, customer_address, customer_complement, customer_neighborhood, 
+          customer_city, customer_state, customer_zip_code, status, total, subtotal, 
+          delivery_fee, discount_amount, payment_method, payment_status, created_at, updated_at, delivered_at
+        )
+        VALUES (
+          '${order.id}', '${establishmentId}', '${customerId}', '${order.orderNumber}', 
+          'João Silva', '+5511999887766', 'joao@email.com', 'Rua das Palmeiras, 456', 
+          'Apto 302', 'Jardim Paulista', 'São Paulo', 'SP', '01234-567', 
+          '${order.status}', ${order.total}, ${order.total - 5.0}, 5.0, 0, 'pix', 'approved', 
+          '${timestamp}', '${timestamp}', ${order.deliveredAt ? `'${order.deliveredAt}'` : 'NULL'}
+        );
       `);
     }
 
