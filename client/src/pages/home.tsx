@@ -24,7 +24,7 @@ export default function Home() {
   });
 
   // Get featured products (first 3 products)
-  const featuredProducts = products.slice(0, 3);
+  const featuredProducts = Array.isArray(products) ? products.slice(0, 3) : [];
 
   if (!establishment) {
     return (

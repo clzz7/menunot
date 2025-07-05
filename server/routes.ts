@@ -124,10 +124,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create default categories if none exist
       if (categories.length === 0) {
         const defaultCategories = [
-          { name: "Pizzas", description: "Pizzas artesanais", establishmentId: establishment.id, sortOrder: 1 },
-          { name: "Massas", description: "Massas frescas", establishmentId: establishment.id, sortOrder: 2 },
-          { name: "Saladas", description: "Saladas frescas", establishmentId: establishment.id, sortOrder: 3 },
-          { name: "Bebidas", description: "Bebidas geladas", establishmentId: establishment.id, sortOrder: 4 }
+          { 
+            id: "cat_1",
+            name: "Pizzas", 
+            description: "Pizzas artesanais", 
+            establishment_id: establishment.id, 
+            sort_order: 1,
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          },
+          { 
+            id: "cat_2",
+            name: "Massas", 
+            description: "Massas frescas", 
+            establishment_id: establishment.id, 
+            sort_order: 2,
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          },
+          { 
+            id: "cat_3",
+            name: "Saladas", 
+            description: "Saladas frescas", 
+            establishment_id: establishment.id, 
+            sort_order: 3,
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          },
+          { 
+            id: "cat_4",
+            name: "Bebidas", 
+            description: "Bebidas geladas", 
+            establishment_id: establishment.id, 
+            sort_order: 4,
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }
         ];
         
         for (const cat of defaultCategories) {

@@ -141,10 +141,10 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(categories)
       .where(and(
-        eq(categories.establishmentId, establishmentId),
-        eq(categories.isActive, true)
+        eq(categories.establishment_id, establishmentId),
+        eq(categories.is_active, true)
       ))
-      .orderBy(categories.sortOrder);
+      .orderBy(categories.sort_order);
   }
 
   async createCategory(category: InsertCategory): Promise<Category> {
@@ -174,10 +174,10 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(products)
       .where(and(
-        eq(products.establishmentId, establishmentId),
-        eq(products.isActive, true)
+        eq(products.establishment_id, establishmentId),
+        eq(products.is_active, true)
       ))
-      .orderBy(products.sortOrder);
+      .orderBy(products.sort_order);
   }
 
   async getProductsByCategory(categoryId: string): Promise<Product[]> {
@@ -185,11 +185,10 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(products)
       .where(and(
-        eq(products.categoryId, categoryId),
-        eq(products.isActive, true),
-        eq(products.isAvailable, true)
+        eq(products.category_id, categoryId),
+        eq(products.is_active, true)
       ))
-      .orderBy(products.sortOrder);
+      .orderBy(products.sort_order);
   }
 
   async getProduct(id: string): Promise<Product | undefined> {
