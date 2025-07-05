@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query.js";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.js";
+import { Button } from "@/components/ui/button.js";
+import { Badge } from "@/components/ui/badge.js";
+import { ScrollArea } from "@/components/ui/scroll-area.js";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.js";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog.js";
 import { 
   Clock, 
   MapPin, 
@@ -16,9 +16,9 @@ import {
   X,
   Eye
 } from "lucide-react";
-import { api } from "@/lib/api";
-import { useToast } from "@/hooks/use-toast";
-import { Order, OrderItem } from "@shared/schema";
+import { api } from "@/lib/api.js";
+import { useToast } from "@/hooks/use-toast.js";
+import { Order, OrderItem } from "@shared/schema.js";
 
 export function OrdersManagement() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);

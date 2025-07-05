@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query.js";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { zodResolver } from "@hookform/resolvers/zod.js";
 import { z } from "zod";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.js";
+import { Button } from "@/components/ui/button.js";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form.js";
+import { Input } from "@/components/ui/input.js";
+import { Textarea } from "@/components/ui/textarea.js";
+import { Switch } from "@/components/ui/switch.js";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs.js";
+import { Badge } from "@/components/ui/badge.js";
+import { ScrollArea } from "@/components/ui/scroll-area.js";
 import { 
   Settings as SettingsIcon, 
   Store, 
@@ -24,9 +24,9 @@ import {
   Edit,
   Trash2
 } from "lucide-react";
-import { api } from "@/lib/api";
-import { useToast } from "@/hooks/use-toast";
-import { Establishment } from "@shared/schema";
+import { api } from "@/lib/api.js";
+import { useToast } from "@/hooks/use-toast.js";
+import { Establishment } from "@shared/schema.js";
 
 const establishmentSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),

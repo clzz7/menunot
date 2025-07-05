@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs.js";
+import { Button } from "@/components/ui/button.js";
 import { BarChart3, Package, Users, Settings, LogOut, Bell, Ticket } from "lucide-react";
-import { Dashboard } from "@/components/admin/dashboard";
-import { OrdersManagement } from "@/components/admin/orders-management";
-import { ProductsManagement } from "@/components/admin/products-management";
-import { CustomersManagement } from "@/components/admin/customers-management";
-import { CouponsManagement } from "@/components/admin/coupons-management";
-import { SettingsPage } from "@/components/admin/settings";
-import { useWebSocket } from "@/hooks/use-websocket";
-import { useToast } from "@/hooks/use-toast";
-import { Badge } from "@/components/ui/badge";
+import { Dashboard } from "@/components/admin/dashboard.js";
+import { OrdersManagement } from "@/components/admin/orders-management.js";
+import { ProductsManagement } from "@/components/admin/products-management.js";
+import { CustomersManagement } from "@/components/admin/customers-management.js";
+import { CouponsManagement } from "@/components/admin/coupons-management.js";
+import { SettingsPage } from "@/components/admin/settings.js";
+import { useWebSocket } from "@/hooks/use-websocket.js";
+import { useToast } from "@/hooks/use-toast.js";
+import { Badge } from "@/components/ui/badge.js";
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState("dashboard");

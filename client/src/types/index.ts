@@ -6,6 +6,8 @@ export interface CartItem {
   total: number;
   selectedOptions?: Record<string, any>;
   observations?: string;
+  image?: string;
+  description?: string;
 }
 
 export interface Cart {
@@ -16,6 +18,7 @@ export interface Cart {
   total: number;
   itemCount: number;
   couponCode?: string;
+  freeDelivery?: boolean;
 }
 
 export interface CustomerData {

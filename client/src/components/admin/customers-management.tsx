@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useQuery } from "@tanstack/react-query.js";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.js";
+import { Button } from "@/components/ui/button.js";
+import { Input } from "@/components/ui/input.js";
+import { Badge } from "@/components/ui/badge.js";
+import { ScrollArea } from "@/components/ui/scroll-area.js";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog.js";
 import { Users, Search, Phone, MapPin, CreditCard, ShoppingCart, Eye } from "lucide-react";
-import { api } from "@/lib/api";
-import { Customer, Order } from "@shared/schema";
+import { api } from "@/lib/api.js";
+import { Customer, Order } from "@shared/schema.js";
 
 export function CustomersManagement() {
   const [searchTerm, setSearchTerm] = useState("");

@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button.js";
+import { ScrollArea } from "@/components/ui/scroll-area.js";
+import { Separator } from "@/components/ui/separator.js";
 import { ShoppingCart, X, Minus, Plus, Trash2 } from "lucide-react";
-import { Cart, CartItem } from "@/types";
+import { Cart, CartItem } from "@/types.js";
 
 interface CartSidebarProps {
   cart: Cart;

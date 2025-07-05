@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { XCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button.js";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.js";
 
 export default function PaymentFailure() {
   const [location] = useLocation();

@@ -1,4 +1,4 @@
-import { apiRequest } from "./queryClient";
+import { apiRequest } from "./queryClient.js";
 
 export const api = {
   // Establishment

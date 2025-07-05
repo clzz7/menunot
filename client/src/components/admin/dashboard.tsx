@@ -1,11 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { useQuery } from "@tanstack/react-query.js";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.js";
+import { Badge } from "@/components/ui/badge.js";
+import { Button } from "@/components/ui/button.js";
+import { ScrollArea } from "@/components/ui/scroll-area.js";
 import { ShoppingCart, DollarSign, Users, Star, Edit, Clock } from "lucide-react";
-import { api } from "@/lib/api";
-import { Order } from "@shared/schema";
+import { api } from "@/lib/api.js";
+import { Order } from "@shared/schema.js";
 
 export function Dashboard() {
   const { data: stats } = useQuery({
