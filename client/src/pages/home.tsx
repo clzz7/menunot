@@ -40,15 +40,24 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-primary to-orange-600 text-white py-20">
+      <section
+        className="relative w-full text-white py-20 flex items-center justify-center text-center"
+        style={{
+          backgroundImage:
+            "url(https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=1200&q=60)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="absolute inset-0 bg-black/60" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
+          <div className="text-center relative z-10">
             <div className="flex items-center justify-center mb-6">
               {establishment.logo && (
                 <img 
                   src={establishment.logo}
                   alt={`Logo ${establishment.name}`}
-                  className="h-20 w-20 rounded-full object-cover mr-4"
+                  className="h-20 w-20 rounded-full object-cover mr-4 shadow-lg ring-2 ring-white"
                 />
               )}
               <h1 className="text-4xl md:text-6xl font-bold">
