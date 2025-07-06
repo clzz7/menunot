@@ -122,7 +122,7 @@ export class DatabaseStorage implements IStorage {
   async updateCustomer(id: string, data: Partial<InsertCustomer>): Promise<Customer> {
     const [updated] = await db
       .update(customers)
-      .set({ ...data, updatedAt: new Date() })
+      .set({ ...data, updated_at: new Date() })
       .where(eq(customers.id, id))
       .returning();
     return updated;
@@ -158,7 +158,7 @@ export class DatabaseStorage implements IStorage {
   async updateCategory(id: string, data: Partial<InsertCategory>): Promise<Category> {
     const [updated] = await db
       .update(categories)
-      .set({ ...data, updatedAt: new Date() })
+      .set({ ...data, updated_at: new Date() })
       .where(eq(categories.id, id))
       .returning();
     return updated;
@@ -210,7 +210,7 @@ export class DatabaseStorage implements IStorage {
   async updateProduct(id: string, data: Partial<InsertProduct>): Promise<Product> {
     const [updated] = await db
       .update(products)
-      .set({ ...data, updatedAt: new Date() })
+      .set({ ...data, updated_at: new Date() })
       .where(eq(products.id, id))
       .returning();
     return updated;
@@ -225,8 +225,8 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(orders)
-      .where(eq(orders.establishmentId, establishmentId))
-      .orderBy(desc(orders.createdAt));
+      .where(eq(orders.establishment_id, establishmentId))
+      .orderBy(desc(orders.created_at));
   }
 
   async getOrder(id: string): Promise<Order | undefined> {
@@ -254,13 +254,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateOrderStatus(id: string, status: string, timestamp?: Date): Promise<Order> {
-    const updateData: any = { status, updatedAt: new Date() };
+    const updateData: any = { status, updated_at: new Date() };
     
     // Set appropriate timestamp based on status
-    if (status === "CONFIRMED" && timestamp) updateData.confirmedAt = timestamp;
-    if (status === "PREPARING" && timestamp) updateData.preparingAt = timestamp;
-    if (status === "READY" && timestamp) updateData.readyAt = timestamp;
-    if (status === "DELIVERED" && timestamp) updateData.deliveredAt = timestamp;
+    if (status === "CONFIRMED" && timestamp) updateData.confirmed_at = timestamp;
+    if (status === "PREPARING" && timestamp) updateData.preparing_at = timestamp;
+    if (status === "READY" && timestamp) updateData.ready_at = timestamp;
+    if (status === "DELIVERED" && timestamp) updateData.delivered_at = timestamp;
 
     const [updated] = await db
       .update(orders)
@@ -283,7 +283,7 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(orderItems)
-      .where(eq(orderItems.orderId, orderId));
+      .where(eq(orderItems.order_id, orderId));
   }
 
   async createOrderItem(item: InsertOrderItem): Promise<OrderItem> {
@@ -300,10 +300,10 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(coupons)
       .where(and(
-        eq(coupons.establishmentId, establishmentId),
-        eq(coupons.isActive, 1)
+        eq(coupons.establishment_id, establishmentId),
+        eq(coupons.is_active, true)
       ))
-      .orderBy(desc(coupons.createdAt));
+      .orderBy(desc(coupons.created_at));
   }
 
   async getCouponByCode(code: string, establishmentId: string): Promise<Coupon | undefined> {
@@ -312,8 +312,8 @@ export class DatabaseStorage implements IStorage {
       .from(coupons)
       .where(and(
         eq(coupons.code, code.toUpperCase()),
-        eq(coupons.establishmentId, establishmentId),
-        eq(coupons.isActive, 1)
+        eq(coupons.establishment_id, establishmentId),
+        eq(coupons.is_active, true)
       ));
     return coupon || undefined;
   }
@@ -329,7 +329,7 @@ export class DatabaseStorage implements IStorage {
   async updateCoupon(id: string, data: Partial<InsertCoupon>): Promise<Coupon> {
     const [updated] = await db
       .update(coupons)
-      .set({ ...data, updatedAt: new Date() })
+      .set({ ...data, updated_at: new Date() })
       .where(eq(coupons.id, id))
       .returning();
     return updated;
@@ -338,7 +338,7 @@ export class DatabaseStorage implements IStorage {
   async incrementCouponUsage(id: string): Promise<void> {
     await db
       .update(coupons)
-      .set({ usageCount: sql`${coupons.usageCount} + 1` })
+      .set({ usage_count: sql`${coupons.usage_count} + 1` })
       .where(eq(coupons.id, id));
   }
 
@@ -356,19 +356,19 @@ export class DatabaseStorage implements IStorage {
       .select({ count: sql<number>`count(*)`, total: sql<number>`sum(${orders.total})` })
       .from(orders)
       .where(and(
-        eq(orders.establishmentId, establishmentId),
-        sql`${orders.createdAt} >= ${today}`
+        eq(orders.establishment_id, establishmentId),
+        sql`${orders.created_at} >= ${today}`
       ));
 
     const totalCustomersResult = await db
-      .select({ count: sql<number>`count(distinct ${orders.customerId})` })
+      .select({ count: sql<number>`count(distinct ${orders.customer_id})` })
       .from(orders)
-      .where(eq(orders.establishmentId, establishmentId));
+      .where(eq(orders.establishment_id, establishmentId));
 
     const averageOrderResult = await db
       .select({ avg: sql<number>`avg(${orders.total})` })
       .from(orders)
-      .where(eq(orders.establishmentId, establishmentId));
+      .where(eq(orders.establishment_id, establishmentId));
 
     return {
       todayOrders: todayOrdersResult[0]?.count || 0,

@@ -342,7 +342,7 @@ export function OrderHistoryModal({
             {currentOrder && (
               <div>
                 <h3 className="font-semibold text-gray-900 mb-3">Pedido Atual</h3>
-                <div className="border-2 border-primary border-opacity-50 rounded-lg bg-primary bg-opacity-5">
+                <div className="border border-gray-200 rounded-lg">
                   <OrderDetails order={currentOrder} />
                 </div>
               </div>
