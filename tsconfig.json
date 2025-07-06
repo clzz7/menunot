@@ -14,7 +14,7 @@
     "allowImportingTsExtensions": true,
     "moduleResolution": "node16",
     "baseUrl": ".",
-    "types": ["node", "vite/client", "react", "./types/ui.d.ts", "./types/env.d.ts"],
+    "types": ["node", "vite/client", "react", "./types/ui.d.ts", "./types/env.d.ts", "./types/shims.d.ts"],
     "paths": {
       "@/*": ["./client/src/*"],
       "@shared/*": ["./shared/*"]
