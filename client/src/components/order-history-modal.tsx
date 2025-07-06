@@ -195,24 +195,24 @@ export function OrderHistoryModal({
                     </div>
                   ))}
                   
-                  <div className="pt-2 mt-4 border-t border-gray-200">
-                    <div className="flex justify-between text-sm">
+                  <div className="pt-3 mt-4 border-t border-gray-200">
+                    <div className="flex justify-between text-sm mb-2">
                       <span>Subtotal:</span>
                       <span>{formatCurrency(order.subtotal)}</span>
                     </div>
                     {order.delivery_fee > 0 && (
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between text-sm mb-2">
                         <span>Taxa de entrega:</span>
                         <span>{formatCurrency(order.delivery_fee)}</span>
                       </div>
                     )}
                     {order.discount_amount > 0 && (
-                      <div className="flex justify-between text-sm text-green-600">
+                      <div className="flex justify-between text-sm text-green-600 mb-2">
                         <span>Desconto:</span>
                         <span>-{formatCurrency(order.discount_amount)}</span>
                       </div>
                     )}
-                    <div className="flex justify-between font-medium text-base pt-2 border-t border-gray-200">
+                    <div className="flex justify-between font-medium text-base pt-3 mt-2 border-t border-gray-200">
                       <span>Total:</span>
                       <span>{formatCurrency(order.total)}</span>
                     </div>
