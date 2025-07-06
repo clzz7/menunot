@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area.js";
 import { ShoppingCart, DollarSign, Users, Star, Edit, Clock } from "lucide-react";
 import { api } from "@/lib/api.js";
 import { Order } from "@shared/schema.js";
+import { getStatusInfo } from "@/lib/status-utils";
 
 export function Dashboard() {
   const { data: stats } = useQuery({
@@ -25,19 +26,7 @@ export function Dashboard() {
     }).format(value);
   };
 
-  const getStatusLabel = (status: string) => {
-    const statusMap: Record<string, { label: string; variant: "default" | "secondary" | "destructive" }> = {
-      'PENDING': { label: 'Pendente', variant: 'secondary' },
-      'CONFIRMED': { label: 'Confirmado', variant: 'default' },
-      'PREPARING': { label: 'Preparando', variant: 'default' },
-      'READY': { label: 'Pronto', variant: 'default' },
-      'OUT_DELIVERY': { label: 'Saiu para entrega', variant: 'default' },
-      'DELIVERED': { label: 'Entregue', variant: 'default' },
-      'CANCELLED': { label: 'Cancelado', variant: 'destructive' }
-    };
-    
-    return statusMap[status] || { label: status, variant: 'secondary' as const };
-  };
+
 
   const formatTimeAgo = (date: Date | string) => {
     const now = new Date();
@@ -140,14 +129,9 @@ export function Dashboard() {
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge 
-                          variant={getStatusLabel(order.status).variant}
-                          className={
-                            getStatusLabel(order.status).variant === 'default' 
-                              ? 'bg-primary text-white' 
-                              : ''
-                          }
+                          className={getStatusInfo(order.status).className}
                         >
-                          {getStatusLabel(order.status).label}
+                          {getStatusInfo(order.status).label}
                         </Badge>
                         <Button variant="ghost" size="sm">
                           <Edit className="w-4 h-4" />

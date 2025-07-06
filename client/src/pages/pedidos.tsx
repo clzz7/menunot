@@ -10,6 +10,7 @@ import { useCart } from "@/hooks/use-cart.js";
 import { useToast } from "@/hooks/use-toast.js";
 import { api } from "@/lib/api.js";
 import { Order, Product } from "@shared/schema.js";
+import { getStatusInfo, getStatusColor } from "@/lib/status-utils";
 
 export default function Pedidos() {
   const [customerPhone, setCustomerPhone] = useState("");
@@ -114,31 +115,7 @@ export default function Pedidos() {
     }
   };
 
-  const getStatusLabel = (status: string) => {
-    const statusMap: Record<string, string> = {
-      'PENDING': 'Pendente',
-      'CONFIRMED': 'Confirmado',
-      'PREPARING': 'Preparando',
-      'READY': 'Pronto',
-      'OUT_DELIVERY': 'Saiu para entrega',
-      'DELIVERED': 'Entregue',
-      'CANCELLED': 'Cancelado'
-    };
-    return statusMap[status] || status;
-  };
 
-  const getStatusColor = (status: string) => {
-    const colorMap: Record<string, string> = {
-      'PENDING': 'bg-yellow-100 text-yellow-800',
-      'CONFIRMED': 'bg-blue-100 text-blue-800',
-      'PREPARING': 'bg-blue-100 text-blue-800',
-      'READY': 'bg-orange-100 text-orange-800',
-      'OUT_DELIVERY': 'bg-orange-100 text-orange-800',
-      'DELIVERED': 'bg-green-100 text-green-800',
-      'CANCELLED': 'bg-red-100 text-red-800'
-    };
-    return colorMap[status] || 'bg-gray-100 text-gray-800';
-  };
 
   return (
     <>

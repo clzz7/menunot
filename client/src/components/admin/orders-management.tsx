@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { api } from "@/lib/api.js";
 import { useToast } from "@/hooks/use-toast.js";
+import { getStatusInfo } from "@/lib/status-utils";
 import { Order, OrderItem } from "@shared/schema.js";
 
 export function OrdersManagement() {
@@ -75,19 +76,7 @@ export function OrdersManagement() {
     });
   };
 
-  const getStatusLabel = (status: string) => {
-    const statusMap: Record<string, { label: string; variant: "default" | "secondary" | "destructive" }> = {
-      'PENDING': { label: 'Pendente', variant: 'secondary' },
-      'CONFIRMED': { label: 'Confirmado', variant: 'default' },
-      'PREPARING': { label: 'Preparando', variant: 'default' },
-      'READY': { label: 'Pronto', variant: 'default' },
-      'OUT_DELIVERY': { label: 'Saiu para entrega', variant: 'default' },
-      'DELIVERED': { label: 'Entregue', variant: 'default' },
-      'CANCELLED': { label: 'Cancelado', variant: 'destructive' }
-    };
-    
-    return statusMap[status] || { label: status, variant: 'secondary' as const };
-  };
+
 
   const getPaymentMethodLabel = (method: string) => {
     const methodMap: Record<string, string> = {
@@ -169,14 +158,9 @@ export function OrdersManagement() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge 
-                        variant={getStatusLabel(order.status).variant}
-                        className={
-                          getStatusLabel(order.status).variant === 'default' 
-                            ? 'bg-primary text-white' 
-                            : ''
-                        }
+                        className={getStatusInfo(order.status).className}
                       >
-                        {getStatusLabel(order.status).label}
+                        {getStatusInfo(order.status).label}
                       </Badge>
                       <Button
                         variant="outline"
@@ -278,8 +262,8 @@ export function OrdersManagement() {
                     </div>
                     <div className="flex items-center space-x-3">
                       <span className="font-semibold">{formatCurrency(order.total)}</span>
-                      <Badge variant={getStatusLabel(order.status).variant}>
-                        {getStatusLabel(order.status).label}
+                      <Badge className={getStatusInfo(order.status).className}>
+                        {getStatusInfo(order.status).label}
                       </Badge>
                       <Button
                         variant="outline"
@@ -325,7 +309,7 @@ export function OrdersManagement() {
                   <h4 className="font-medium text-gray-900 mb-2">Informações do Pedido</h4>
                   <div className="space-y-1 text-sm">
                     <p><strong>Data:</strong> {formatTime(selectedOrder.created_at)}</p>
-                    <p><strong>Status:</strong> {getStatusLabel(selectedOrder.status).label}</p>
+                    <p><strong>Status:</strong> {getStatusInfo(selectedOrder.status).label}</p>
                     <p><strong>Pagamento:</strong> {getPaymentMethodLabel(selectedOrder.payment_method)}</p>
                   </div>
                 </div>

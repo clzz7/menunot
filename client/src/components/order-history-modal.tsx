@@ -10,6 +10,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { History, X, RotateCcw, ShoppingCart, Search, ChevronDown, ChevronUp } from "lucide-react";
 import { api } from "@/lib/api.js";
 import { Order } from "@shared/schema.js";
+import { getStatusInfo } from "@/lib/status-utils";
 
 interface OrderHistoryModalProps {
   isOpen: boolean;
@@ -144,8 +145,8 @@ export function OrderHistoryModal({
                   {formatCurrency(order.total)}
                 </span>
                 <div className="flex items-center space-x-2">
-                  <Badge variant={getStatusLabel(order.status).variant}>
-                    {getStatusLabel(order.status).label}
+                  <Badge className={getStatusInfo(order.status).className}>
+                    {getStatusInfo(order.status).label}
                   </Badge>
                   {order.status === 'DELIVERED' && (
                     <Button
@@ -258,26 +259,7 @@ export function OrderHistoryModal({
     });
   };
 
-  const getStatusLabel = (status: string) => {
-    const statusMap: Record<string, { label: string; variant: "default" | "secondary" | "destructive" }> = {
-      'PENDING': { label: 'Pendente', variant: 'secondary' },
-      'CONFIRMED': { label: 'Confirmado', variant: 'default' },
-      'PREPARING': { label: 'Preparando', variant: 'default' },
-      'READY': { label: 'Pronto', variant: 'default' },
-      'OUT_DELIVERY': { label: 'Saiu para entrega', variant: 'default' },
-      'DELIVERED': { label: 'Entregue', variant: 'default' },
-      'CANCELLED': { label: 'Cancelado', variant: 'destructive' },
-      'pending': { label: 'Pendente', variant: 'secondary' },
-      'confirmed': { label: 'Confirmado', variant: 'default' },
-      'preparing': { label: 'Preparando', variant: 'default' },
-      'ready': { label: 'Pronto', variant: 'default' },
-      'out_delivery': { label: 'Saiu para entrega', variant: 'default' },
-      'delivered': { label: 'Entregue', variant: 'default' },
-      'cancelled': { label: 'Cancelado', variant: 'destructive' }
-    };
-    
-    return statusMap[status] || { label: status, variant: 'secondary' as const };
-  };
+
 
   const currentOrder = Array.isArray(orders) ? orders.find(order => 
     ['pending', 'confirmed', 'preparing', 'ready', 'out_delivery', 'PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'OUT_DELIVERY'].includes(order.status)
@@ -402,7 +384,7 @@ export function OrderHistoryModal({
                         <div className="bg-gray-50 rounded p-2 text-sm">
                           <p><strong>Entrega:</strong> {order.customer_address}</p>
                           <p><strong>Pagamento:</strong> {order.payment_method === 'pix' ? 'PIX' : order.payment_method.toUpperCase()}</p>
-                          <p><strong>Status:</strong> {getStatusLabel(order.status).label}</p>
+                          <p><strong>Status:</strong> {getStatusInfo(order.status).label}</p>
                         </div>
                       </div>
                       
@@ -411,8 +393,8 @@ export function OrderHistoryModal({
                           {formatCurrency(order.total)}
                         </span>
                         <div className="flex items-center space-x-2">
-                          <Badge variant={getStatusLabel(order.status).variant}>
-                            {getStatusLabel(order.status).label}
+                          <Badge className={getStatusInfo(order.status).className}>
+                            {getStatusInfo(order.status).label}
                           </Badge>
                           {order.status === 'DELIVERED' && (
                             <Button
