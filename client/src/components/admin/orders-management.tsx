@@ -109,16 +109,16 @@ export function OrdersManagement() {
   };
 
   const canAdvanceStatus = (status: string) => {
-    return !['DELIVERED', 'CANCELLED'].includes(status);
+    return !['delivered', 'cancelled'].includes(status.toLowerCase());
   };
 
   // Group orders by status
   const activeOrders = orders.filter((order: Order) => 
-    ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'OUT_DELIVERY'].includes(order.status)
+    ['pending', 'confirmed', 'preparing', 'ready', 'out_delivery'].includes(order.status.toLowerCase())
   );
   
   const completedOrders = orders.filter((order: Order) => 
-    ['DELIVERED', 'CANCELLED'].includes(order.status)
+    ['delivered', 'cancelled'].includes(order.status.toLowerCase())
   );
 
   if (isLoading) {
