@@ -126,43 +126,50 @@ export function Dashboard() {
             <ScrollArea className="h-[400px]">
               <div className="space-y-4">
                 {recentOrders.map((order: Order) => (
-                  <div key={order.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
-                    <div className="flex items-center space-x-4">
-                      <div>
-                        <p className="font-medium text-gray-900 flex items-center">
+                  <div key={order.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    {/* Header com número do pedido e ações */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-medium text-gray-900">
                           #{order.order_number} - {order.customer_name}
-                          <Clock className="w-3 h-3 ml-2 text-gray-400" />
-                          <span className="text-xs text-gray-500 ml-1">
-                            {formatTimeAgo(order.created_at)}
-                          </span>
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {order.customer_address}, {order.customer_neighborhood}
-                        </p>
-                        {order.observations && (
-                          <p className="text-xs text-gray-400 mt-1">
-                            Obs: {order.observations}
-                          </p>
-                        )}
+                        </h3>
+                        <div className="flex items-center text-xs text-gray-500">
+                          <Clock className="w-3 h-3 mr-1" />
+                          {formatTimeAgo(order.created_at)}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge 
+                          variant={getStatusLabel(order.status).variant}
+                          className={
+                            getStatusLabel(order.status).variant === 'default' 
+                              ? 'bg-primary text-white' 
+                              : ''
+                          }
+                        >
+                          {getStatusLabel(order.status).label}
+                        </Badge>
+                        <Button variant="ghost" size="sm">
+                          <Edit className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-4">
-                      <span className="font-semibold text-gray-900">
-                        {formatCurrency(Number(order.total))}
-                      </span>
-                      <Badge 
-                        variant={getStatusLabel(order.status).variant}
-                        className={
-                          getStatusLabel(order.status).variant === 'default' 
-                            ? 'bg-primary text-white' 
-                            : ''
-                        }
-                      >
-                        {getStatusLabel(order.status).label}
-                      </Badge>
-                      <Button variant="ghost" size="sm">
-                        <Edit className="w-4 h-4" />
-                      </Button>
+
+                    {/* Informações do pedido */}
+                    <div className="space-y-2">
+                      <p className="text-sm text-gray-500">
+                        📍 {order.customer_address}, {order.customer_neighborhood}
+                      </p>
+                      {order.observations && (
+                        <p className="text-xs text-gray-400">
+                          💬 {order.observations}
+                        </p>
+                      )}
+                      <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                        <span className="font-semibold text-lg text-gray-900">
+                          {formatCurrency(Number(order.total))}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 ))}

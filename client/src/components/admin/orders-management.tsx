@@ -114,7 +114,7 @@ export function OrdersManagement() {
 
   // Group orders by status
   const activeOrders = orders.filter((order: Order) => 
-    !['DELIVERED', 'CANCELLED'].includes(order.status)
+    ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'OUT_DELIVERY'].includes(order.status)
   );
   
   const completedOrders = orders.filter((order: Order) => 
@@ -150,18 +150,17 @@ export function OrdersManagement() {
             <div className="space-y-4">
               {activeOrders.map((order: Order) => (
                 <div key={order.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center space-x-4">
-                      <div>
-                        <h3 className="font-medium text-gray-900">
-                          Pedido #{order.order_number}
-                        </h3>
-                        <p className="text-sm text-gray-500">
-                          {order.customer_name} • {formatTime(order.created_at)}
-                        </p>
-                      </div>
+                  {/* Header com número do pedido e status */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                    <div>
+                      <h3 className="font-medium text-gray-900">
+                        Pedido #{order.order_number}
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        {order.customer_name} • {formatTime(order.created_at)}
+                      </p>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center gap-2">
                       <Badge 
                         variant={getStatusLabel(order.status).variant}
                         className={
@@ -182,18 +181,19 @@ export function OrdersManagement() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600 mb-3">
-                    <div className="flex items-center">
-                      <MapPin className="w-4 h-4 mr-2" />
-                      {order.customer_address}, {order.customer_neighborhood}
+                  {/* Informações de contato e entrega */}
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-start gap-2 text-sm text-gray-600">
+                      <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      <span>{order.customer_address}, {order.customer_neighborhood}</span>
                     </div>
-                    <div className="flex items-center">
-                      <Phone className="w-4 h-4 mr-2" />
-                      {order.customer_phone}
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Phone className="w-4 h-4 flex-shrink-0" />
+                      <span>{order.customer_phone}</span>
                     </div>
-                    <div className="flex items-center">
-                      <CreditCard className="w-4 h-4 mr-2" />
-                      {getPaymentMethodLabel(order.payment_method)}
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <CreditCard className="w-4 h-4 flex-shrink-0" />
+                      <span>{getPaymentMethodLabel(order.payment_method)}</span>
                     </div>
                   </div>
 
