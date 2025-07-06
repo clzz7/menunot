@@ -1,4 +1,10 @@
-import { MercadoPagoConfig, Preference, Payment } from 'mercadopago';
+import {
+  MercadoPagoConfig,
+  Preference,
+  Payment,
+} from 'mercadopago';
+
+// Não utilizamos tipos internos do SDK para evitar erros de resolução; usaremos 'any' quando necessário.
 
 // Initialize MercadoPago with access token
 const client = new MercadoPagoConfig({
@@ -54,9 +60,15 @@ export class MercadoPagoService {
       phone: string;
     };
     description: string;
-  }) {
+  }): Promise<{
+    id: string | number;
+    status: string;
+    qr_code?: string;
+    qr_code_base64?: string;
+    ticket_url?: string;
+  }> {
     try {
-      const paymentRequest = {
+      const paymentRequest: any = {
         transaction_amount: paymentData.amount,
         description: paymentData.description,
         payment_method_id: 'pix',
@@ -77,7 +89,7 @@ export class MercadoPagoService {
         notification_url: `${(globalThis as any).process?.env?.BASE_URL || 'http://localhost:5000'}/api/mercadopago/webhook`
       };
 
-      const result = await payment.create({ body: paymentRequest });
+      const result: any = await payment.create({ body: paymentRequest });
       
       return {
         id: result.id,
