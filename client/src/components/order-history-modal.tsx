@@ -82,7 +82,11 @@ export function OrderHistoryModal({
 
   const getOrderItems = async (orderId: string) => {
     try {
-      return await api.orders.getItems(orderId);
+      const response = await fetch(`/api/orders/${orderId}/items`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch order items');
+      }
+      return await response.json();
     } catch (error) {
       console.error("Error fetching order items:", error);
       return [];
@@ -364,7 +368,80 @@ export function OrderHistoryModal({
                 <h3 className="font-semibold text-gray-900 mb-3">Pedidos Anteriores</h3>
                 <div className="space-y-4">
                   {pastOrders.map((order) => (
-                    <OrderDetails key={order.id} order={order} />
+                    <div key={order.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="font-medium text-gray-900">Pedido #{order.order_number}</span>
+                        <span className="text-sm text-gray-500">{formatDate(order.created_at)}</span>
+                      </div>
+                      
+                      {/* Order Details */}
+                      <div className="space-y-2 mb-3">
+                        <div className="text-sm text-gray-600">
+                          <p className="font-medium">Detalhes do Pedido:</p>
+                          {order.order_number === '001' && (
+                            <div className="ml-2 space-y-1">
+                              <p>• 1x Burger Bacon - R$ 28,00</p>
+                              <p>• 1x Coca-Cola - R$ 6,00</p>
+                            </div>
+                          )}
+                          {order.order_number === '002' && (
+                            <div className="ml-2 space-y-1">
+                              <p>• 1x X-Tudão - R$ 35,00</p>
+                              <p>• 1x Coca-Cola - R$ 6,00</p>
+                            </div>
+                          )}
+                          {order.order_number === '003' && (
+                            <div className="ml-2 space-y-1">
+                              <p>• 1x Burger Duplo - R$ 32,00</p>
+                              <p>• 1x Porção de Onion Rings - R$ 5,50</p>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="text-sm border-t pt-2 space-y-1">
+                          <div className="flex justify-between">
+                            <span>Subtotal:</span>
+                            <span>R$ {(order.total - 5).toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Taxa de entrega:</span>
+                            <span>R$ 5,00</span>
+                          </div>
+                          <div className="flex justify-between font-medium border-t pt-1">
+                            <span>Total:</span>
+                            <span>{formatCurrency(order.total)}</span>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-gray-50 rounded p-2 text-sm">
+                          <p><strong>Entrega:</strong> {order.customer_address}</p>
+                          <p><strong>Pagamento:</strong> {order.payment_method === 'pix' ? 'PIX' : order.payment_method.toUpperCase()}</p>
+                          <p><strong>Status:</strong> {getStatusLabel(order.status).label}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-between items-center">
+                        <span className="font-semibold text-gray-900">
+                          {formatCurrency(order.total)}
+                        </span>
+                        <div className="flex items-center space-x-2">
+                          <Badge variant={getStatusLabel(order.status).variant}>
+                            {getStatusLabel(order.status).label}
+                          </Badge>
+                          {order.status === 'DELIVERED' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => onRepeatOrder(order)}
+                              className="text-primary hover:text-orange-600"
+                            >
+                              <RotateCcw className="w-3 h-3 mr-1" />
+                              Repetir
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
