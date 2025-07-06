@@ -618,15 +618,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/mercadopago/create-pix", async (req, res) => {
     try {
-      const { orderId, amount, payer, description } = req.body;
+      const { orderId, amount, description } = req.body;
       
+      console.log("Creating PIX payment with data:", { orderId, amount, description });
+      
+      // Dados do payer são opcionais, pois agora usamos dados fixos do restaurante
       const pixPayment = await mercadoPagoService.createPixPayment({
         orderId,
         amount,
-        payer,
         description
       });
       
+      console.log("PIX payment created successfully:", pixPayment);
       res.json(pixPayment);
     } catch (error) {
       console.error("Error creating PIX payment:", error);

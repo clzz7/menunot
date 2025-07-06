@@ -40,31 +40,45 @@ export class MercadoPagoService {
   async createPixPayment(paymentData: {
     orderId: string;
     amount: number;
-    payer: {
+    payer?: {
       name: string;
       email: string;
       phone: string;
     };
     description: string;
   }) {
-    try {
-      const paymentRequest = {
-        transaction_amount: paymentData.amount,
-        description: paymentData.description,
-        payment_method_id: 'pix',
-        payer: {
-          email: paymentData.payer.email,
-          first_name: paymentData.payer.name.split(' ')[0],
-          last_name: paymentData.payer.name.split(' ').slice(1).join(' ') || 'Cliente',
-          phone: {
-            area_code: paymentData.payer.phone.substring(2, 4),
-            number: paymentData.payer.phone.substring(4)
-          }
-        },
-        external_reference: paymentData.orderId,
-        notification_url: `${(globalThis as any).process?.env?.BASE_URL || 'http://localhost:5000'}/api/mercadopago/webhook`
-      };
+    // Usar dados fixos do restaurante para evitar erros de validação
+    const restaurantName = process.env.RESTAURANT_NAME || 'Restaurante Delivery';
+    const restaurantEmail = process.env.RESTAURANT_EMAIL || 'pagamentos@restaurante.com';
+    const restaurantPhone = process.env.RESTAURANT_PHONE || '5511999999999';
+    const restaurantCPF = process.env.RESTAURANT_CPF || '11144477735';
 
+    const paymentRequest: any = {
+      transaction_amount: paymentData.amount,
+      description: paymentData.description,
+      payment_method_id: 'pix',
+      payer: {
+        email: restaurantEmail,
+        first_name: restaurantName.split(' ')[0],
+        last_name: restaurantName.split(' ').slice(1).join(' ') || 'Delivery',
+        phone: {
+          area_code: restaurantPhone.substring(0, 2),
+          number: restaurantPhone.substring(2)
+        },
+        identification: {
+          type: 'CPF',
+          number: restaurantCPF
+        }
+      },
+      external_reference: paymentData.orderId
+    };
+
+    // Adicionar notification_url apenas se for uma URL pública válida
+    if (process.env.BASE_URL && !process.env.BASE_URL.includes('localhost')) {
+      paymentRequest.notification_url = `${process.env.BASE_URL}/api/mercadopago/webhook`;
+    }
+
+    try {
       const result = await payment.create({ body: paymentRequest });
       
       return {
@@ -76,6 +90,7 @@ export class MercadoPagoService {
       };
     } catch (error) {
       console.error('Error creating PIX payment:', error);
+      console.error('Payment request data:', JSON.stringify(paymentRequest, null, 2));
       throw error;
     }
   }

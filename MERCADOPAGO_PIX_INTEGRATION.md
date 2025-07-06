@@ -30,14 +30,11 @@ POST /api/mercadopago/create-pix
 {
   "orderId": "ORDER_123456",
   "amount": 100.50,
-  "payer": {
-    "name": "João Silva",
-    "email": "joao@email.com",
-    "phone": "5511999999999"
-  },
   "description": "Pagamento do pedido #123456"
 }
 ```
+
+**Nota:** Os dados do cliente não são mais necessários no payload, pois agora usamos dados fixos do restaurante configurados no servidor.
 
 **Resposta:**
 ```json
@@ -86,11 +83,6 @@ const createPixPayment = async (orderData) => {
     const response = await api.mercadopago.createPix({
       orderId: orderData.id,
       amount: orderData.total,
-      payer: {
-        name: orderData.customer.name,
-        email: orderData.customer.email,
-        phone: orderData.customer.phone
-      },
       description: `Pagamento do pedido #${orderData.id}`
     });
     
@@ -148,11 +140,6 @@ const PixPayment = ({ orderData }) => {
       const response = await api.mercadopago.createPix({
         orderId: orderData.id,
         amount: orderData.total,
-        payer: {
-          name: orderData.customer.name,
-          email: orderData.customer.email,
-          phone: orderData.customer.phone
-        },
         description: `Pagamento do pedido #${orderData.id}`
       });
       
@@ -256,11 +243,6 @@ const PixPayment = ({ orderData }) => {
      -d '{
        "orderId": "TEST_123",
        "amount": 10.00,
-       "payer": {
-         "name": "João Teste",
-         "email": "teste@email.com",
-         "phone": "5511999999999"
-       },
        "description": "Pagamento teste"
      }'
    ```
@@ -280,5 +262,25 @@ POST /api/mercadopago/webhook
 2. **Webhook**: Configure o webhook na sua conta do Mercado Pago apontando para `{sua_url}/api/mercadopago/webhook`
 3. **Timeout**: Os pagamentos PIX têm validade de 30 minutos
 4. **Polling**: Implemente verificação periódica do status do pagamento no frontend
+5. **Dados Fixos**: A integração foi configurada para usar dados fixos do restaurante (nome, email, telefone, CPF) ao invés dos dados do cliente
+6. **URL Pública**: O webhook só funciona com URLs públicas. Em desenvolvimento local, o notification_url é omitido
+7. **Configuração**: Todos os dados do restaurante estão configurados no arquivo `.env`
+
+## Vantagens da Configuração com Dados Fixos
+
+✅ **Evita erros de validação** com dados de clientes
+✅ **Simplifica o processo** de pagamento
+✅ **Reduz a complexidade** da integração
+✅ **Mantém a segurança** dos dados dos clientes
+✅ **Facilita testes** e desenvolvimento
+
+## Para Produção
+
+Para usar em produção, você precisará:
+
+1. **Configurar URL pública**: Altere a `BASE_URL` no arquivo `.env` para a URL pública do seu servidor
+2. **Configurar webhook**: No painel do Mercado Pago, configure o webhook apontando para `{sua_url}/api/mercadopago/webhook`
+3. **Validar dados**: Certifique-se de que os dados do restaurante no `.env` estão corretos
+4. **Testar**: Faça testes com valores baixos antes de colocar em produção
 
 A integração está pronta para uso! 🎉
