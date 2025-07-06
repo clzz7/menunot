@@ -456,26 +456,7 @@ export function OrderHistoryModal({
               </div>
             )}
 
-            {/* Statistics */}
-            {orders.length > 0 && (
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h4 className="font-semibold text-gray-900 mb-3">Suas Estatísticas</h4>
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div>
-                    <p className="text-2xl font-bold text-primary">{totalOrders}</p>
-                    <p className="text-sm text-gray-600">Pedidos</p>
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-primary">{formatCurrency(totalSpent)}</p>
-                    <p className="text-sm text-gray-600">Total Gasto</p>
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-primary">{formatCurrency(averageOrder)}</p>
-                    <p className="text-sm text-gray-600">Ticket Médio</p>
-                  </div>
-                </div>
-              </div>
-            )}
+
           </div>
         </ScrollArea>
 
