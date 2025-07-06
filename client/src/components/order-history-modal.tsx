@@ -266,18 +266,25 @@ export function OrderHistoryModal({
       'READY': { label: 'Pronto', variant: 'default' },
       'OUT_DELIVERY': { label: 'Saiu para entrega', variant: 'default' },
       'DELIVERED': { label: 'Entregue', variant: 'default' },
-      'CANCELLED': { label: 'Cancelado', variant: 'destructive' }
+      'CANCELLED': { label: 'Cancelado', variant: 'destructive' },
+      'pending': { label: 'Pendente', variant: 'secondary' },
+      'confirmed': { label: 'Confirmado', variant: 'default' },
+      'preparing': { label: 'Preparando', variant: 'default' },
+      'ready': { label: 'Pronto', variant: 'default' },
+      'out_delivery': { label: 'Saiu para entrega', variant: 'default' },
+      'delivered': { label: 'Entregue', variant: 'default' },
+      'cancelled': { label: 'Cancelado', variant: 'destructive' }
     };
     
     return statusMap[status] || { label: status, variant: 'secondary' as const };
   };
 
   const currentOrder = Array.isArray(orders) ? orders.find(order => 
-    ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'OUT_DELIVERY'].includes(order.status)
+    ['pending', 'confirmed', 'preparing', 'ready', 'out_delivery', 'PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'OUT_DELIVERY'].includes(order.status)
   ) : null;
   
   const pastOrders = Array.isArray(orders) ? orders.filter(order => 
-    ['DELIVERED', 'CANCELLED'].includes(order.status)
+    ['delivered', 'cancelled', 'DELIVERED', 'CANCELLED'].includes(order.status)
   ) : [];
 
   // Calculate statistics
