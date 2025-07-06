@@ -181,9 +181,9 @@ export function OrderHistoryModal({
                   {orderItems.map((item: any) => (
                     <div key={item.id} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
                       <div className="flex-1">
-                        <p className="font-medium text-sm">{getProductName(item.productId)}</p>
+                        <p className="font-medium text-sm">{getProductName(item.product_id)}</p>
                         <p className="text-sm text-gray-500">
-                          {item.quantity}x {formatCurrency(item.unitPrice)}
+                          {item.quantity}x {formatCurrency(item.unit_price)}
                         </p>
                         {item.observations && (
                           <p className="text-xs text-gray-400 mt-1">Obs: {item.observations}</p>

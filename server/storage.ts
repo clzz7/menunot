@@ -20,7 +20,7 @@ import {
   type InsertOrderItem,
   type Coupon,
   type InsertCoupon
-} from "@shared/schema";
+} from "@shared/schema-sqlite";
 import { db } from "./db";
 import { eq, and, desc, sql } from "drizzle-orm";
 
