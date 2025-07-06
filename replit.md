@@ -116,6 +116,9 @@ The application has been successfully migrated to PostgreSQL:
 ## Changelog
 ```
 Changelog:
+- July 6, 2025: Database recreated with lanchonete (burger place) theme
+- July 6, 2025: UI improvements: removed orange CTA card, fixed cart button alignment
+- July 6, 2025: Enhanced order history with detailed item breakdown
 - July 5, 2025: Migration from Replit Agent to Replit completed
 - July 5, 2025: PostgreSQL database migrated and configured successfully
 - July 5, 2025: Database preparation for PostgreSQL migration
