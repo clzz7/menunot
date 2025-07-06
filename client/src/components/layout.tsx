@@ -107,9 +107,9 @@ export default function Layout({ children }: LayoutProps) {
               {/* Cart Button */}
               <Link href="/checkout">
                 <Button 
-                  className="relative bg-primary text-white hover:bg-orange-600 transition-colors flex items-center justify-center"
+                  className="relative bg-primary text-white hover:bg-orange-600 transition-colors flex items-center justify-center h-10"
                 >
-                  <ShoppingCart className="w-4 h-4 mr-2" />
+                  <ShoppingCart className="w-4 h-4 sm:mr-2" />
                   <span className="hidden sm:inline">Carrinho</span>
                   {cart.itemCount > 0 && (
                     <Badge className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center p-0">
