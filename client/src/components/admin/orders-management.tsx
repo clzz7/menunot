@@ -154,10 +154,10 @@ export function OrdersManagement() {
                     <div className="flex items-center space-x-4">
                       <div>
                         <h3 className="font-medium text-gray-900">
-                          Pedido #{order.orderNumber}
+                          Pedido #{order.order_number}
                         </h3>
                         <p className="text-sm text-gray-500">
-                          {order.customerName} • {formatTime(order.createdAt)}
+                          {order.customer_name} • {formatTime(order.created_at)}
                         </p>
                       </div>
                     </div>
@@ -185,31 +185,31 @@ export function OrdersManagement() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600 mb-3">
                     <div className="flex items-center">
                       <MapPin className="w-4 h-4 mr-2" />
-                      {order.deliveryAddress}, {order.deliveryNumber}
+                      {order.customer_address}, {order.customer_neighborhood}
                     </div>
                     <div className="flex items-center">
                       <Phone className="w-4 h-4 mr-2" />
-                      {order.customerPhone}
+                      {order.customer_phone}
                     </div>
                     <div className="flex items-center">
                       <CreditCard className="w-4 h-4 mr-2" />
-                      {getPaymentMethodLabel(order.paymentMethod)}
+                      {getPaymentMethodLabel(order.payment_method)}
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <span className="font-semibold text-lg">
                       {formatCurrency(order.total)}
                     </span>
                     
-                    <div className="flex items-center space-x-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       {canAdvanceStatus(order.status) && (
                         <>
                           {getNextStatus(order.status) && (
                             <Button
                               size="sm"
                               onClick={() => handleStatusUpdate(order.id, getNextStatus(order.status)!)}
-                              className="bg-primary hover:bg-orange-600"
+                              className="bg-primary hover:bg-orange-600 text-white"
                             >
                               <Check className="w-4 h-4 mr-1" />
                               Avançar Status
@@ -265,9 +265,9 @@ export function OrdersManagement() {
                   <div key={order.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
                     <div>
                       <p className="font-medium text-gray-900">
-                        #{order.orderNumber} - {order.customerName}
+                        #{order.order_number} - {order.customer_name}
                       </p>
-                      <p className="text-sm text-gray-500">{formatTime(order.createdAt)}</p>
+                      <p className="text-sm text-gray-500">{formatTime(order.created_at)}</p>
                     </div>
                     <div className="flex items-center space-x-3">
                       <span className="font-semibold">{formatCurrency(order.total)}</span>
@@ -317,9 +317,9 @@ export function OrdersManagement() {
                 <div>
                   <h4 className="font-medium text-gray-900 mb-2">Informações do Pedido</h4>
                   <div className="space-y-1 text-sm">
-                    <p><strong>Data:</strong> {formatTime(selectedOrder.createdAt)}</p>
+                    <p><strong>Data:</strong> {formatTime(selectedOrder.created_at)}</p>
                     <p><strong>Status:</strong> {getStatusLabel(selectedOrder.status).label}</p>
-                    <p><strong>Pagamento:</strong> {getPaymentMethodLabel(selectedOrder.paymentMethod)}</p>
+                    <p><strong>Pagamento:</strong> {getPaymentMethodLabel(selectedOrder.payment_method)}</p>
                   </div>
                 </div>
               </div>

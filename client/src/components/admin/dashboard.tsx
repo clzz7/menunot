@@ -130,14 +130,14 @@ export function Dashboard() {
                     <div className="flex items-center space-x-4">
                       <div>
                         <p className="font-medium text-gray-900 flex items-center">
-                          #{order.orderNumber} - {order.customerName}
+                          #{order.order_number} - {order.customer_name}
                           <Clock className="w-3 h-3 ml-2 text-gray-400" />
                           <span className="text-xs text-gray-500 ml-1">
-                            {formatTimeAgo(order.createdAt)}
+                            {formatTimeAgo(order.created_at)}
                           </span>
                         </p>
                         <p className="text-sm text-gray-500">
-                          {order.deliveryAddress}, {order.deliveryNumber}
+                          {order.customer_address}, {order.customer_neighborhood}
                         </p>
                         {order.observations && (
                           <p className="text-xs text-gray-400 mt-1">
