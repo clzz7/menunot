@@ -342,29 +342,8 @@ export function OrderHistoryModal({
             {currentOrder && (
               <div>
                 <h3 className="font-semibold text-gray-900 mb-3">Pedido Atual</h3>
-                <div className="bg-primary bg-opacity-10 border border-primary border-opacity-20 rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-medium text-primary">Pedido #{currentOrder.orderNumber}</span>
-                    <span className="text-sm text-gray-500">{formatDate(currentOrder.createdAt)}</span>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-2">{currentOrder.customerName}</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-semibold text-primary">
-                      {formatCurrency(currentOrder.total)}
-                    </span>
-                    <Badge 
-                      variant={getStatusLabel(currentOrder.status).variant}
-                      className={`${
-                        ['PREPARING'].includes(currentOrder.status) ? 'order-status-animate' : ''
-                      } ${
-                        getStatusLabel(currentOrder.status).variant === 'default' 
-                          ? 'bg-primary text-white' 
-                          : ''
-                      }`}
-                    >
-                      {getStatusLabel(currentOrder.status).label}
-                    </Badge>
-                  </div>
+                <div className="border-2 border-primary border-opacity-50 rounded-lg bg-primary bg-opacity-5">
+                  <OrderDetails order={currentOrder} />
                 </div>
               </div>
             )}
