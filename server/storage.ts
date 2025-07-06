@@ -254,13 +254,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateOrderStatus(id: string, status: string, timestamp?: Date): Promise<Order> {
-    const updateData: any = { status, updated_at: new Date() };
+    const now = new Date().toISOString();
+    const updateData: any = { status, updated_at: now };
     
     // Set appropriate timestamp based on status
-    if (status === "CONFIRMED" && timestamp) updateData.confirmed_at = timestamp;
-    if (status === "PREPARING" && timestamp) updateData.preparing_at = timestamp;
-    if (status === "READY" && timestamp) updateData.ready_at = timestamp;
-    if (status === "DELIVERED" && timestamp) updateData.delivered_at = timestamp;
+    const timestampISO = timestamp?.toISOString() || now;
+    if (status === "CONFIRMED") updateData.confirmed_at = timestampISO;
+    if (status === "PREPARING") updateData.preparing_at = timestampISO;
+    if (status === "READY") updateData.ready_at = timestampISO;
+    if (status === "DELIVERED") updateData.delivered_at = timestampISO;
 
     const [updated] = await db
       .update(orders)

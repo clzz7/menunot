@@ -32,6 +32,13 @@ export function OrdersManagement() {
     refetchInterval: 5000 // Refresh every 5 seconds
   });
 
+  // Fetch order items when a specific order is selected
+  const { data: orderItems = [] } = useQuery({
+    queryKey: ["/api/orders", selectedOrder?.id, "items"],
+    queryFn: () => selectedOrder ? api.orders.getItems(selectedOrder.id) : [],
+    enabled: !!selectedOrder?.id
+  });
+
   const updateStatusMutation = useMutation({
     mutationFn: ({ orderId, status }: { orderId: string; status: string }) =>
       api.orders.updateStatus(orderId, status),
@@ -306,10 +313,10 @@ export function OrdersManagement() {
                 <div>
                   <h4 className="font-medium text-gray-900 mb-2">Informações do Cliente</h4>
                   <div className="space-y-1 text-sm">
-                    <p><strong>Nome:</strong> {selectedOrder.customerName}</p>
-                    <p><strong>Telefone:</strong> {selectedOrder.customerPhone}</p>
-                    {selectedOrder.customerEmail && (
-                      <p><strong>Email:</strong> {selectedOrder.customerEmail}</p>
+                    <p><strong>Nome:</strong> {selectedOrder.customer_name}</p>
+                    <p><strong>Telefone:</strong> {selectedOrder.customer_phone}</p>
+                    {selectedOrder.customer_email && (
+                      <p><strong>Email:</strong> {selectedOrder.customer_email}</p>
                     )}
                   </div>
                 </div>
@@ -329,24 +336,42 @@ export function OrdersManagement() {
                 <h4 className="font-medium text-gray-900 mb-2">Endereço de Entrega</h4>
                 <div className="p-3 bg-gray-50 rounded text-sm">
                   <p>
-                    {selectedOrder.deliveryAddress}, {selectedOrder.deliveryNumber}
-                    {selectedOrder.deliveryComplement && `, ${selectedOrder.deliveryComplement}`}
+                    {selectedOrder.customer_address}
+                    {selectedOrder.customer_complement && `, ${selectedOrder.customer_complement}`}
                   </p>
-                  <p>{selectedOrder.deliveryNeighborhood} - {selectedOrder.deliveryCity}/{selectedOrder.deliveryState}</p>
-                  <p>CEP: {selectedOrder.deliveryZipCode}</p>
-                  {selectedOrder.deliveryReference && (
-                    <p className="text-gray-600 mt-1">Ref: {selectedOrder.deliveryReference}</p>
-                  )}
+                  <p>{selectedOrder.customer_neighborhood} - {selectedOrder.customer_city}/{selectedOrder.customer_state}</p>
+                  <p>CEP: {selectedOrder.customer_zip_code}</p>
                 </div>
               </div>
 
-              {/* Order Items - This would need to be fetched separately */}
+              {/* Order Items */}
               <div>
                 <h4 className="font-medium text-gray-900 mb-2">Itens do Pedido</h4>
                 <div className="border rounded">
-                  <div className="p-3 bg-gray-50 text-sm text-gray-600">
-                    Itens do pedido (implementar busca de itens)
-                  </div>
+                  {orderItems.length > 0 ? (
+                    <div className="divide-y">
+                      {orderItems.map((item: any, index: number) => (
+                        <div key={index} className="p-3 flex justify-between items-center">
+                          <div>
+                            <p className="font-medium text-sm">Item #{item.product_id}</p>
+                            <p className="text-xs text-gray-500">
+                              Quantidade: {item.quantity} × {formatCurrency(item.unit_price)}
+                            </p>
+                            {item.observations && (
+                              <p className="text-xs text-gray-400 mt-1">Obs: {item.observations}</p>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            <p className="font-medium text-sm">{formatCurrency(item.total)}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-3 bg-gray-50 text-sm text-gray-600">
+                      Carregando itens do pedido...
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -359,12 +384,12 @@ export function OrdersManagement() {
                   </div>
                   <div className="flex justify-between">
                     <span>Taxa de entrega:</span>
-                    <span>{formatCurrency(selectedOrder.deliveryFee)}</span>
+                    <span>{formatCurrency(selectedOrder.delivery_fee)}</span>
                   </div>
-                  {Number(selectedOrder.discount) > 0 && (
+                  {Number(selectedOrder.discount_amount) > 0 && (
                     <div className="flex justify-between text-success">
                       <span>Desconto:</span>
-                      <span>-{formatCurrency(selectedOrder.discount)}</span>
+                      <span>-{formatCurrency(selectedOrder.discount_amount)}</span>
                     </div>
                   )}
                   <div className="flex justify-between font-semibold text-lg border-t pt-2">
