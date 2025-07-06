@@ -351,13 +351,14 @@ export class DatabaseStorage implements IStorage {
   }> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const todayISO = today.toISOString();
     
     const todayOrdersResult = await db
       .select({ count: sql<number>`count(*)`, total: sql<number>`sum(${orders.total})` })
       .from(orders)
       .where(and(
         eq(orders.establishment_id, establishmentId),
-        sql`${orders.created_at} >= ${today}`
+        sql`${orders.created_at} >= ${todayISO}`
       ));
 
     const totalCustomersResult = await db
