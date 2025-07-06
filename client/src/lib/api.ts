@@ -33,6 +33,8 @@ export const api = {
     getAll: () => fetch("/api/orders").then(res => res.json()),
     getByCustomer: (customerId: string) => 
       fetch(`/api/orders/customer/${customerId}`).then(res => res.json()),
+    getItems: (orderId: string) => 
+      fetch(`/api/orders/${orderId}/items`).then(res => res.json()),
     create: (data: any) => apiRequest("POST", "/api/orders", data),
     updateStatus: (id: string, status: string) => 
       apiRequest("PUT", `/api/orders/${id}/status`, { status })

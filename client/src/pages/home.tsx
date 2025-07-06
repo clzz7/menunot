@@ -384,45 +384,7 @@ function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <Card className="hero-gradient p-12 text-center text-primary-foreground">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                Pronto para uma Experiência Inesquecível?
-              </h2>
-              <p className="text-xl mb-8 opacity-90">
-                Reserve sua mesa e descubra por que somos referência em gastronomia
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/cardapio">
-                  <Button 
-                    size="lg" 
-                    variant="secondary"
-                    className="rounded-full px-8 py-6 text-lg"
-                  >
-                    Fazer Pedido Online
-                  </Button>
-                </Link>
-                <Button 
-                  size="lg"
-                  variant="outline" 
-                  className="rounded-full px-8 py-6 text-lg border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
-                >
-                  <MapPin className="w-5 h-5 mr-2" />
-                  Ver Localização
-                </Button>
-              </div>
-            </Card>
-          </motion.div>
-        </div>
-      </section>
+
 
       {/* Cart Sidebar */}
       <CartSidebar
@@ -444,7 +406,7 @@ function Home() {
         >
           <ShoppingBag className="w-6 h-6" />
           <span className="absolute -top-2 -right-2 bg-secondary text-secondary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">
-            {cart.items.reduce((acc, item) => acc + item.quantity, 0)}
+            {cart.items.reduce((acc: number, item: any) => acc + item.quantity, 0)}
           </span>
         </motion.button>
       )}

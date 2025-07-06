@@ -154,15 +154,15 @@ async function setupDatabase() {
     // Insert establishment
     sqlite.exec(`
       INSERT OR IGNORE INTO establishments (id, name, description, phone, email, address, delivery_fee, minimum_order, created_at, updated_at)
-      VALUES ('${establishmentId}', 'Pizzaria Bella Vista', 'Authentic Italian pizza and pasta', '(11) 99999-9999', 'contato@bellavista.com.br', 'Rua das Flores, 123 - Centro', 5.0, 25.0, '${timestamp}', '${timestamp}');
+      VALUES ('${establishmentId}', 'Burger Point', 'Lanchonete tradicional com os melhores hambúrgueres da cidade', '(11) 99999-9999', 'contato@burgerpoint.com.br', 'Rua das Flores, 123 - Centro', 5.0, 20.0, '${timestamp}', '${timestamp}');
     `);
 
     // Insert categories
     const categories = [
-      { id: '1', name: 'Pizzas', description: 'Traditional and specialty pizzas' },
-      { id: '2', name: 'Pasta', description: 'Homemade pasta dishes' },
-      { id: '3', name: 'Appetizers', description: 'Starters and appetizers' },
-      { id: '4', name: 'Beverages', description: 'Drinks and beverages' }
+      { id: '1', name: 'Hambúrgueres', description: 'Hambúrgueres artesanais e tradicionais' },
+      { id: '2', name: 'Batatas e Porções', description: 'Batatas fritas e porções especiais' },
+      { id: '3', name: 'Lanches e Sanduíches', description: 'Lanches tradicionais e sanduíches' },
+      { id: '4', name: 'Bebidas', description: 'Refrigerantes, sucos e bebidas' }
     ];
 
     for (const category of categories) {
@@ -174,15 +174,16 @@ async function setupDatabase() {
 
     // Insert products
     const products = [
-      { id: '1', categoryId: '1', name: 'Margherita', description: 'Fresh tomatoes, mozzarella, basil', price: 35.0, prepTime: '25-30 min' },
-      { id: '2', categoryId: '1', name: 'Pepperoni', description: 'Pepperoni, mozzarella, tomato sauce', price: 40.0, prepTime: '25-30 min' },
-      { id: '3', categoryId: '1', name: 'Quattro Stagioni', description: 'Ham, mushrooms, artichokes, olives', price: 45.0, prepTime: '30-35 min' },
-      { id: '4', categoryId: '2', name: 'Spaghetti Carbonara', description: 'Eggs, bacon, parmesan, black pepper', price: 28.0, prepTime: '20-25 min' },
-      { id: '5', categoryId: '2', name: 'Penne Arrabiata', description: 'Spicy tomato sauce, garlic, chili', price: 25.0, prepTime: '20-25 min' },
-      { id: '6', categoryId: '3', name: 'Bruschetta', description: 'Toasted bread, tomatoes, basil', price: 15.0, prepTime: '10-15 min' },
-      { id: '7', categoryId: '3', name: 'Mozzarella Sticks', description: 'Breaded mozzarella with marinara', price: 18.0, prepTime: '15-20 min' },
-      { id: '8', categoryId: '4', name: 'Coca-Cola', description: 'Classic cola drink', price: 8.0, prepTime: '2-3 min' },
-      { id: '9', categoryId: '4', name: 'Fresh Orange Juice', description: 'Freshly squeezed orange juice', price: 12.0, prepTime: '5-8 min' }
+      { id: '1', categoryId: '1', name: 'Burger Bacon', description: 'Hambúrguer artesanal com bacon crocante, queijo cheddar, alface e tomate', price: 28.0, prepTime: '15-20 min' },
+      { id: '2', categoryId: '1', name: 'X-Tudão', description: 'Hambúrguer completo com 2 carnes, bacon, queijo, ovo, alface, tomate e batata palha', price: 35.0, prepTime: '20-25 min' },
+      { id: '3', categoryId: '1', name: 'Burger Duplo', description: 'Dois hambúrgueres artesanais, queijo duplo, cebola caramelizada e molho especial', price: 32.0, prepTime: '18-22 min' },
+      { id: '4', categoryId: '2', name: 'Batata Frita Recheada', description: 'Batatas fritas crocantes com queijo derretido, bacon e cebolinha', price: 22.0, prepTime: '12-15 min' },
+      { id: '5', categoryId: '2', name: 'Porção de Onion Rings', description: 'Anéis de cebola empanados e fritos, acompanha molho especial', price: 18.0, prepTime: '10-12 min' },
+      { id: '6', categoryId: '3', name: 'Sanduíche Natural', description: 'Pão integral com peito de peru, queijo branco, alface, tomate e maionese', price: 15.0, prepTime: '8-10 min' },
+      { id: '7', categoryId: '3', name: 'Hot Dog Especial', description: 'Salsicha artesanal, queijo, milho, batata palha e molho especial', price: 16.0, prepTime: '10-12 min' },
+      { id: '8', categoryId: '4', name: 'Coca-Cola', description: 'Refrigerante clássico gelado', price: 6.0, prepTime: '2-3 min' },
+      { id: '9', categoryId: '4', name: 'Suco de Laranja Natural', description: 'Suco de laranja natural, sem conservantes', price: 8.0, prepTime: '3-5 min' },
+      { id: '10', categoryId: '2', name: 'Nuggets com Molho', description: '8 nuggets crocantes acompanhados de molho barbecue', price: 20.0, prepTime: '8-10 min' }
     ];
 
     for (const product of products) {
@@ -214,9 +215,9 @@ async function setupDatabase() {
 
     // Insert sample orders for the recurring customer
     const orders = [
-      { id: 'order-1', orderNumber: '001', total: 42.50, status: 'delivered', deliveredAt: new Date(Date.now() - 86400000 * 7).toISOString() },
-      { id: 'order-2', orderNumber: '002', total: 35.00, status: 'delivered', deliveredAt: new Date(Date.now() - 86400000 * 3).toISOString() },
-      { id: 'order-3', orderNumber: '003', total: 50.00, status: 'preparing', deliveredAt: null }
+      { id: 'order-1', orderNumber: '001', total: 39.00, status: 'delivered', deliveredAt: new Date(Date.now() - 86400000 * 7).toISOString() },
+      { id: 'order-2', orderNumber: '002', total: 46.00, status: 'delivered', deliveredAt: new Date(Date.now() - 86400000 * 3).toISOString() },
+      { id: 'order-3', orderNumber: '003', total: 42.50, status: 'preparing', deliveredAt: null }
     ];
 
     for (const order of orders) {
@@ -239,10 +240,12 @@ async function setupDatabase() {
 
     // Insert order items for the orders
     const orderItems = [
-      { id: 'item-1', orderId: 'order-1', productId: '1', quantity: 1, unitPrice: 35.0, total: 35.0 },
-      { id: 'item-2', orderId: 'order-1', productId: '8', quantity: 1, unitPrice: 8.0, total: 8.0 },
-      { id: 'item-3', orderId: 'order-2', productId: '2', quantity: 1, unitPrice: 40.0, total: 40.0 },
-      { id: 'item-4', orderId: 'order-3', productId: '3', quantity: 1, unitPrice: 45.0, total: 45.0 }
+      { id: 'item-1', orderId: 'order-1', productId: '1', quantity: 1, unitPrice: 28.0, total: 28.0 },
+      { id: 'item-2', orderId: 'order-1', productId: '8', quantity: 1, unitPrice: 6.0, total: 6.0 },
+      { id: 'item-3', orderId: 'order-2', productId: '2', quantity: 1, unitPrice: 35.0, total: 35.0 },
+      { id: 'item-4', orderId: 'order-2', productId: '8', quantity: 1, unitPrice: 6.0, total: 6.0 },
+      { id: 'item-5', orderId: 'order-3', productId: '3', quantity: 1, unitPrice: 32.0, total: 32.0 },
+      { id: 'item-6', orderId: 'order-3', productId: '5', quantity: 1, unitPrice: 5.5, total: 5.5 }
     ];
 
     for (const item of orderItems) {
@@ -256,7 +259,7 @@ async function setupDatabase() {
     console.log('Sample data inserted:');
     console.log('- 1 establishment');
     console.log('- 4 categories');
-    console.log('- 9 products');
+    console.log('- 10 products');
     console.log('- 1 user');
     console.log('- 1 coupon');
     console.log('- 1 recurring customer (João Silva)');

@@ -449,6 +449,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/orders/:id/items", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const items = await storage.getOrderItems(id);
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching order items:", error);
+      res.status(500).json({ error: "Failed to fetch order items" });
+    }
+  });
+
   // Coupons
   app.get("/api/coupons", async (req, res) => {
     try {

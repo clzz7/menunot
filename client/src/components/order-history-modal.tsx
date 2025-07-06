@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button.js";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog.js";
@@ -6,7 +6,8 @@ import { ScrollArea } from "@/components/ui/scroll-area.js";
 import { Badge } from "@/components/ui/badge.js";
 import { Separator } from "@/components/ui/separator.js";
 import { Input } from "@/components/ui/input.js";
-import { History, X, RotateCcw, ShoppingCart, Search } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible.js";
+import { History, X, RotateCcw, ShoppingCart, Search, ChevronDown, ChevronUp } from "lucide-react";
 import { api } from "@/lib/api.js";
 import { Order } from "@shared/schema.js";
 
@@ -27,6 +28,7 @@ export function OrderHistoryModal({
 }: OrderHistoryModalProps) {
   const [whatsapp, setWhatsapp] = useState("");
   const [searchedCustomerId, setSearchedCustomerId] = useState<string | null>(null);
+  const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
   
   const effectiveCustomerId = customerId || searchedCustomerId;
   
@@ -34,6 +36,12 @@ export function OrderHistoryModal({
     queryKey: ["/api/orders/customer", effectiveCustomerId],
     queryFn: () => effectiveCustomerId ? api.orders.getByCustomer(effectiveCustomerId) : Promise.resolve([]),
     enabled: !!effectiveCustomerId && isOpen
+  });
+
+  const { data: products = [] } = useQuery({
+    queryKey: ["/api/products"],
+    queryFn: api.products.getAll,
+    enabled: isOpen
   });
 
   const handleSearchOrders = async () => {
@@ -56,7 +64,179 @@ export function OrderHistoryModal({
     // Reset search state when modal closes
     setWhatsapp("");
     setSearchedCustomerId(null);
+    setExpandedOrders(new Set());
     onClose();
+  };
+
+  const toggleOrderExpansion = (orderId: string) => {
+    setExpandedOrders(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(orderId)) {
+        newSet.delete(orderId);
+      } else {
+        newSet.add(orderId);
+      }
+      return newSet;
+    });
+  };
+
+  const getOrderItems = async (orderId: string) => {
+    try {
+      return await api.orders.getItems(orderId);
+    } catch (error) {
+      console.error("Error fetching order items:", error);
+      return [];
+    }
+  };
+
+  const getProductName = (productId: string) => {
+    const product = products.find((p: any) => p.id === productId);
+    return product?.name || 'Produto não encontrado';
+  };
+
+  // Component to show order details
+  const OrderDetails = ({ order }: { order: Order }) => {
+    const [orderItems, setOrderItems] = useState<any[]>([]);
+    const [loadingItems, setLoadingItems] = useState(false);
+    const isExpanded = expandedOrders.has(order.id);
+
+    const fetchOrderItems = async () => {
+      if (isExpanded && orderItems.length === 0) {
+        setLoadingItems(true);
+        try {
+          const items = await getOrderItems(order.id);
+          setOrderItems(items);
+        } catch (error) {
+          console.error("Error fetching items:", error);
+        } finally {
+          setLoadingItems(false);
+        }
+      }
+    };
+
+    React.useEffect(() => {
+      if (isExpanded) {
+        fetchOrderItems();
+      }
+    }, [isExpanded]);
+
+    return (
+      <Collapsible open={isExpanded} onOpenChange={() => toggleOrderExpansion(order.id)}>
+        <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+          <CollapsibleTrigger asChild>
+            <div className="w-full cursor-pointer">
+              <div className="flex justify-between items-start mb-2">
+                <span className="font-medium text-gray-900">Pedido #{order.order_number}</span>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-500">{formatDate(order.created_at)}</span>
+                  {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">
+                {order.status === 'DELIVERED' ? `Entregue em ${formatDate(order.delivered_at || order.created_at)}` : 'Em andamento'}
+              </p>
+              <div className="flex justify-between items-center">
+                <span className="font-semibold text-gray-900">
+                  {formatCurrency(order.total)}
+                </span>
+                <div className="flex items-center space-x-2">
+                  <Badge variant={getStatusLabel(order.status).variant}>
+                    {getStatusLabel(order.status).label}
+                  </Badge>
+                  {order.status === 'DELIVERED' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRepeatOrder(order);
+                      }}
+                      className="text-primary hover:text-orange-600"
+                    >
+                      <RotateCcw className="w-3 h-3 mr-1" />
+                      Repetir
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </CollapsibleTrigger>
+          
+          <CollapsibleContent className="mt-4">
+            <Separator className="mb-4" />
+            <div className="space-y-3">
+              <h4 className="font-medium text-gray-900">Detalhes do Pedido</h4>
+              
+              {loadingItems ? (
+                <div className="text-center py-4">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
+                  <p className="text-sm text-gray-500 mt-2">Carregando itens...</p>
+                </div>
+              ) : orderItems.length > 0 ? (
+                <div className="space-y-2">
+                  {orderItems.map((item: any) => (
+                    <div key={item.id} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                      <div className="flex-1">
+                        <p className="font-medium text-sm">{getProductName(item.productId)}</p>
+                        <p className="text-sm text-gray-500">
+                          {item.quantity}x {formatCurrency(item.unitPrice)}
+                        </p>
+                        {item.observations && (
+                          <p className="text-xs text-gray-400 mt-1">Obs: {item.observations}</p>
+                        )}
+                      </div>
+                      <span className="font-medium text-sm">
+                        {formatCurrency(item.total)}
+                      </span>
+                    </div>
+                  ))}
+                  
+                  <div className="pt-2 mt-4 border-t border-gray-200">
+                    <div className="flex justify-between text-sm">
+                      <span>Subtotal:</span>
+                      <span>{formatCurrency(order.subtotal)}</span>
+                    </div>
+                    {order.delivery_fee > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span>Taxa de entrega:</span>
+                        <span>{formatCurrency(order.delivery_fee)}</span>
+                      </div>
+                    )}
+                    {order.discount_amount > 0 && (
+                      <div className="flex justify-between text-sm text-green-600">
+                        <span>Desconto:</span>
+                        <span>-{formatCurrency(order.discount_amount)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between font-medium text-base pt-2 border-t border-gray-200">
+                      <span>Total:</span>
+                      <span>{formatCurrency(order.total)}</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500">Não foi possível carregar os itens do pedido.</p>
+              )}
+
+              <div className="bg-gray-50 rounded-lg p-3 mt-4">
+                <h5 className="font-medium text-sm mb-2">Informações de Entrega</h5>
+                <p className="text-sm text-gray-600">
+                  {order.customer_address}
+                  {order.customer_complement && `, ${order.customer_complement}`}
+                </p>
+                <p className="text-sm text-gray-600">
+                  {order.customer_neighborhood}, {order.customer_city} - {order.customer_state}
+                </p>
+                <p className="text-sm text-gray-600">CEP: {order.customer_zip_code}</p>
+                <p className="text-sm text-gray-600 mt-2">
+                  Pagamento: {order.payment_method === 'pix' ? 'PIX' : order.payment_method.toUpperCase()}
+                </p>
+              </div>
+            </div>
+          </CollapsibleContent>
+        </div>
+      </Collapsible>
+    );
   };
 
   const formatCurrency = (value: number | string) => {
@@ -184,34 +364,7 @@ export function OrderHistoryModal({
                 <h3 className="font-semibold text-gray-900 mb-3">Pedidos Anteriores</h3>
                 <div className="space-y-4">
                   {pastOrders.map((order) => (
-                    <div key={order.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                      <div className="flex justify-between items-start mb-2">
-                        <span className="font-medium text-gray-900">Pedido #{order.orderNumber}</span>
-                        <span className="text-sm text-gray-500">{formatDate(order.createdAt)}</span>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-3">Total de {order.customerName}</p>
-                      <div className="flex justify-between items-center">
-                        <span className="font-semibold text-gray-900">
-                          {formatCurrency(order.total)}
-                        </span>
-                        <div className="flex items-center space-x-2">
-                          <Badge variant={getStatusLabel(order.status).variant}>
-                            {getStatusLabel(order.status).label}
-                          </Badge>
-                          {order.status === 'DELIVERED' && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => onRepeatOrder(order)}
-                              className="text-primary hover:text-orange-600"
-                            >
-                              <RotateCcw className="w-3 h-3 mr-1" />
-                              Repetir
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                    <OrderDetails key={order.id} order={order} />
                   ))}
                 </div>
               </div>

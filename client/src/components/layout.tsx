@@ -107,7 +107,7 @@ export default function Layout({ children }: LayoutProps) {
               {/* Cart Button */}
               <Link href="/checkout">
                 <Button 
-                  className="relative bg-primary text-white hover:bg-orange-600 transition-colors"
+                  className="relative bg-primary text-white hover:bg-orange-600 transition-colors flex items-center justify-center"
                 >
                   <ShoppingCart className="w-4 h-4 mr-2" />
                   <span className="hidden sm:inline">Carrinho</span>
