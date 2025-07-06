@@ -8,6 +8,14 @@ const client = new MercadoPagoConfig({
 const preference = new Preference(client);
 const payment = new Payment(client);
 
+// Dados fixos do restaurante para evitar erros de validação do Mercado Pago
+const DEFAULT_PAYER = {
+  name: process.env.RESTAURANT_PAYER_NAME || 'Restaurante',
+  email: process.env.RESTAURANT_PAYER_EMAIL || 'restaurante@example.com',
+  phone: process.env.RESTAURANT_PAYER_PHONE || '5511999999999', // formato E164 sem +
+  cpf: process.env.RESTAURANT_PAYER_CPF || '12345678909', // CPF válido fictício
+};
+
 export interface PaymentRequest {
   orderId: string;
   items: Array<{
@@ -53,12 +61,16 @@ export class MercadoPagoService {
         description: paymentData.description,
         payment_method_id: 'pix',
         payer: {
-          email: paymentData.payer.email,
-          first_name: paymentData.payer.name.split(' ')[0],
-          last_name: paymentData.payer.name.split(' ').slice(1).join(' ') || 'Cliente',
+          email: DEFAULT_PAYER.email,
+          first_name: DEFAULT_PAYER.name.split(' ')[0],
+          last_name: DEFAULT_PAYER.name.split(' ').slice(1).join(' ') || 'Restaurante',
           phone: {
-            area_code: paymentData.payer.phone.substring(2, 4),
-            number: paymentData.payer.phone.substring(4)
+            area_code: DEFAULT_PAYER.phone.substring(2, 4),
+            number: DEFAULT_PAYER.phone.substring(4)
+          },
+          identification: {
+            type: 'CPF',
+            number: DEFAULT_PAYER.cpf
           }
         },
         external_reference: paymentData.orderId,
