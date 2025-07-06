@@ -149,6 +149,11 @@ npm run db:push
 NODE_ENV=development
 DATABASE_URL=./database.sqlite
 PORT=3000
+
+# Mercado Pago
+MERCADOPAGO_PUBLIC_KEY=SEU_PUBLIC_KEY
+MERCADOPAGO_ACCESS_TOKEN=SEU_ACCESS_TOKEN
+BASE_URL=http://localhost:5000
 ```
 
 ### Personalização
