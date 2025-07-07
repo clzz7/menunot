@@ -580,6 +580,103 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ publicKey: process.env.MERCADOPAGO_PUBLIC_KEY });
   });
 
+  // Rota para obter configuração do Mercado Pago
+  app.get("/api/mercadopago/config", (req, res) => {
+    res.json({ 
+      publicKey: process.env.MERCADOPAGO_PUBLIC_KEY,
+      environment: process.env.NODE_ENV === 'production' ? 'production' : 'sandbox'
+    });
+  });
+
+  // Rota para criar pagamento com cartão (Checkout Transparente)
+  app.post("/api/mercadopago/create-card-payment", async (req, res) => {
+    try {
+      console.log('=== DADOS RECEBIDOS PARA PAGAMENTO ===');
+      console.log('Body completo:', JSON.stringify(req.body, null, 2));
+
+      // Validar dados obrigatórios
+      const { orderId, amount, token, payer, installments, payment_method_id } = req.body;
+
+      if (!orderId) {
+        return res.status(400).json({ error: "Order ID é obrigatório" });
+      }
+
+      if (!amount || amount <= 0) {
+        return res.status(400).json({ error: "Valor deve ser maior que zero" });
+      }
+
+      if (!token) {
+        return res.status(400).json({ error: "Token do cartão é obrigatório" });
+      }
+
+      if (!payer?.email) {
+        return res.status(400).json({ error: "Email do pagador é obrigatório" });
+      }
+
+      if (!payer?.first_name) {
+        return res.status(400).json({ error: "Nome do pagador é obrigatório" });
+      }
+
+      if (!payer?.identification?.number) {
+        return res.status(400).json({ error: "CPF/CNPJ é obrigatório" });
+      }
+
+      const cardPaymentData = {
+        orderId,
+        amount: Number(amount),
+        token,
+        description: req.body.description || `Pedido #${orderId}`,
+        payer: {
+          email: payer.email,
+          first_name: payer.first_name,
+          last_name: payer.last_name || '',
+          identification: {
+            type: payer.identification.type || 'CPF',
+            number: payer.identification.number.replace(/\D/g, '') // Remove formatação
+          }
+        },
+        installments: Number(installments) || 1,
+        payment_method_id,
+        issuer_id: req.body.issuer_id
+      };
+
+      console.log('=== DADOS PROCESSADOS PARA MERCADO PAGO ===');
+      console.log('cardPaymentData:', JSON.stringify(cardPaymentData, null, 2));
+
+      const payment = await mercadoPagoService.createCardPayment(cardPaymentData);
+      
+      console.log('=== RESPOSTA DO MERCADO PAGO ===');
+      console.log('payment result:', JSON.stringify(payment, null, 2));
+      
+      // Atualizar status do pedido baseado no resultado
+      if (payment.status === 'approved') {
+        await storage.updateOrderStatus(orderId, 'CONFIRMED');
+        console.log(`✅ Pedido ${orderId} confirmado`);
+      } else if (payment.status === 'rejected') {
+        await storage.updateOrderStatus(orderId, 'CANCELLED');
+        console.log(`❌ Pedido ${orderId} cancelado - motivo: ${payment.status_detail}`);
+      } else {
+        console.log(`⏳ Pedido ${orderId} com status: ${payment.status}`);
+      }
+      
+      res.json(payment);
+    } catch (error) {
+      console.error("=== ERRO NO PAGAMENTO ===");
+      console.error("Error creating card payment:", error);
+      
+      // Log mais detalhado do erro
+      if (error instanceof Error) {
+        console.error("Error message:", error.message);
+        console.error("Error stack:", error.stack);
+      }
+      
+      res.status(500).json({ 
+        error: "Failed to process card payment",
+        details: error instanceof Error ? error.message : "Erro desconhecido"
+      });
+    }
+  });
+
   app.post("/api/mercadopago/create-preference", async (req, res) => {
     try {
       const { orderId, items, payer } = req.body;
