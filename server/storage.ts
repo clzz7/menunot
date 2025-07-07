@@ -20,8 +20,8 @@ import {
   type InsertOrderItem,
   type Coupon,
   type InsertCoupon
-} from "@shared/schema-sqlite";
-import { db } from "./db";
+} from "@shared/schema-sqlite.js";
+import { db } from "./db.js";
 import { eq, and, desc, sql } from "drizzle-orm";
 
 export interface IStorage {
@@ -132,7 +132,7 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(customers)
-      .orderBy(desc(customers.createdAt));
+      .orderBy(desc(customers.created_at));
   }
 
   // Categories
