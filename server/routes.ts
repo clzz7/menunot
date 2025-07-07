@@ -369,9 +369,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate order number
       const orderNumber = await storage.generateOrderNumber();
       
+      // Generate unique order ID
+      const orderId = `order-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      
       // Create order with correct establishment ID and generated number
       const orderData = { 
-        ...order, 
+        ...order,
+        id: orderId,
         orderNumber,
         establishmentId: establishment.id,
         customerId: order.customerId, // Ensure customerId is preserved
@@ -389,8 +393,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create order items
       for (const item of items) {
+        const itemId = `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         const itemData = { 
-          ...item, 
+          ...item,
+          id: itemId,
           orderId: createdOrder.id,
           createdAt: new Date(),
           updatedAt: new Date()

@@ -112,9 +112,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCustomer(customer: InsertCustomer): Promise<Customer> {
+    const customerId = customer.id || `customer-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const [created] = await db
       .insert(customers)
-      .values(customer)
+      .values({ ...customer, id: customerId })
       .returning();
     return created;
   }
@@ -148,9 +149,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCategory(category: InsertCategory): Promise<Category> {
+    const categoryId = category.id || `category-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const [created] = await db
       .insert(categories)
-      .values(category)
+      .values({ ...category, id: categoryId })
       .returning();
     return created;
   }
@@ -200,9 +202,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createProduct(product: InsertProduct): Promise<Product> {
+    const productId = product.id || `product-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const [created] = await db
       .insert(products)
-      .values(product)
+      .values({ ...product, id: productId })
       .returning();
     return created;
   }
@@ -321,9 +324,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCoupon(coupon: InsertCoupon): Promise<Coupon> {
+    const couponId = coupon.id || `coupon-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const [created] = await db
       .insert(coupons)
-      .values(coupon)
+      .values({ ...coupon, id: couponId })
       .returning();
     return created;
   }
