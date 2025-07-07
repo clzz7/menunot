@@ -194,17 +194,25 @@ export function CheckoutModal({
         items: orderItems
       }) as any;
 
+      console.log('Order created:', order);
+      console.log('Payment method:', data.paymentMethod);
+
       // If payment method is PIX, show PIX modal
       if (data.paymentMethod === 'PIX') {
-        setCurrentOrder({
+        console.log('Setting up PIX modal...');
+        const pixOrder = {
           id: order.id,
-          orderNumber: order.orderNumber || `PED${Date.now().toString().slice(-6)}`,
+          orderNumber: order.order_number || order.orderNumber || `PED${Date.now().toString().slice(-6)}`,
           total: cart.total,
           customerName: data.name,
           customerPhone: data.whatsapp,
           customerEmail: data.email
-        });
+        };
+        console.log('PIX order data:', pixOrder);
+        setCurrentOrder(pixOrder);
         setShowPixModal(true);
+        console.log('PIX modal should be showing now');
+        return; // Don't call onOrderComplete yet, wait for PIX payment
       } else if (data.paymentMethod === 'CARD') {
         try {
           const preference = await api.mercadopago.createPreference({
@@ -242,11 +250,10 @@ export function CheckoutModal({
       } else {
         toast({
           title: "Pedido confirmado!",
-          description: `Pedido #${order.orderNumber || order.id} foi criado com sucesso`,
+          description: `Pedido #${order.order_number || order.orderNumber || order.id} foi criado com sucesso`,
         });
+        onOrderComplete(order);
       }
-
-      onOrderComplete(order);
 
     } catch (error: any) {
       console.error("Error creating order:", error);
