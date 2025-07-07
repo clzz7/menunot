@@ -359,6 +359,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/orders", async (req, res) => {
     try {
       const { order, items } = req.body;
+      console.log("Order data received:", JSON.stringify(order, null, 2));
+      console.log("Items data received:", JSON.stringify(items, null, 2));
       
       // Get the establishment ID from database
       const establishment = await storage.getEstablishment();
@@ -372,32 +374,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate unique order ID
       const orderId = `order-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       
-      // Create order with correct establishment ID and generated number
+      // Map frontend camelCase to database snake_case
       const orderData = { 
         id: orderId,
         order_number: orderNumber,
-        customer_id: order.customerId || order.customer_id,
+        customer_id: order.customerId,
         establishment_id: establishment.id,
-        customer_name: order.customerName || order.customer_name,
-        customer_phone: order.customerPhone || order.customer_phone,
-        customer_email: order.customerEmail || order.customer_email,
-        customer_address: order.customerAddress || order.customer_address,
-        customer_complement: order.customerComplement || order.customer_complement,
-        customer_neighborhood: order.customerNeighborhood || order.customer_neighborhood,
-        customer_city: order.customerCity || order.customer_city,
-        customer_state: order.customerState || order.customer_state,
-        customer_zip_code: order.customerZipCode || order.customer_zip_code,
-        subtotal: order.subtotal,
-        delivery_fee: order.deliveryFee || order.delivery_fee || 0,
-        discount_amount: order.discountAmount || order.discount_amount || 0,
-        coupon_code: order.couponCode || order.coupon_code || null,
-        total: order.total,
-        payment_method: order.paymentMethod || order.payment_method || 'pix',
-        payment_status: order.paymentStatus || order.payment_status || 'pending',
+        customer_name: order.customerName,
+        customer_phone: order.customerPhone,
+        customer_email: order.customerEmail || null,
+        customer_address: order.deliveryAddress || order.customerAddress,
+        customer_complement: order.deliveryComplement || order.customerComplement || null,
+        customer_neighborhood: order.deliveryNeighborhood || order.customerNeighborhood,
+        customer_city: order.deliveryCity || order.customerCity,
+        customer_state: order.deliveryState || order.customerState,
+        customer_zip_code: order.deliveryZipCode || order.customerZipCode,
+        subtotal: parseFloat(order.subtotal),
+        delivery_fee: parseFloat(order.deliveryFee || '0'),
+        discount_amount: parseFloat(order.discount || '0'),
+        coupon_code: order.couponCode || null,
+        total: parseFloat(order.total),
+        payment_method: order.paymentMethod || 'PIX',
+        payment_status: 'pending',
         status: 'PENDING',
         observations: order.observations || null,
-        estimated_delivery_time: order.estimatedDeliveryTime || order.estimated_delivery_time || null,
-        mercadopago_payment_id: order.mercadopagoPaymentId || order.mercadopago_payment_id || null,
+        estimated_delivery_time: order.estimatedTime ? `${order.estimatedTime} minutos` : null,
+        mercadopago_payment_id: null,
         created_at: new Date(),
         updated_at: new Date()
       };
@@ -412,24 +414,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create order items
       for (const item of items) {
         const itemId = `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        
+        // Get product details to fill in missing data
+        const product = await storage.getProduct(item.productId);
+        
         const itemData = { 
           id: itemId,
           order_id: createdOrder.id,
-          product_id: item.productId || item.product_id,
+          product_id: item.productId,
           quantity: item.quantity,
-          product_name: item.productName || item.product_name,
-          product_price: item.productPrice || item.product_price,
-          product_description: item.productDescription || item.product_description,
-          unit_price: item.unitPrice || item.unit_price || item.productPrice || item.product_price,
-          subtotal: item.subtotal || (item.quantity * (item.productPrice || item.product_price)),
-          total_price: item.totalPrice || item.total_price || (item.quantity * (item.productPrice || item.product_price)),
+          product_name: product?.name || 'Produto',
+          product_price: parseFloat(item.unitPrice),
+          product_description: product?.description || null,
+          unit_price: parseFloat(item.unitPrice),
+          subtotal: parseFloat(item.totalPrice),
+          total_price: parseFloat(item.totalPrice),
+          selected_options: item.selectedOptions || null,
+          observations: item.observations || null,
           created_at: new Date()
         };
-        
-        // Remove undefined fields
-        const cleanItemData = Object.fromEntries(
-          Object.entries(itemData).filter(([_, v]) => v !== undefined)
-        );
         
         await storage.createOrderItem(itemData as any);
       }
