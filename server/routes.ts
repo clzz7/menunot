@@ -374,14 +374,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create order with correct establishment ID and generated number
       const orderData = { 
-        ...order,
         id: orderId,
-        orderNumber,
-        establishmentId: establishment.id,
-        customerId: order.customerId, // Ensure customerId is preserved
+        order_number: orderNumber,
+        customer_id: order.customerId || order.customer_id,
+        establishment_id: establishment.id,
+        customer_name: order.customerName || order.customer_name,
+        customer_phone: order.customerPhone || order.customer_phone,
+        customer_email: order.customerEmail || order.customer_email,
+        customer_address: order.customerAddress || order.customer_address,
+        customer_complement: order.customerComplement || order.customer_complement,
+        customer_neighborhood: order.customerNeighborhood || order.customer_neighborhood,
+        customer_city: order.customerCity || order.customer_city,
+        customer_state: order.customerState || order.customer_state,
+        customer_zip_code: order.customerZipCode || order.customer_zip_code,
+        subtotal: order.subtotal,
+        delivery_fee: order.deliveryFee || order.delivery_fee || 0,
+        discount_amount: order.discountAmount || order.discount_amount || 0,
+        coupon_code: order.couponCode || order.coupon_code || null,
+        total: order.total,
+        payment_method: order.paymentMethod || order.payment_method || 'pix',
+        payment_status: order.paymentStatus || order.payment_status || 'pending',
         status: 'PENDING',
-        createdAt: new Date(),
-        updatedAt: new Date()
+        observations: order.observations || null,
+        estimated_delivery_time: order.estimatedDeliveryTime || order.estimated_delivery_time || null,
+        mercadopago_payment_id: order.mercadopagoPaymentId || order.mercadopago_payment_id || null,
+        created_at: new Date(),
+        updated_at: new Date()
       };
       
       // Remove undefined fields and ensure proper types
@@ -395,11 +413,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (const item of items) {
         const itemId = `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         const itemData = { 
-          ...item,
           id: itemId,
-          orderId: createdOrder.id,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          order_id: createdOrder.id,
+          product_id: item.productId || item.product_id,
+          quantity: item.quantity,
+          product_name: item.productName || item.product_name,
+          product_price: item.productPrice || item.product_price,
+          product_description: item.productDescription || item.product_description,
+          unit_price: item.unitPrice || item.unit_price || item.productPrice || item.product_price,
+          subtotal: item.subtotal || (item.quantity * (item.productPrice || item.product_price)),
+          total_price: item.totalPrice || item.total_price || (item.quantity * (item.productPrice || item.product_price)),
+          created_at: new Date()
         };
         
         // Remove undefined fields
