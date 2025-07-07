@@ -580,6 +580,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ publicKey: process.env.MERCADOPAGO_PUBLIC_KEY });
   });
 
+  // Rota para obter configuração do Mercado Pago
+  app.get("/api/mercadopago/config", (req, res) => {
+    res.json({ 
+      publicKey: process.env.MERCADOPAGO_PUBLIC_KEY,
+      environment: process.env.NODE_ENV === 'production' ? 'production' : 'sandbox'
+    });
+  });
+
+  // Rota para criar pagamento com cartão (Checkout Transparente)
+  app.post("/api/mercadopago/create-card-payment", async (req, res) => {
+    try {
+      const cardPaymentData = {
+        orderId: req.body.orderId,
+        amount: req.body.amount,
+        token: req.body.token,
+        description: req.body.description,
+        payer: req.body.payer,
+        installments: req.body.installments,
+        payment_method_id: req.body.payment_method_id,
+        issuer_id: req.body.issuer_id
+      };
+
+      const payment = await mercadoPagoService.createCardPayment(cardPaymentData);
+      
+      // Atualizar status do pedido baseado no resultado
+      if (payment.status === 'approved') {
+        await storage.updateOrderStatus(req.body.orderId, 'CONFIRMED');
+      } else if (payment.status === 'rejected') {
+        await storage.updateOrderStatus(req.body.orderId, 'CANCELLED');
+      }
+      
+      res.json(payment);
+    } catch (error) {
+      console.error("Error creating card payment:", error);
+      res.status(500).json({ error: "Failed to process card payment" });
+    }
+  });
+
   app.post("/api/mercadopago/create-preference", async (req, res) => {
     try {
       const { orderId, items, payer } = req.body;

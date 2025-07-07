@@ -3,6 +3,9 @@ import { MercadoPagoConfig, Preference, Payment } from 'mercadopago';
 // Initialize MercadoPago with access token
 const client = new MercadoPagoConfig({
   accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN!,
+  options: {
+    timeout: 5000,
+  }
 });
 
 const preference = new Preference(client);
@@ -35,8 +38,69 @@ export interface PaymentRequest {
   notification_url?: string;
 }
 
+export interface CardPaymentRequest {
+  orderId: string;
+  amount: number;
+  token: string;
+  description: string;
+  payer: {
+    email: string;
+    first_name: string;
+    last_name: string;
+    identification: {
+      type: string;
+      number: string;
+    };
+  };
+  installments: number;
+  payment_method_id: string;
+  issuer_id?: string;
+}
+
 export class MercadoPagoService {
   
+  // Método para criar pagamento com cartão (Checkout Transparente)
+  async createCardPayment(paymentData: CardPaymentRequest) {
+    try {
+      const paymentRequest = {
+        transaction_amount: paymentData.amount,
+        token: paymentData.token,
+        description: paymentData.description,
+        installments: paymentData.installments,
+        payment_method_id: paymentData.payment_method_id,
+        issuer_id: paymentData.issuer_id ? parseInt(paymentData.issuer_id) : undefined,
+        payer: {
+          email: paymentData.payer.email,
+          first_name: paymentData.payer.first_name,
+          last_name: paymentData.payer.last_name,
+          identification: {
+            type: paymentData.payer.identification.type,
+            number: paymentData.payer.identification.number
+          }
+        },
+        external_reference: paymentData.orderId,
+        notification_url: `${(globalThis as any).process?.env?.BASE_URL || 'http://localhost:5000'}/api/mercadopago/webhook`,
+        metadata: {
+          order_id: paymentData.orderId
+        }
+      };
+
+      const result = await payment.create({ body: paymentRequest });
+      
+      return {
+        id: result.id,
+        status: result.status,
+        status_detail: result.status_detail,
+        transaction_amount: result.transaction_amount,
+        payment_method_id: result.payment_method_id,
+        external_reference: result.external_reference
+      };
+    } catch (error) {
+      console.error('Error creating card payment:', error);
+      throw error;
+    }
+  }
+
   async createPixPayment(paymentData: {
     orderId: string;
     amount: number;
