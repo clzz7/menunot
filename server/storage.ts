@@ -20,7 +20,7 @@ import {
   type InsertOrderItem,
   type Coupon,
   type InsertCoupon
-} from "@shared/schema-sqlite.js";
+} from "@shared/schema.js";
 import { db } from "./db.js";
 import { eq, and, desc, sql } from "drizzle-orm";
 
@@ -142,7 +142,7 @@ export class DatabaseStorage implements IStorage {
       .from(categories)
       .where(and(
         eq(categories.establishment_id, establishmentId),
-        eq(categories.is_active, 1)
+        eq(categories.is_active, true)
       ))
       .orderBy(categories.sort_order);
   }
@@ -175,7 +175,7 @@ export class DatabaseStorage implements IStorage {
       .from(products)
       .where(and(
         eq(products.establishment_id, establishmentId),
-        eq(products.is_active, 1)
+        eq(products.is_active, true)
       ))
       .orderBy(products.sort_order);
   }
@@ -186,7 +186,7 @@ export class DatabaseStorage implements IStorage {
       .from(products)
       .where(and(
         eq(products.category_id, categoryId),
-        eq(products.is_active, 1)
+        eq(products.is_active, true)
       ))
       .orderBy(products.sort_order);
   }
