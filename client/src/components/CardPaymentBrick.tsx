@@ -67,6 +67,40 @@ export const CardPaymentBrick: React.FC<CardPaymentBrickProps> = ({
     setPaymentError(null);
 
     try {
+      // Validar dados obrigatórios
+      const payerEmail = cardFormData.payer?.email || customerData?.email;
+      const payerFirstName = customerData?.firstName || cardFormData.payer?.first_name || 'Cliente';
+      const payerLastName = customerData?.lastName || cardFormData.payer?.last_name || '';
+      const identificationType = cardFormData.payer?.identification?.type || customerData?.documentType || 'CPF';
+      const identificationNumber = cardFormData.payer?.identification?.number || customerData?.document;
+
+      // Validar email obrigatório
+      if (!payerEmail || !payerEmail.includes('@')) {
+        setPaymentError('Email é obrigatório e deve ser válido');
+        return;
+      }
+
+      // Validar identificação obrigatória
+      if (!identificationNumber) {
+        setPaymentError('CPF/CNPJ é obrigatório');
+        return;
+      }
+
+      console.log('Dados enviados para pagamento:', {
+        orderId,
+        amount,
+        token: cardFormData.token,
+        payer: {
+          email: payerEmail,
+          first_name: payerFirstName,
+          last_name: payerLastName,
+          identification: {
+            type: identificationType,
+            number: identificationNumber
+          }
+        }
+      });
+
       const response = await fetch('/api/mercadopago/create-card-payment', {
         method: 'POST',
         headers: {
@@ -78,12 +112,12 @@ export const CardPaymentBrick: React.FC<CardPaymentBrickProps> = ({
           token: cardFormData.token,
           description: `Pedido #${orderId}`,
           payer: {
-            email: cardFormData.payer?.email || customerData?.email || '',
-            first_name: customerData?.firstName || 'Cliente',
-            last_name: customerData?.lastName || '',
+            email: payerEmail,
+            first_name: payerFirstName,
+            last_name: payerLastName,
             identification: {
-              type: cardFormData.payer?.identification?.type || 'CPF',
-              number: cardFormData.payer?.identification?.number || ''
+              type: identificationType,
+              number: identificationNumber.replace(/\D/g, '') // Remove formatação do CPF/CNPJ
             }
           },
           installments: cardFormData.installments,
@@ -212,32 +246,35 @@ export const CardPaymentBrick: React.FC<CardPaymentBrickProps> = ({
           <CardPayment
             initialization={{
               amount: amount,
-              ...(customerData && {
-                payer: {
-                  email: customerData.email,
-                  ...(customerData.document && customerData.documentType && {
-                    identification: {
-                      type: customerData.documentType,
-                      number: customerData.document
-                    }
-                  })
+              payer: {
+                email: customerData?.email || '',
+                identification: {
+                  type: customerData?.documentType || 'CPF',
+                  number: customerData?.document || ''
                 }
-              })
+              }
             }}
             customization={{
               visual: {
                 style: {
                   theme: 'default',
                 },
-              },
+              }
             }}
             onSubmit={handleSubmit}
             onReady={() => {
-              console.log('Card Payment Brick is ready');
+              console.log('✅ Card Payment Brick está pronto');
+              console.log('Dados do cliente passados:', {
+                email: customerData?.email,
+                firstName: customerData?.firstName,
+                lastName: customerData?.lastName,
+                document: customerData?.document,
+                documentType: customerData?.documentType
+              });
             }}
             onError={(error) => {
-              console.error('Card Payment Brick error:', error);
-              setPaymentError('Erro no formulário de pagamento');
+              console.error('❌ Card Payment Brick error:', error);
+              setPaymentError('Erro no formulário de pagamento. Verifique os dados.');
               onPaymentError(error);
             }}
           />

@@ -54,19 +54,31 @@ const handleCardPaymentError = (error: any) => {
   // Mostrar mensagem de erro
 };
 
+// IMPORTANTE: Garanta que os dados do cliente estejam completos
+const customerData = {
+  email: customer?.email || '', // ⚠️ OBRIGATÓRIO
+  firstName: customer?.name?.split(' ')[0] || 'Cliente', // ⚠️ OBRIGATÓRIO  
+  lastName: customer?.name?.split(' ').slice(1).join(' ') || '',
+  phone: customer?.whatsapp,
+  document: customer?.document || '', // ⚠️ OBRIGATÓRIO (CPF/CNPJ)
+  documentType: customer?.document?.length > 11 ? 'CNPJ' : 'CPF' // ⚠️ OBRIGATÓRIO
+};
+
+// Validar dados antes de renderizar
+if (!customerData.email || !customerData.document) {
+  return (
+    <div className="text-red-500 p-4">
+      ⚠️ Dados do cliente incompletos. Email e CPF/CNPJ são obrigatórios.
+    </div>
+  );
+}
+
 // Renderizar o componente
 {paymentMethod === 'card' && (
   <CardPaymentBrick
     amount={total}
     orderId={orderId}
-    customerData={{
-      email: customer?.email,
-      firstName: customer?.name?.split(' ')[0],
-      lastName: customer?.name?.split(' ').slice(1).join(' '),
-      phone: customer?.whatsapp,
-      document: customer?.document,
-      documentType: 'CPF'
-    }}
+    customerData={customerData}
     onPaymentSuccess={handleCardPaymentSuccess}
     onPaymentError={handleCardPaymentError}
   />
@@ -116,10 +128,56 @@ Use estes cartões para testar:
 
 1. **Cliente escolhe produtos** → Adiciona ao carrinho
 2. **Abre checkout** → Seleciona "Pagar com Cartão"
-3. **Preenche dados** → Cartão, dados pessoais, parcelas
-4. **Processa pagamento** → Mercado Pago valida em tempo real
-5. **Recebe resultado** → Aprovado, Pendente ou Recusado
-6. **Atualiza pedido** → Status automaticamente atualizado
+3. **Valida dados obrigatórios** → Email, nome, CPF/CNPJ
+4. **Preenche dados do cartão** → Número, CVV, validade, parcelas
+5. **Processa pagamento** → Mercado Pago valida em tempo real
+6. **Recebe resultado** → Aprovado, Pendente ou Recusado
+7. **Atualiza pedido** → Status automaticamente atualizado
+
+## 🔍 Validação de Dados
+
+### ⚠️ Campos Obrigatórios
+
+O Mercado Pago exige os seguintes dados:
+
+✅ **Email** - Deve ser um email válido  
+✅ **Nome** - Primeiro nome do cliente  
+✅ **Sobrenome** - Último nome (pode ser vazio)  
+✅ **CPF/CNPJ** - Documento de identificação  
+✅ **Token do cartão** - Gerado automaticamente pelo Brick  
+
+### 🛠️ Debug e Logs
+
+Para verificar se os dados estão sendo enviados corretamente:
+
+1. **Abra o Console do Navegador** (F12)
+2. **Faça um pagamento teste**
+3. **Verifique os logs:**
+
+```
+✅ Card Payment Brick está pronto
+Dados do cliente passados: {email: "...", firstName: "...", ...}
+
+Dados enviados para pagamento: {orderId: "...", amount: 100, ...}
+
+=== DADOS RECEBIDOS PARA PAGAMENTO ===
+Body completo: {...}
+
+=== DADOS PROCESSADOS PARA MERCADO PAGO ===
+cardPaymentData: {...}
+
+=== RESPOSTA DO MERCADO PAGO ===
+payment result: {status: "approved", ...}
+```
+
+### ❌ Erros Comuns
+
+| Erro | Causa | Solução |
+|------|-------|---------|
+| "Email é obrigatório" | Email vazio/inválido | Validar dados do cliente |
+| "CPF/CNPJ é obrigatório" | Documento não informado | Coletar CPF na checkout |
+| "Token do cartão é obrigatório" | Erro no Brick | Verificar credenciais |
+| "Nome do pagador é obrigatório" | Nome vazio | Garantir first_name |
 
 ## 🔒 Segurança
 
