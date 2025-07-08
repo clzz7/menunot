@@ -79,9 +79,9 @@ const Toast = React.forwardRef<
       </div>
       
       {/* Progress bar */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200/50 dark:bg-gray-700/50 rounded-b-2xl overflow-hidden">
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200/30 dark:bg-gray-700/30 rounded-b-2xl overflow-hidden">
         <div 
-          className="h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-75 ease-linear"
+          className="h-full bg-gradient-to-r from-orange-500 to-yellow-500 transition-all duration-75 ease-linear"
           style={{ width: `${progress}%` }}
         />
       </div>
