@@ -780,9 +780,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { orderId, items, payer } = req.body;
       
-      const baseUrl = process.env.NODE_ENV === 'production' 
-        ? `https://${req.get('host')}`
-        : `http://${req.get('host')}`;
+      const baseUrl = process.env.WEBHOOK_URL?.replace('/api/webhook/mercadopago', '') || 
+        (process.env.NODE_ENV === 'production' 
+          ? `https://${req.get('host')}`
+          : `http://${req.get('host')}`);
 
       const paymentRequest = {
         orderId,
@@ -801,7 +802,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         auto_return: 'approved' as const,
         external_reference: orderId,
-        notification_url: `${baseUrl}/api/webhook/mercadopago`
+        notification_url: process.env.WEBHOOK_URL || `${baseUrl}/api/webhook/mercadopago`
       };
 
       const preference = await mercadoPagoService.createPreference(paymentRequest);
