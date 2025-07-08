@@ -66,14 +66,20 @@ export default function Checkout() {
       let discount = 0;
       let freeDelivery = false;
       
-      if (coupon.type === "PERCENTAGE") {
+      // Check if coupon includes free delivery
+      if (coupon.freeDelivery || coupon.free_delivery) {
+        freeDelivery = true;
+      }
+      
+      if (coupon.type === "PERCENTAGE" || coupon.type === "percentage") {
         discount = cart.subtotal * (Number(coupon.value) / 100);
-        if (coupon.maxDiscount) {
-          discount = Math.min(discount, Number(coupon.maxDiscount));
+        if (coupon.maxDiscount || coupon.maximum_discount) {
+          const maxDiscount = Number(coupon.maxDiscount || coupon.maximum_discount);
+          discount = Math.min(discount, maxDiscount);
         }
-      } else if (coupon.type === "FIXED") {
+      } else if (coupon.type === "FIXED" || coupon.type === "fixed") {
         discount = Number(coupon.value);
-      } else if (coupon.type === "FREE_DELIVERY") {
+      } else if (coupon.type === "FREE_DELIVERY" || coupon.type === "free_delivery") {
         freeDelivery = true;
         discount = 0; // No discount on subtotal, just free delivery
       }

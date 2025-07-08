@@ -557,10 +557,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Establishment not found" });
       }
 
-      const validatedData = insertCouponSchema.parse({
-        ...req.body,
-        establishmentId: establishment.id
-      });
+      // Transform data to match database schema
+      const couponData = {
+        id: req.body.id || `coupon-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        code: req.body.code?.toUpperCase(),
+        name: req.body.name,
+        description: req.body.description,
+        establishment_id: establishment.id,
+        type: req.body.type || 'percentage',
+        value: Number(req.body.value) || 0,
+        minimum_order: Number(req.body.minimumOrder) || 0,
+        maximum_discount: req.body.maxDiscount ? Number(req.body.maxDiscount) : null,
+        usage_limit: req.body.usageLimit ? Number(req.body.usageLimit) : null,
+        usage_count: 0,
+        valid_from: new Date(req.body.validFrom),
+        valid_until: req.body.validUntil ? new Date(req.body.validUntil) : null,
+        is_active: req.body.isActive !== false,
+        free_delivery: req.body.freeDelivery === true || req.body.free_delivery === true
+      };
+
+      const validatedData = insertCouponSchema.parse(couponData);
       const coupon = await storage.createCoupon(validatedData);
       res.status(201).json(coupon);
     } catch (error) {
