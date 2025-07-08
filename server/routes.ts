@@ -748,66 +748,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/mercadopago/create-pix", async (req, res) => {
     try {
-      console.log('=== DADOS RECEBIDOS PARA PIX ===');
-      console.log('Body completo:', JSON.stringify(req.body, null, 2));
-
       const { orderId, amount, payer, description } = req.body;
-
-      // Validar dados obrigatórios
-      if (!orderId) {
-        return res.status(400).json({ error: "Order ID é obrigatório" });
-      }
-
-      if (!amount || amount <= 0) {
-        return res.status(400).json({ error: "Valor deve ser maior que zero" });
-      }
-
-      if (!payer?.email) {
-        return res.status(400).json({ error: "Email do pagador é obrigatório" });
-      }
-
-      if (!payer?.name) {
-        return res.status(400).json({ error: "Nome do pagador é obrigatório" });
-      }
-
-      const pixPaymentData = {
+      
+      const pixPayment = await mercadoPagoService.createPixPayment({
         orderId,
-        amount: Number(amount),
-        payer: {
-          name: payer.name,
-          email: payer.email,
-          phone: payer.phone || '+5511999999999',
-          identification: {
-            type: 'CPF',
-            number: '11144477735' // CPF válido padrão para testes
-          }
-        },
-        description: description || `Pedido PIX #${orderId}`
-      };
-
-      console.log('=== DADOS PROCESSADOS PARA PIX ===');
-      console.log('pixPaymentData:', JSON.stringify(pixPaymentData, null, 2));
-      
-      const pixPayment = await mercadoPagoService.createPixPayment(pixPaymentData);
-      
-      console.log('=== RESPOSTA PIX DO MERCADO PAGO ===');
-      console.log('PIX payment result:', JSON.stringify(pixPayment, null, 2));
+        amount,
+        payer,
+        description
+      });
       
       res.json(pixPayment);
     } catch (error) {
-      console.error("=== ERRO NO PAGAMENTO PIX ===");
       console.error("Error creating PIX payment:", error);
-      
-      // Log mais detalhado do erro
-      if (error instanceof Error) {
-        console.error("Error message:", error.message);
-        console.error("Error stack:", error.stack);
-      }
-      
-      res.status(500).json({ 
-        error: "Failed to create PIX payment",
-        details: error instanceof Error ? error.message : "Erro desconhecido"
-      });
+      res.status(500).json({ error: "Failed to create PIX payment" });
     }
   });
 

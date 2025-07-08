@@ -108,37 +108,21 @@ export class MercadoPagoService {
       name: string;
       email: string;
       phone: string;
-      identification?: {
-        type: string;
-        number: string;
-      };
     };
     description: string;
   }) {
     try {
-      // CPF válido padrão para testes (algoritmo de validação do CPF)
-      const defaultCPF = '11144477735'; // CPF válido para testes
-
-      // Limpar e validar telefone
-      const cleanPhone = paymentData.payer.phone.replace(/\D/g, '');
-      const areaCode = cleanPhone.substring(2, 4) || '11';
-      const phoneNumber = cleanPhone.substring(4) || '999999999';
-
       const paymentRequest = {
         transaction_amount: paymentData.amount,
         description: paymentData.description,
         payment_method_id: 'pix',
         payer: {
           email: paymentData.payer.email,
-          first_name: paymentData.payer.name.split(' ')[0] || 'Cliente',
-          last_name: paymentData.payer.name.split(' ').slice(1).join(' ') || 'Teste',
-          identification: {
-            type: paymentData.payer.identification?.type || 'CPF',
-            number: paymentData.payer.identification?.number?.replace(/\D/g, '') || defaultCPF
-          },
+          first_name: paymentData.payer.name.split(' ')[0],
+          last_name: paymentData.payer.name.split(' ').slice(1).join(' ') || 'Cliente',
           phone: {
-            area_code: areaCode,
-            number: phoneNumber
+            area_code: paymentData.payer.phone.substring(2, 4),
+            number: paymentData.payer.phone.substring(4)
           }
         },
         external_reference: paymentData.orderId,

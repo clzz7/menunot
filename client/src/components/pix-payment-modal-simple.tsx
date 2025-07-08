@@ -63,11 +63,7 @@ export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: P
           payer: {
             name: order.customerName,
             email: order.customerEmail || `${order.customerPhone.replace(/\D/g, '')}@noemail.com`,
-            phone: order.customerPhone.replace(/\D/g, ''),
-            identification: {
-              type: 'CPF',
-              number: '11144477735' // CPF válido padrão para testes
-            }
+            phone: order.customerPhone.replace(/\D/g, '')
           },
           description: `Pedido #${order.orderNumber} - ${order.customerName}`
         })
