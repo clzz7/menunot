@@ -12,6 +12,19 @@ import { api } from "@/lib/api.js";
 import { Order, Product } from "@shared/schema.js";
 import { getStatusInfo, getStatusColor } from "@/lib/status-utils";
 
+// Formatting function for WhatsApp
+const formatWhatsApp = (value: string) => {
+  const numbers = value.replace(/\D/g, '');
+  if (numbers.length <= 2) return numbers;
+  if (numbers.length <= 6) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+  if (numbers.length <= 10) return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6)}`;
+  return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+};
+
+const unformatPhone = (value: string) => {
+  return value.replace(/\D/g, '');
+};
+
 export default function Pedidos() {
   const [customerPhone, setCustomerPhone] = useState("");
   const [isOrderHistoryOpen, setIsOrderHistoryOpen] = useState(false);
@@ -35,7 +48,8 @@ export default function Pedidos() {
     }
 
     try {
-      const customer = await api.customers.getByWhatsapp(customerPhone);
+      const unformattedPhone = unformatPhone(customerPhone);
+      const customer = await api.customers.getByWhatsapp(unformattedPhone);
       if (customer) {
         setCurrentCustomerId(customer.id);
         setIsOrderHistoryOpen(true);
@@ -155,10 +169,19 @@ export default function Pedidos() {
             <div className="flex space-x-4">
               <Input
                 type="tel"
-                placeholder="Digite seu número de telefone (ex: 11999999999)"
+                placeholder="Digite seu número de telefone (ex: (11) 99999-9999)"
                 value={customerPhone}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomerPhone(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const formatted = formatWhatsApp(e.target.value);
+                  setCustomerPhone(formatted);
+                }}
                 className="flex-1"
+                maxLength={15}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSearchOrders();
+                  }
+                }}
               />
               <Button onClick={handleSearchOrders} className="bg-primary hover:bg-orange-600">
                 Buscar

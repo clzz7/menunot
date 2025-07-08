@@ -16,6 +16,29 @@ import { api } from "@/lib/api.js";
 import { useToast } from "@/hooks/use-toast.js";
 import { PixPaymentModal } from "./pix-payment-modal-simple.js";
 
+// Formatting functions
+const formatWhatsApp = (value: string) => {
+  const numbers = value.replace(/\D/g, '');
+  if (numbers.length <= 2) return numbers;
+  if (numbers.length <= 6) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+  if (numbers.length <= 10) return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6)}`;
+  return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+};
+
+const formatZipCode = (value: string) => {
+  const numbers = value.replace(/\D/g, '');
+  if (numbers.length <= 5) return numbers;
+  return `${numbers.slice(0, 5)}-${numbers.slice(5, 8)}`;
+};
+
+const unformatPhone = (value: string) => {
+  return value.replace(/\D/g, '');
+};
+
+const unformatZipCode = (value: string) => {
+  return value.replace(/\D/g, '');
+};
+
 const checkoutSchema = z.object({
   whatsapp: z.string().min(1, "WhatsApp é obrigatório"),
   name: z.string().min(1, "Nome é obrigatório"),
@@ -89,8 +112,15 @@ export function CheckoutModal({
     const whatsapp = form.getValues("whatsapp");
     if (!whatsapp) return;
 
+    // Format the WhatsApp number
+    const formattedWhatsApp = formatWhatsApp(whatsapp);
+    form.setValue("whatsapp", formattedWhatsApp);
+
+    // Get unformatted phone for API call
+    const unformattedPhone = unformatPhone(whatsapp);
+
     try {
-      const customer = await api.customers.getByWhatsapp(whatsapp);
+      const customer = await api.customers.getByWhatsapp(unformattedPhone);
       if (customer) {
         form.setValue("name", customer.name);
         form.setValue("email", customer.email || "");
@@ -100,7 +130,7 @@ export function CheckoutModal({
         form.setValue("neighborhood", customer.neighborhood);
         form.setValue("city", customer.city);
         form.setValue("state", customer.state);
-        form.setValue("zipCode", customer.zipCode);
+        form.setValue("zipCode", formatZipCode(customer.zipCode));
         form.setValue("reference", customer.reference || "");
         form.setValue("paymentMethod", customer.defaultPaymentMethod);
         
@@ -110,6 +140,16 @@ export function CheckoutModal({
     } catch (error) {
       console.error("Error fetching customer:", error);
     }
+  };
+
+  const handleWhatsAppChange = (value: string) => {
+    const formatted = formatWhatsApp(value);
+    form.setValue("whatsapp", formatted);
+  };
+
+  const handleZipCodeChange = (value: string) => {
+    const formatted = formatZipCode(value);
+    form.setValue("zipCode", formatted);
   };
 
   const handleApplyCoupon = async () => {
@@ -137,11 +177,15 @@ export function CheckoutModal({
     
     try {
       // Check if customer exists, if not create one
-      let customer = await api.customers.getByWhatsapp(data.whatsapp);
+      // Use unformatted phone for API calls
+      const unformattedPhone = unformatPhone(data.whatsapp);
+      const unformattedZipCode = unformatZipCode(data.zipCode);
+      
+      let customer = await api.customers.getByWhatsapp(unformattedPhone);
       
       if (!customer) {
         customer = await api.customers.create({
-          whatsapp: data.whatsapp,
+          whatsapp: unformattedPhone,
           name: data.name,
           email: data.email || undefined,
           address: data.address,
@@ -150,7 +194,7 @@ export function CheckoutModal({
           neighborhood: data.neighborhood,
           city: data.city,
           state: data.state,
-          zipCode: data.zipCode,
+          zipCode: unformattedZipCode,
           reference: data.reference || undefined,
           defaultPaymentMethod: data.paymentMethod
         });
@@ -159,7 +203,7 @@ export function CheckoutModal({
       // Create order
       const orderData = {
         customerName: data.name,
-        customerPhone: data.whatsapp,
+        customerPhone: unformattedPhone,
         customerEmail: data.email || undefined,
         deliveryAddress: data.address,
         deliveryNumber: data.number,
@@ -167,7 +211,7 @@ export function CheckoutModal({
         deliveryNeighborhood: data.neighborhood,
         deliveryCity: data.city,
         deliveryState: data.state,
-        deliveryZipCode: data.zipCode,
+        deliveryZipCode: unformattedZipCode,
         deliveryReference: data.reference || undefined,
         subtotal: cart.subtotal.toString(),
         deliveryFee: cart.deliveryFee.toString(),
@@ -269,7 +313,21 @@ export function CheckoutModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent 
+        className="max-w-2xl max-h-[90vh] overflow-y-auto"
+        onPointerDownOutside={(e) => {
+          // Prevent closing when clicking outside unless form is empty
+          if (form.getValues("whatsapp") || form.getValues("name")) {
+            e.preventDefault();
+          }
+        }}
+        onInteractOutside={(e) => {
+          // Prevent closing when interacting outside unless form is empty
+          if (form.getValues("whatsapp") || form.getValues("name")) {
+            e.preventDefault();
+          }
+        }}
+      >
         <DialogHeader>
           <DialogTitle>Finalizar Pedido</DialogTitle>
           
@@ -300,7 +358,12 @@ export function CheckoutModal({
                     <Input 
                       placeholder="(11) 99999-9999" 
                       {...field}
+                      onChange={(e) => {
+                        const formatted = formatWhatsApp(e.target.value);
+                        field.onChange(formatted);
+                      }}
                       onBlur={handleWhatsAppBlur}
+                      maxLength={15}
                     />
                   </FormControl>
                   <p className="text-xs text-gray-500">Utilizamos o WhatsApp para identificar seu perfil automaticamente</p>
@@ -452,7 +515,15 @@ export function CheckoutModal({
                     <FormItem>
                       <FormLabel>CEP *</FormLabel>
                       <FormControl>
-                        <Input placeholder="12345-678" {...field} />
+                        <Input 
+                          placeholder="12345-678" 
+                          {...field}
+                          onChange={(e) => {
+                            const formatted = formatZipCode(e.target.value);
+                            field.onChange(formatted);
+                          }}
+                          maxLength={9}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

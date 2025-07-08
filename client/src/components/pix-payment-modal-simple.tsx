@@ -34,20 +34,29 @@ export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: P
   const [timeRemaining, setTimeRemaining] = useState(1800); // 30 minutes
   const { toast } = useToast();
 
-  // Create PIX payment when modal opens
+  // Reset state when modal is closed
   useEffect(() => {
-    if (isOpen && !pixPayment) {
-      createPixPayment();
+    if (!isOpen) {
+      setPixPayment(null);
+      setIsLoading(false);
+      setTimeRemaining(1800);
     }
   }, [isOpen]);
 
+  // Create PIX payment when modal opens
+  useEffect(() => {
+    if (isOpen && !pixPayment && !isLoading) {
+      createPixPayment();
+    }
+  }, [isOpen, pixPayment, isLoading]);
+
   // Countdown timer
   useEffect(() => {
-    if (timeRemaining > 0) {
+    if (isOpen && timeRemaining > 0) {
       const timer = setTimeout(() => setTimeRemaining(time => time - 1), 1000);
       return () => clearTimeout(timer);
     }
-  }, [timeRemaining]);
+  }, [timeRemaining, isOpen]);
 
   const createPixPayment = async () => {
     setIsLoading(true);
@@ -112,7 +121,11 @@ export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: P
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg mx-auto max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
+      <DialogContent 
+        className="max-w-lg mx-auto max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <QrCode className="h-5 w-5" />

@@ -12,6 +12,19 @@ import { api } from "@/lib/api.js";
 import { Order } from "@shared/schema.js";
 import { getStatusInfo } from "@/lib/status-utils";
 
+// Formatting function for WhatsApp
+const formatWhatsApp = (value: string) => {
+  const numbers = value.replace(/\D/g, '');
+  if (numbers.length <= 2) return numbers;
+  if (numbers.length <= 6) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+  if (numbers.length <= 10) return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6)}`;
+  return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+};
+
+const unformatPhone = (value: string) => {
+  return value.replace(/\D/g, '');
+};
+
 interface OrderHistoryModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -49,7 +62,8 @@ export function OrderHistoryModal({
     if (!whatsapp) return;
     
     try {
-      const customer = await api.customers.getByWhatsapp(whatsapp);
+      const unformattedPhone = unformatPhone(whatsapp);
+      const customer = await api.customers.getByWhatsapp(unformattedPhone);
       if (customer) {
         setSearchedCustomerId(customer.id);
       } else {
@@ -292,10 +306,19 @@ export function OrderHistoryModal({
                 <h3 className="font-medium mb-3">Digite seu WhatsApp para ver seus pedidos</h3>
                 <div className="flex space-x-2">
                   <Input
-                    placeholder="11999999999"
+                    placeholder="(11) 99999-9999"
                     value={whatsapp}
-                    onChange={(e) => setWhatsapp(e.target.value)}
+                    onChange={(e) => {
+                      const formatted = formatWhatsApp(e.target.value);
+                      setWhatsapp(formatted);
+                    }}
                     className="flex-1"
+                    maxLength={15}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        handleSearchOrders();
+                      }
+                    }}
                   />
                   <Button onClick={handleSearchOrders} disabled={!whatsapp}>
                     <Search className="w-4 h-4" />
