@@ -5,7 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge.js";
 import { Separator } from "@/components/ui/separator.js";
 import { useToast } from "@/hooks/use-toast.js";
-import { Copy, Clock, QrCode, CheckCircle2, Loader2 } from "lucide-react";
+import { Copy, Clock, QrCode, CheckCircle2, Loader2, CreditCard } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface PixPaymentModalProps {
   isOpen: boolean;
@@ -33,6 +34,54 @@ export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: P
   const [isLoading, setIsLoading] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(1800); // 30 minutes
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const checkPaymentMutation = useMutation({
+    mutationFn: async (orderId: string) => {
+      const response = await fetch(`/api/orders/${orderId}/check-payment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      if (data.success) {
+        toast({
+          title: "Pagamento confirmado!",
+          description: data.message,
+          duration: 5000,
+        });
+        // Close PIX modal and call completion callback
+        onClose();
+        if (onPaymentComplete) {
+          onPaymentComplete();
+        }
+        // Invalidate queries to refresh order data
+        queryClient.invalidateQueries({ queryKey: ['/api/orders'] });
+      } else {
+        toast({
+          title: "Pagamento não confirmado",
+          description: data.message,
+          variant: "destructive",
+          duration: 5000,
+        });
+      }
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao verificar pagamento",
+        description: "Tente novamente em alguns minutos",
+        variant: "destructive",
+        duration: 5000,
+      });
+    }
+  });
+
+  const handleCheckPayment = () => {
+    if (order?.id) {
+      checkPaymentMutation.mutate(order.id);
+    }
+  };
 
   // Reset state when modal is closed
   useEffect(() => {
@@ -234,6 +283,27 @@ export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: P
               <p>4. O pedido será confirmado automaticamente</p>
             </CardContent>
           </Card>
+
+          {/* Payment Confirmation Button */}
+          {pixPayment && (
+            <Card className="bg-blue-50 border-blue-200">
+              <CardContent className="pt-6">
+                <div className="text-center">
+                  <p className="text-sm text-blue-700 mb-4">
+                    Após realizar o pagamento PIX, clique no botão abaixo para confirmar:
+                  </p>
+                  <Button 
+                    onClick={handleCheckPayment}
+                    disabled={checkPaymentMutation.isPending}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12"
+                  >
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    {checkPaymentMutation.isPending ? 'Verificando...' : 'Já Paguei'}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Actions */}
           <div className="flex gap-2">

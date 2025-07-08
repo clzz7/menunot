@@ -176,8 +176,8 @@ export function OrderTrackingModal({
             </div>
           </div>
 
-          {/* Payment Check Button - Only show if order is pending */}
-          {currentStatus === 'PENDING' && (
+          {/* Payment Check Button - Only show if order is pending or confirmed but not yet preparing */}
+          {(currentStatus === 'PENDING' || currentStatus === 'CONFIRMED') && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
               <div className="text-center">
                 <p className="text-sm text-blue-700 mb-3">

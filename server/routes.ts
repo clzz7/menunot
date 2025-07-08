@@ -801,7 +801,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         auto_return: 'approved' as const,
         external_reference: orderId,
-        notification_url: `${baseUrl}/api/mercadopago/webhook`
+        notification_url: `${baseUrl}/api/webhook/mercadopago`
       };
 
       const preference = await mercadoPagoService.createPreference(paymentRequest);
@@ -823,6 +823,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         description
       });
       
+      // Update order with payment ID and status
+      if (pixPayment.id) {
+        const order = await storage.getOrder(orderId);
+        if (order) {
+          // Update order status to CONFIRMED and save payment ID
+          await storage.updateOrderStatus(orderId, 'CONFIRMED');
+          await storage.updateOrderPaymentId(orderId, pixPayment.id.toString());
+          console.log(`=== PAYMENT ID SALVO ===`);
+          console.log(`Order: ${orderId}, Payment ID: ${pixPayment.id}`);
+        }
+      }
+      
       res.json(pixPayment);
     } catch (error) {
       console.error("Error creating PIX payment:", error);
@@ -841,11 +853,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/mercadopago/webhook", async (req, res) => {
+  // Webhook endpoint for MercadoPago notifications
+  app.post("/api/webhook/mercadopago", async (req, res) => {
     try {
+      console.log('=== WEBHOOK MERCADOPAGO RECEBIDO ===');
+      console.log('Headers:', req.headers);
+      console.log('Body:', JSON.stringify(req.body, null, 2));
+      
       const webhookData = await mercadoPagoService.processWebhook(req.body);
       
       if (webhookData && webhookData.externalReference) {
+        console.log('=== PROCESSANDO WEBHOOK ===');
+        console.log('Payment ID:', webhookData.paymentId);
+        console.log('Status:', webhookData.status);
+        console.log('External Reference (Order ID):', webhookData.externalReference);
+        
         // Update order payment status
         const order = await storage.getOrder(webhookData.externalReference);
         if (order) {

@@ -56,6 +56,7 @@ export interface IStorage {
   getOrdersByCustomer(customerId: string): Promise<Order[]>;
   createOrder(order: InsertOrder): Promise<Order>;
   updateOrderStatus(id: string, status: string, timestamp?: Date): Promise<Order>;
+  updateOrderPaymentId(id: string, paymentId: string): Promise<Order>;
   generateOrderNumber(): Promise<string>;
   
   // Order Items
@@ -270,6 +271,18 @@ export class DatabaseStorage implements IStorage {
     const [updated] = await db
       .update(orders)
       .set(updateData)
+      .where(eq(orders.id, id))
+      .returning();
+    return updated;
+  }
+
+  async updateOrderPaymentId(id: string, paymentId: string): Promise<Order> {
+    const [updated] = await db
+      .update(orders)
+      .set({ 
+        mercadopago_payment_id: paymentId,
+        updated_at: new Date().toISOString()
+      })
       .where(eq(orders.id, id))
       .returning();
     return updated;
