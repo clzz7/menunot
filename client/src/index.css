@@ -14,13 +14,13 @@
   }
 }
 
-@keyframes toast-slide-out-to-bottom {
+@keyframes toast-slide-out-to-right {
   from {
-    transform: translateY(0) scale(1);
+    transform: translateX(0) scale(1);
     opacity: 1;
   }
   to {
-    transform: translateY(120%) scale(0.95);
+    transform: translateX(100%) scale(0.95);
     opacity: 0;
   }
 }
@@ -52,7 +52,7 @@
 }
 
 .animate-toast-out {
-  animation: toast-slide-out-to-bottom 0.5s ease-in-out;
+  animation: toast-slide-out-to-right 0.5s ease-in-out;
 }
 
 :root {
