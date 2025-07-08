@@ -780,7 +780,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { orderId, items, payer } = req.body;
       
-      const baseUrl = process.env.WEBHOOK_URL?.replace('/api/webhook/mercadopago', '') || 
+      const baseUrl = process.env.REPLIT_BASE_URL || 
         (process.env.NODE_ENV === 'production' 
           ? `https://${req.get('host')}`
           : `http://${req.get('host')}`);
