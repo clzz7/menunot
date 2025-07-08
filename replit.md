@@ -116,6 +116,9 @@ The application has been successfully migrated to PostgreSQL:
 ## Changelog
 ```
 Changelog:
+- July 8, 2025: ✅ Fixed PIX payment authorization error with fallback to MercadoPago preferences
+- July 8, 2025: ✅ Added better error handling and CPF identification for PIX payments
+- July 8, 2025: ✅ Implemented redirect fallback when direct PIX API fails
 - July 8, 2025: ✅ Toast system redesigned with minimalista design and smooth animations
 - July 8, 2025: ✅ Toast moved to bottom of screen with progress bar and glassmorphism effect
 - July 8, 2025: ✅ Added icons and improved typography for better visual feedback

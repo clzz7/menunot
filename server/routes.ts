@@ -817,28 +817,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { orderId, amount, payer, description } = req.body;
       
-      const pixPayment = await mercadoPagoService.createPixPayment({
-        orderId,
-        amount,
-        payer,
-        description
-      });
-      
-      // Update order with payment ID and status
-      if (pixPayment.id) {
-        const order = await storage.getOrder(orderId);
-        if (order) {
-          // Update order status to CONFIRMED and save payment ID
-          await storage.updateOrderStatus(orderId, 'CONFIRMED');
-          await storage.updateOrderPaymentId(orderId, pixPayment.id.toString());
-          console.log(`=== PAYMENT ID SALVO ===`);
-          console.log(`Order: ${orderId}, Payment ID: ${pixPayment.id}`);
+      try {
+        // Try direct PIX payment first
+        const pixPayment = await mercadoPagoService.createPixPayment({
+          orderId,
+          amount,
+          payer,
+          description
+        });
+        
+        // Update order with payment ID and status
+        if (pixPayment.id) {
+          const order = await storage.getOrder(orderId);
+          if (order) {
+            await storage.updateOrderStatus(orderId, 'CONFIRMED');
+            await storage.updateOrderPaymentId(orderId, pixPayment.id.toString());
+            console.log(`=== PAYMENT ID SALVO ===`);
+            console.log(`Order: ${orderId}, Payment ID: ${pixPayment.id}`);
+          }
         }
+        
+        res.json(pixPayment);
+      } catch (pixError: any) {
+        console.error("Direct PIX payment failed, trying preference fallback:", pixError);
+        
+        // Fallback: Create preference with PIX only
+        const preferenceData = {
+          items: [{
+            id: orderId,
+            title: description,
+            quantity: 1,
+            unit_price: amount,
+            currency_id: 'BRL'
+          }],
+          payer: {
+            name: payer.name,
+            email: payer.email,
+            phone: {
+              area_code: payer.phone.substring(0, 2),
+              number: payer.phone.substring(2)
+            }
+          },
+          payment_methods: {
+            excluded_payment_types: [
+              { id: "credit_card" },
+              { id: "debit_card" },
+              { id: "ticket" }
+            ],
+            installments: 1
+          },
+          back_urls: {
+            success: `${baseUrl}/payment/success`,
+            failure: `${baseUrl}/payment/failure`,
+            pending: `${baseUrl}/payment/pending`
+          },
+          auto_return: 'approved' as const,
+          external_reference: orderId,
+          notification_url: process.env.WEBHOOK_URL ? `${process.env.WEBHOOK_URL}/api/webhook/mercadopago` : `${baseUrl}/api/webhook/mercadopago`
+        };
+        
+        const preference = await mercadoPagoService.createPreference(preferenceData);
+        
+        // Return preference data in a format compatible with PIX modal
+        res.json({
+          id: preference.id,
+          status: 'pending',
+          init_point: preference.init_point,
+          fallback_to_preference: true
+        });
       }
-      
-      res.json(pixPayment);
     } catch (error) {
-      console.error("Error creating PIX payment:", error);
+      console.error("Error creating PIX payment and fallback:", error);
       res.status(500).json({ error: "Failed to create PIX payment" });
     }
   });

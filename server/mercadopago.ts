@@ -1,12 +1,21 @@
 import { MercadoPagoConfig, Preference, Payment } from 'mercadopago';
 
 // Initialize MercadoPago with access token
+const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN || process.env.MERCADO_PAGO_ACCESS_TOKEN;
+
+if (!accessToken) {
+  console.error('MERCADOPAGO_ACCESS_TOKEN not found in environment variables');
+}
+
 const client = new MercadoPagoConfig({
-  accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN!,
+  accessToken: accessToken!,
   options: {
     timeout: 5000,
+    integratorId: 'dev_24c65fb163bf11ea96500242ac130004', // Test integrator ID
   }
 });
+
+console.log('MercadoPago initialized with token:', accessToken ? `${accessToken.substring(0, 10)}...` : 'NOT FOUND');
 
 const preference = new Preference(client);
 const payment = new Payment(client);
@@ -111,18 +120,31 @@ export class MercadoPagoService {
     description: string;
   }) {
     try {
+      // Ensure amount is a number and properly formatted
+      const amount = Number(paymentData.amount);
+      if (isNaN(amount) || amount <= 0) {
+        throw new Error('Invalid payment amount');
+      }
+
       const paymentRequest = {
-        transaction_amount: paymentData.amount,
+        transaction_amount: amount,
         description: paymentData.description,
         payment_method_id: 'pix',
         payer: {
           email: paymentData.payer.email,
-          first_name: paymentData.payer.name.split(' ')[0],
-          last_name: paymentData.payer.name.split(' ').slice(1).join(' ') || 'Cliente'
+          first_name: paymentData.payer.name.split(' ')[0] || 'Cliente',
+          last_name: paymentData.payer.name.split(' ').slice(1).join(' ') || 'Cliente',
+          identification: {
+            type: 'CPF',
+            number: '12345678901' // Fake CPF for testing - in production you'd collect this
+          }
         },
-        external_reference: paymentData.orderId
+        external_reference: paymentData.orderId,
+        notification_url: process.env.WEBHOOK_URL ? `${process.env.WEBHOOK_URL}/api/webhook/mercadopago` : undefined
       };
 
+      console.log('Creating PIX payment with request:', JSON.stringify(paymentRequest, null, 2));
+      
       const result = await payment.create({ body: paymentRequest });
       
       return {
@@ -134,6 +156,7 @@ export class MercadoPagoService {
       };
     } catch (error) {
       console.error('Error creating PIX payment:', error);
+      console.error('Error details:', JSON.stringify(error, null, 2));
       throw error;
     }
   }

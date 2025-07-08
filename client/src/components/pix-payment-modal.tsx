@@ -108,7 +108,19 @@ export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: P
       }
 
       const pixData = await response.json();
-      setPixPayment(pixData);
+      
+      // Check if we got a fallback preference instead of direct PIX
+      if (pixData.fallback_to_preference && pixData.init_point) {
+        // Redirect to MercadoPago checkout for PIX
+        window.open(pixData.init_point, '_blank');
+        toast({
+          title: "PIX via MercadoPago",
+          description: "Você será redirecionado para completar o pagamento PIX.",
+        });
+        onClose(); // Close modal since user will complete payment externally
+      } else {
+        setPixPayment(pixData);
+      }
     } catch (error) {
       console.error('Error creating PIX payment:', error);
       toast({
