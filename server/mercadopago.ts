@@ -136,7 +136,7 @@ export class MercadoPagoService {
           last_name: paymentData.payer.name.split(' ').slice(1).join(' ') || 'Cliente',
           identification: {
             type: 'CPF',
-            number: '12345678901' // Fake CPF for testing - in production you'd collect this
+            number: '11144477735' // Valid test CPF for sandbox
           }
         },
         external_reference: paymentData.orderId,

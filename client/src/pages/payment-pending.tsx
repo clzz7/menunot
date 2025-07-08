@@ -1,56 +1,40 @@
-import { useEffect, useState } from "react";
-import { Link, useLocation } from "wouter";
-import { Clock } from "lucide-react";
-import { Button } from "@/components/ui/button.js";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.js";
+import { useLocation } from 'wouter';
+import { Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
-export default function PaymentPending() {
-  const [location] = useLocation();
-  const [paymentId, setPaymentId] = useState<string | null>(null);
-  const [orderId, setOrderId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    setPaymentId(urlParams.get('payment_id'));
-    setOrderId(urlParams.get('external_reference'));
-  }, [location]);
+export default function PaymentPendingPage() {
+  const [, setLocation] = useLocation();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
-            <Clock className="w-8 h-8 text-yellow-600" />
-          </div>
-          <CardTitle className="text-2xl text-yellow-600">Pagamento Pendente</CardTitle>
-          <CardDescription>
-            Seu pagamento está sendo processado e será confirmado em breve.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {paymentId && (
-            <div className="text-sm text-gray-600">
-              <strong>ID do Pagamento:</strong> {paymentId}
-            </div>
-          )}
-          {orderId && (
-            <div className="text-sm text-gray-600">
-              <strong>Número do Pedido:</strong> {orderId}
-            </div>
-          )}
-          <p className="text-sm text-gray-600">
-            Aguarde a confirmação do pagamento. Você será notificado assim que 
-            o pagamento for processado e seu pedido confirmado.
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="max-w-md w-full text-center space-y-6">
+        <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto">
+          <Clock className="w-8 h-8 text-yellow-600" />
+        </div>
+        
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold text-foreground">
+            Pagamento Pendente
+          </h1>
+          <p className="text-muted-foreground">
+            Estamos aguardando a confirmação do seu pagamento.
           </p>
-          <div className="flex flex-col gap-2">
-            <Link href="/" asChild>
-              <Button className="w-full">
-                Voltar ao Início
-              </Button>
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+
+        <div className="bg-card border rounded-lg p-4 space-y-2">
+          <p className="text-sm text-muted-foreground">
+            Para PIX, o pagamento é processado instantaneamente.
+            Para outros métodos, pode levar alguns minutos.
+          </p>
+        </div>
+
+        <Button 
+          onClick={() => setLocation('/')}
+          className="w-full"
+        >
+          Voltar ao Início
+        </Button>
+      </div>
     </div>
   );
 }

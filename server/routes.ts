@@ -867,13 +867,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             installments: 1
           },
           back_urls: {
-            success: `${baseUrl}/payment/success`,
-            failure: `${baseUrl}/payment/failure`,
-            pending: `${baseUrl}/payment/pending`
+            success: `${req.protocol}://${req.get('host')}/payment/success`,
+            failure: `${req.protocol}://${req.get('host')}/payment/failure`,
+            pending: `${req.protocol}://${req.get('host')}/payment/pending`
           },
           auto_return: 'approved' as const,
           external_reference: orderId,
-          notification_url: process.env.WEBHOOK_URL ? `${process.env.WEBHOOK_URL}/api/webhook/mercadopago` : `${baseUrl}/api/webhook/mercadopago`
+          notification_url: process.env.WEBHOOK_URL ? `${process.env.WEBHOOK_URL}/api/webhook/mercadopago` : `${req.protocol}://${req.get('host')}/api/webhook/mercadopago`
         };
         
         const preference = await mercadoPagoService.createPreference(preferenceData);

@@ -55,10 +55,12 @@ const Toast = React.forwardRef<
         const newProgress = prev - decrement;
         if (newProgress <= 0) {
           clearInterval(timer);
-          // Trigger the smooth close animation
-          if (onOpenChange) {
-            onOpenChange(false);
-          }
+          // Use setTimeout to avoid setState during render
+          setTimeout(() => {
+            if (onOpenChange) {
+              onOpenChange(false);
+            }
+          }, 0);
           return 0;
         }
         return newProgress;
