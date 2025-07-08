@@ -171,6 +171,24 @@ export class MercadoPagoService {
     }
   }
 
+  async checkPaymentStatus(paymentId: string) {
+    try {
+      const payment = await this.getPayment(paymentId);
+      return {
+        id: payment.id,
+        status: payment.status,
+        status_detail: payment.status_detail,
+        transaction_amount: payment.transaction_amount,
+        date_approved: payment.date_approved,
+        date_created: payment.date_created,
+        external_reference: payment.external_reference
+      };
+    } catch (error) {
+      console.error('Error checking payment status:', error);
+      throw error;
+    }
+  }
+
   async processWebhook(data: any) {
     try {
       if (data.type === 'payment') {

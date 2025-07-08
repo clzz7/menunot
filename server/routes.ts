@@ -493,6 +493,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Check payment status and update order
+  app.post("/api/orders/:id/check-payment", async (req, res) => {
+    try {
+      const order = await storage.getOrder(req.params.id);
+      if (!order) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+
+      if (!order.mercadopago_payment_id) {
+        return res.status(400).json({ error: "No payment ID found for this order" });
+      }
+
+      // Check payment status on MercadoPago
+      const paymentStatus = await mercadoPagoService.checkPaymentStatus(order.mercadopago_payment_id);
+      
+      if (paymentStatus.status === 'approved') {
+        // Payment is approved, update order status to PREPARING
+        const updatedOrder = await storage.updateOrderStatus(order.id, 'PREPARING');
+        
+        // Broadcast order update to admin clients
+        broadcast({
+          type: 'ORDER_UPDATED',
+          data: updatedOrder
+        });
+        
+        res.json({ 
+          success: true, 
+          message: 'Pagamento confirmado! Seu pedido está sendo preparado.',
+          order: updatedOrder,
+          paymentStatus: paymentStatus
+        });
+      } else if (paymentStatus.status === 'pending') {
+        res.json({ 
+          success: false, 
+          message: 'Pagamento ainda está pendente. Aguarde alguns minutos e tente novamente.',
+          paymentStatus: paymentStatus
+        });
+      } else {
+        res.json({ 
+          success: false, 
+          message: 'Pagamento não foi aprovado. Verifique os dados e tente novamente.',
+          paymentStatus: paymentStatus
+        });
+      }
+    } catch (error) {
+      console.error("Error checking payment:", error);
+      res.status(500).json({ error: "Failed to check payment status" });
+    }
+  });
+
   // Coupons
   app.get("/api/coupons", async (req, res) => {
     try {

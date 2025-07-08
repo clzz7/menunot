@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button.js";
 import { Dialog, DialogContent } from "@/components/ui/dialog.js";
 import { Badge } from "@/components/ui/badge.js";
-import { Check, Clock, Utensils, Bell, Truck, Home, History, Plus } from "lucide-react";
+import { Check, Clock, Utensils, Bell, Truck, Home, History, Plus, CreditCard } from "lucide-react";
 import { Order } from "@shared/schema.js";
+import { useToast } from "@/hooks/use-toast.js";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface OrderTrackingModalProps {
   isOpen: boolean;
@@ -21,12 +23,57 @@ export function OrderTrackingModal({
   onNewOrder
 }: OrderTrackingModalProps) {
   const [currentStatus, setCurrentStatus] = useState<string>("PENDING");
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (order) {
       setCurrentStatus(order.status);
     }
   }, [order]);
+
+  const checkPaymentMutation = useMutation({
+    mutationFn: async (orderId: string) => {
+      const response = await fetch(`/api/orders/${orderId}/check-payment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      if (data.success) {
+        setCurrentStatus('PREPARING');
+        toast({
+          title: "Pagamento confirmado!",
+          description: data.message,
+          duration: 5000,
+        });
+        // Invalidate queries to refresh order data
+        queryClient.invalidateQueries({ queryKey: ['/api/orders'] });
+      } else {
+        toast({
+          title: "Pagamento não confirmado",
+          description: data.message,
+          variant: "destructive",
+          duration: 5000,
+        });
+      }
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao verificar pagamento",
+        description: "Tente novamente em alguns minutos",
+        variant: "destructive",
+        duration: 5000,
+      });
+    }
+  });
+
+  const handleCheckPayment = () => {
+    if (order?.id) {
+      checkPaymentMutation.mutate(order.id);
+    }
+  };
 
   const statusSteps = [
     {
@@ -128,6 +175,25 @@ export function OrderTrackingModal({
               </span>
             </div>
           </div>
+
+          {/* Payment Check Button - Only show if order is pending */}
+          {currentStatus === 'PENDING' && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <div className="text-center">
+                <p className="text-sm text-blue-700 mb-3">
+                  Após realizar o pagamento, clique no botão abaixo para confirmar:
+                </p>
+                <Button 
+                  onClick={handleCheckPayment}
+                  disabled={checkPaymentMutation.isPending}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12"
+                >
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  {checkPaymentMutation.isPending ? 'Verificando...' : 'Já Paguei'}
+                </Button>
+              </div>
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className="space-y-3 pt-2">
