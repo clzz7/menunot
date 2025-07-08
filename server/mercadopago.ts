@@ -79,7 +79,6 @@ export class MercadoPagoService {
           }
         },
         external_reference: paymentData.orderId,
-        notification_url: `${(globalThis as any).process?.env?.BASE_URL || 'http://localhost:5000'}/api/mercadopago/webhook`,
         metadata: {
           order_id: paymentData.orderId
         }
@@ -119,14 +118,9 @@ export class MercadoPagoService {
         payer: {
           email: paymentData.payer.email,
           first_name: paymentData.payer.name.split(' ')[0],
-          last_name: paymentData.payer.name.split(' ').slice(1).join(' ') || 'Cliente',
-          phone: {
-            area_code: paymentData.payer.phone.substring(2, 4),
-            number: paymentData.payer.phone.substring(4)
-          }
+          last_name: paymentData.payer.name.split(' ').slice(1).join(' ') || 'Cliente'
         },
-        external_reference: paymentData.orderId,
-        notification_url: `${(globalThis as any).process?.env?.BASE_URL || 'http://localhost:5000'}/api/mercadopago/webhook`
+        external_reference: paymentData.orderId
       };
 
       const result = await payment.create({ body: paymentRequest });
