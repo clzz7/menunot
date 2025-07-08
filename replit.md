@@ -116,6 +116,9 @@ The application has been successfully migrated to PostgreSQL:
 ## Changelog
 ```
 Changelog:
+- July 8, 2025: ✅ Toast system redesigned with minimalista design and smooth animations
+- July 8, 2025: ✅ Toast moved to bottom of screen with progress bar and glassmorphism effect
+- July 8, 2025: ✅ Added icons and improved typography for better visual feedback
 - July 8, 2025: ✅ Migration from Replit Agent to Replit completed successfully
 - July 8, 2025: ✅ .env file configured with PostgreSQL database and MercadoPago credentials
 - July 8, 2025: ✅ Database connection switched from SQLite to PostgreSQL

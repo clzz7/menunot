@@ -23,7 +23,7 @@ const ToastViewport = React.forwardRef<
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName
 
 const toastVariants = cva(
-  "group pointer-events-auto relative flex w-full max-w-sm items-start space-x-3 overflow-hidden rounded-2xl border-0 bg-white/95 backdrop-blur-md p-4 shadow-xl transition-all duration-300 ease-out data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-bottom-full data-[state=open]:slide-in-from-bottom-full",
+  "group pointer-events-auto relative flex w-full max-w-sm items-start space-x-3 overflow-hidden rounded-2xl border-0 bg-white/95 backdrop-blur-md p-4 shadow-xl transition-all duration-500 ease-out data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-bottom-full data-[state=open]:slide-in-from-bottom-full data-[state=closed]:duration-500 data-[state=open]:duration-300",
   {
     variants: {
       variant: {
@@ -42,9 +42,8 @@ const Toast = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Root>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root> &
     VariantProps<typeof toastVariants>
->(({ className, variant, ...props }, ref) => {
+>(({ className, variant, onOpenChange, ...props }, ref) => {
   const [progress, setProgress] = React.useState(100);
-  const [isVisible, setIsVisible] = React.useState(true);
 
   React.useEffect(() => {
     const duration = 4000; // 4 seconds
@@ -56,7 +55,10 @@ const Toast = React.forwardRef<
         const newProgress = prev - decrement;
         if (newProgress <= 0) {
           clearInterval(timer);
-          setIsVisible(false);
+          // Trigger the smooth close animation
+          if (onOpenChange) {
+            onOpenChange(false);
+          }
           return 0;
         }
         return newProgress;
@@ -64,14 +66,13 @@ const Toast = React.forwardRef<
     }, interval);
 
     return () => clearInterval(timer);
-  }, []);
-
-  if (!isVisible) return null;
+  }, [onOpenChange]);
 
   return (
     <ToastPrimitives.Root
       ref={ref}
       className={cn(toastVariants({ variant }), className)}
+      onOpenChange={onOpenChange}
       {...props}
     >
       <div className="flex-1">
