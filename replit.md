@@ -116,6 +116,10 @@ The application has been successfully migrated to PostgreSQL:
 ## Changelog
 ```
 Changelog:
+- July 8, 2025: ✅ Migration from Replit Agent to Replit completed successfully
+- July 8, 2025: ✅ .env file configured with PostgreSQL database and MercadoPago credentials
+- July 8, 2025: ✅ Database connection switched from SQLite to PostgreSQL
+- July 8, 2025: ✅ All API endpoints verified working with proper data
 - July 6, 2025: Database recreated with lanchonete (burger place) theme
 - July 6, 2025: UI improvements: removed orange CTA card, fixed cart button alignment
 - July 6, 2025: Enhanced order history with detailed item breakdown
