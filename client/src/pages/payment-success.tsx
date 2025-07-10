@@ -7,12 +7,22 @@ export default function PaymentSuccessPage() {
   const [, setLocation] = useLocation();
 
   useEffect(() => {
-    // Auto redirect to home after 5 seconds
-    const timer = setTimeout(() => {
-      setLocation('/');
-    }, 5000);
-
-    return () => clearTimeout(timer);
+    // Verificar se há WhatsApp armazenado para redirecionar para pedidos
+    const storedWhatsApp = localStorage.getItem('customerWhatsApp');
+    
+    if (storedWhatsApp) {
+      // Redirecionar para pedidos após 2 segundos se houver WhatsApp
+      const timer = setTimeout(() => {
+        setLocation('/pedidos?from=payment-success');
+      }, 2000);
+      return () => clearTimeout(timer);
+    } else {
+      // Fallback: redirecionar para home após 5 segundos
+      const timer = setTimeout(() => {
+        setLocation('/');
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
   }, [setLocation]);
 
   return (
@@ -33,16 +43,25 @@ export default function PaymentSuccessPage() {
 
         <div className="bg-card border rounded-lg p-4 space-y-2">
           <p className="text-sm text-muted-foreground">
-            Você será redirecionado automaticamente em 5 segundos...
+            Redirecionando para seus pedidos...
           </p>
         </div>
 
-        <Button 
-          onClick={() => setLocation('/')}
-          className="w-full"
-        >
-          Voltar ao Início
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={() => setLocation('/pedidos')}
+            className="flex-1"
+          >
+            Ver Meus Pedidos
+          </Button>
+          <Button 
+            onClick={() => setLocation('/')}
+            variant="outline"
+            className="flex-1"
+          >
+            Voltar ao Início
+          </Button>
+        </div>
       </div>
     </div>
   );

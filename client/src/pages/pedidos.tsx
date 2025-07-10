@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button.js";
 import { Input } from "@/components/ui/input.js";
@@ -36,6 +36,56 @@ export default function Pedidos() {
     queryKey: ["/api/products"],
     queryFn: api.products.getAll
   });
+
+  // Identificação automática do cliente após pagamento bem-sucedido
+  useEffect(() => {
+    const checkAutoLogin = async () => {
+      // Verificar se chegou aqui via pagamento bem-sucedido
+      const urlParams = new URLSearchParams(window.location.search);
+      const fromPayment = urlParams.get('from') === 'payment-success';
+      
+      // Buscar WhatsApp armazenado
+      const storedWhatsApp = localStorage.getItem('customerWhatsApp');
+      const lastPaymentOrder = localStorage.getItem('lastPaymentOrder');
+      
+      if (fromPayment && storedWhatsApp) {
+        // Formatar o WhatsApp para exibição
+        const formattedWhatsApp = formatWhatsApp(storedWhatsApp);
+        setCustomerPhone(formattedWhatsApp);
+        
+        try {
+          // Buscar automaticamente os pedidos do cliente
+          const unformattedPhone = unformatPhone(storedWhatsApp);
+          const customer = await api.customers.getByWhatsapp(unformattedPhone);
+          
+          if (customer) {
+            setCurrentCustomerId(customer.id);
+            setIsOrderHistoryOpen(true);
+            
+            // Mostrar mensagem de sucesso
+            toast({
+              title: "🎉 Bem-vindo de volta!",
+              description: "Aqui estão seus pedidos. Seu último pedido já aparece no topo!",
+              duration: 5000,
+            });
+            
+            // Limpar dados temporários do localStorage
+            setTimeout(() => {
+              localStorage.removeItem('lastPaymentOrder');
+              // Manter customerWhatsApp para futuras visitas
+            }, 2000);
+            
+            // Limpar a URL para remover o parâmetro
+            window.history.replaceState({}, document.title, '/pedidos');
+          }
+        } catch (error) {
+          console.error('Erro ao buscar cliente automaticamente:', error);
+        }
+      }
+    };
+
+    checkAutoLogin();
+  }, [toast]);
 
   const handleSearchOrders = async () => {
     if (!customerPhone.trim()) {
