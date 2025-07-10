@@ -895,59 +895,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/mercadopago/payment/:paymentId", async (req, res) => {
     try {
       const { paymentId } = req.params;
-      console.log(`🔍 Checking payment status for ID: ${paymentId}`);
-      
       const payment = await mercadoPagoService.getPayment(paymentId);
-      
-      // Enhanced response with more useful information
-      const enhancedResponse = {
-        id: payment.id,
-        status: payment.status,
-        status_detail: payment.status_detail,
-        transaction_amount: payment.transaction_amount,
-        currency_id: payment.currency_id,
-        date_created: payment.date_created,
-        date_approved: payment.date_approved,
-        date_last_updated: payment.date_last_updated,
-        external_reference: payment.external_reference,
-        payment_method_id: payment.payment_method_id,
-        payment_type_id: payment.payment_type_id,
-        last_check: new Date().toISOString()
-      };
-      
-      console.log(`💳 Payment status response:`, {
-        id: payment.id,
-        status: payment.status,
-        status_detail: payment.status_detail
-      });
-      
-      res.json(enhancedResponse);
+      res.json(payment);
     } catch (error) {
-      console.error("❌ Error fetching payment:", error);
-      
-      // More detailed error response
-      let errorMessage = "Failed to fetch payment status";
-      let errorCode = "PAYMENT_FETCH_ERROR";
-      
-      if (error instanceof Error) {
-        if (error.message.includes('404')) {
-          errorMessage = "Payment not found";
-          errorCode = "PAYMENT_NOT_FOUND";
-        } else if (error.message.includes('401')) {
-          errorMessage = "Authentication error";
-          errorCode = "AUTH_ERROR";
-        } else if (error.message.includes('timeout')) {
-          errorMessage = "Request timeout";
-          errorCode = "TIMEOUT_ERROR";
-        }
-      }
-      
-      res.status(500).json({ 
-        error: errorMessage,
-        code: errorCode,
-        timestamp: new Date().toISOString(),
-        paymentId: req.params.paymentId
-      });
+      console.error("Error fetching payment:", error);
+      res.status(500).json({ error: "Failed to fetch payment status" });
     }
   });
 
@@ -978,26 +930,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           await storage.updateOrderStatus(order.id, orderStatus);
           
-          // Broadcast order status update
+          // Broadcast status update
           broadcast({
             type: 'ORDER_STATUS_UPDATE',
             orderId: order.id,
             status: orderStatus,
             timestamp: new Date()
           });
-
-          // Real-time payment status notification for PIX modal
-          broadcast({
-            type: 'PAYMENT_STATUS_UPDATE',
-            paymentId: webhookData.paymentId,
-            orderId: order.id,
-            status: webhookData.status,
-            transactionAmount: webhookData.transactionAmount,
-            paymentMethodId: webhookData.paymentMethodId,
-            timestamp: new Date()
-          });
-
-          console.log('🔄 Real-time notifications sent via WebSocket');
         }
       }
       

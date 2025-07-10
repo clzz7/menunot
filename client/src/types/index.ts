@@ -42,12 +42,9 @@ export interface OrderStatus {
 }
 
 export interface WebSocketMessage {
-  type: 'NEW_ORDER' | 'ORDER_STATUS_UPDATE' | 'PAYMENT_STATUS_UPDATE' | 'CONNECTION_STATUS' | 'ORDER_UPDATED';
+  type: 'NEW_ORDER' | 'ORDER_STATUS_UPDATE' | 'CONNECTION_STATUS';
   orderId?: string;
-  paymentId?: string;
   order?: any;
   status?: string;
-  transactionAmount?: number;
-  paymentMethodId?: string;
   timestamp?: Date;
 }

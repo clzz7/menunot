@@ -1,12 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog.js";
 import { Button } from "@/components/ui/button.js";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.js";
 import { Badge } from "@/components/ui/badge.js";
 import { Separator } from "@/components/ui/separator.js";
 import { useToast } from "@/hooks/use-toast.js";
-import { useWebSocket } from "@/hooks/use-websocket.js";
-import { Copy, Clock, QrCode, CreditCard, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
+import { Copy, Clock, QrCode, CreditCard, CheckCircle2, Loader2 } from "lucide-react";
 
 interface PixPaymentModalProps {
   isOpen: boolean;
@@ -35,45 +34,7 @@ export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: P
   const [isLoading, setIsLoading] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<'pending' | 'approved' | 'rejected'>('pending');
   const [timeRemaining, setTimeRemaining] = useState(1800); // 30 minutes in seconds
-  const [retryCount, setRetryCount] = useState(0);
-  const [lastStatusCheck, setLastStatusCheck] = useState<Date | null>(null);
   const { toast } = useToast();
-  
-  // Refs for cleanup
-  const pollingIntervalRef = useRef<number | null>(null);
-  const countdownTimerRef = useRef<number | null>(null);
-  const retryTimeoutRef = useRef<number | null>(null);
-
-  // WebSocket for real-time payment updates
-  useWebSocket((message) => {
-    if (message.type === 'PAYMENT_STATUS_UPDATE' && 
-        pixPayment && 
-        message.paymentId === pixPayment.id) {
-      console.log('🔄 Received real-time payment update:', message);
-      
-      if (message.status === 'approved') {
-        setPaymentStatus('approved');
-        setLastStatusCheck(new Date());
-        stopPolling();
-        
-        toast({
-          title: "✅ Pagamento aprovado!",
-          description: "Seu pedido foi confirmado com sucesso.",
-        });
-        onPaymentComplete?.();
-      } else if (message.status === 'rejected') {
-        setPaymentStatus('rejected');
-        setLastStatusCheck(new Date());
-        stopPolling();
-        
-        toast({
-          title: "❌ Pagamento rejeitado",
-          description: "O pagamento não foi processado. Tente novamente.",
-          variant: "destructive"
-        });
-      }
-    }
-  });
 
   // Create PIX payment when modal opens
   useEffect(() => {
@@ -85,121 +46,42 @@ export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: P
   // Countdown timer
   useEffect(() => {
     if (timeRemaining > 0 && paymentStatus === 'pending') {
-      countdownTimerRef.current = setTimeout(() => setTimeRemaining((time: number) => time - 1), 1000);
-      return () => {
-        if (countdownTimerRef.current) {
-          clearTimeout(countdownTimerRef.current);
-        }
-      };
+      const timer = setTimeout(() => setTimeRemaining(time => time - 1), 1000);
+      return () => clearTimeout(timer);
     }
   }, [timeRemaining, paymentStatus]);
 
-  // Enhanced polling with exponential backoff
+  // Poll payment status
   useEffect(() => {
     if (pixPayment && paymentStatus === 'pending') {
-      startPolling();
+      const interval = setInterval(async () => {
+        try {
+          const response = await fetch(`/api/mercadopago/payment/${pixPayment.id}`);
+          const paymentData = await response.json();
+          
+          if (paymentData.status === 'approved') {
+            setPaymentStatus('approved');
+            toast({
+              title: "Pagamento aprovado!",
+              description: "Seu pedido foi confirmado com sucesso.",
+            });
+            onPaymentComplete?.();
+          } else if (paymentData.status === 'rejected') {
+            setPaymentStatus('rejected');
+            toast({
+              title: "Pagamento rejeitado",
+              description: "O pagamento não foi processado. Tente novamente.",
+              variant: "destructive"
+            });
+          }
+        } catch (error) {
+          console.error('Error checking payment status:', error);
+        }
+      }, 5000); // Check every 5 seconds
+
+      return () => clearInterval(interval);
     }
-    
-    return () => stopPolling();
   }, [pixPayment, paymentStatus]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      stopPolling();
-      if (countdownTimerRef.current) {
-        clearTimeout(countdownTimerRef.current);
-      }
-      if (retryTimeoutRef.current) {
-        clearTimeout(retryTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  const startPolling = () => {
-    if (pollingIntervalRef.current) return; // Already polling
-    
-    console.log('🔄 Starting payment status polling...');
-    
-    const checkPaymentStatus = async () => {
-      try {
-        const response = await fetch(`/api/mercadopago/payment/${pixPayment!.id}`);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const paymentData = await response.json();
-        setLastStatusCheck(new Date());
-        setRetryCount(0); // Reset retry count on successful call
-        
-        console.log('💳 Payment status check result:', paymentData);
-        
-        if (paymentData.status === 'approved') {
-          setPaymentStatus('approved');
-          stopPolling();
-          
-          toast({
-            title: "✅ Pagamento aprovado!",
-            description: "Seu pedido foi confirmado com sucesso.",
-          });
-          onPaymentComplete?.();
-        } else if (paymentData.status === 'rejected') {
-          setPaymentStatus('rejected');
-          stopPolling();
-          
-          toast({
-            title: "❌ Pagamento rejeitado",
-            description: "O pagamento não foi processado. Tente novamente.",
-            variant: "destructive"
-          });
-        }
-      } catch (error) {
-        console.error('❌ Error checking payment status:', error);
-        handlePollingError();
-      }
-    };
-
-    // Initial check
-    checkPaymentStatus();
-    
-    // Start polling with 2-second interval for better responsiveness
-    pollingIntervalRef.current = setInterval(checkPaymentStatus, 2000);
-  };
-
-  const stopPolling = () => {
-    if (pollingIntervalRef.current) {
-      console.log('🛑 Stopping payment status polling...');
-      clearInterval(pollingIntervalRef.current);
-      pollingIntervalRef.current = null;
-    }
-  };
-
-  const handlePollingError = () => {
-    const newRetryCount = retryCount + 1;
-    setRetryCount(newRetryCount);
-    
-    // Stop polling temporarily and retry with exponential backoff
-    stopPolling();
-    
-    if (newRetryCount < 5) {
-      const backoffDelay = Math.min(1000 * Math.pow(2, newRetryCount), 30000); // Max 30 seconds
-      
-      console.log(`⏳ Retrying polling in ${backoffDelay}ms (attempt ${newRetryCount})`);
-      
-      retryTimeoutRef.current = setTimeout(() => {
-        if (paymentStatus === 'pending') {
-          startPolling();
-        }
-      }, backoffDelay);
-    } else {
-      toast({
-        title: "⚠️ Problema na verificação",
-        description: "Tivemos dificuldade para verificar o status. O pagamento pode ter sido processado normalmente.",
-        variant: "destructive"
-      });
-    }
-  };
 
   const createPixPayment = async () => {
     setIsLoading(true);
@@ -238,7 +120,6 @@ export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: P
         onClose(); // Close modal since user will complete payment externally
       } else {
         setPixPayment(pixData);
-        console.log('💳 PIX payment created:', pixData);
       }
     } catch (error) {
       console.error('Error creating PIX payment:', error);
@@ -324,20 +205,6 @@ export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: P
             )}
           </div>
 
-          {/* Connection Status */}
-          {retryCount > 0 && paymentStatus === 'pending' && (
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-              <AlertCircle className="h-4 w-4" />
-              <span>Verificando status... (tentativa {retryCount})</span>
-            </div>
-          )}
-
-          {lastStatusCheck && (
-            <div className="text-xs text-center text-muted-foreground">
-              Última verificação: {lastStatusCheck.toLocaleTimeString('pt-BR')}
-            </div>
-          )}
-
           {/* PIX Payment */}
           {isLoading ? (
             <Card>
@@ -409,7 +276,7 @@ export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: P
               <p>1. Abra o app do seu banco</p>
               <p>2. Escaneie o QR Code ou cole o código PIX</p>
               <p>3. Confirme o pagamento</p>
-              <p>4. Aguarde a confirmação automática (em tempo real)</p>
+              <p>4. Aguarde a confirmação automática</p>
             </CardContent>
           </Card>
 
