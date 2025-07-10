@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog.js";
 import { Button } from "@/components/ui/button.js";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.js";
 import { Badge } from "@/components/ui/badge.js";
 import { Separator } from "@/components/ui/separator.js";
 import { useToast } from "@/hooks/use-toast.js";
-import { Copy, Clock, QrCode, CheckCircle2, Loader2, CreditCard } from "lucide-react";
+import { useWebSocket } from "@/hooks/use-websocket.js";
+import { Copy, Clock, QrCode, CheckCircle2, Loader2, CreditCard, AlertCircle } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface PixPaymentModalProps {
@@ -32,9 +33,58 @@ interface PixPaymentData {
 export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: PixPaymentModalProps) {
   const [pixPayment, setPixPayment] = useState<PixPaymentData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<'pending' | 'approved' | 'rejected'>('pending');
   const [timeRemaining, setTimeRemaining] = useState(1800); // 30 minutes
+  const [retryCount, setRetryCount] = useState(0);
+  const [lastStatusCheck, setLastStatusCheck] = useState<Date | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Refs for cleanup
+  const pollingIntervalRef = useRef<number | null>(null);
+  const countdownTimerRef = useRef<number | null>(null);
+  const retryTimeoutRef = useRef<number | null>(null);
+
+  // WebSocket for real-time payment updates
+  useWebSocket((message) => {
+    if (message.type === 'PAYMENT_STATUS_UPDATE' && 
+        pixPayment && 
+        message.paymentId === pixPayment.id) {
+      console.log('🔄 Received real-time payment update:', message);
+      
+      if (message.status === 'approved') {
+        setPaymentStatus('approved');
+        setLastStatusCheck(new Date());
+        stopPolling();
+        
+        toast({
+          title: "✅ Pagamento aprovado!",
+          description: "Seu pedido foi confirmado com sucesso.",
+          duration: 5000,
+        });
+        
+        // Close PIX modal and call completion callback
+        onClose();
+        if (onPaymentComplete) {
+          onPaymentComplete();
+        }
+        
+        // Invalidate queries to refresh order data
+        queryClient.invalidateQueries({ queryKey: ['/api/orders'] });
+      } else if (message.status === 'rejected') {
+        setPaymentStatus('rejected');
+        setLastStatusCheck(new Date());
+        stopPolling();
+        
+        toast({
+          title: "❌ Pagamento rejeitado",
+          description: "O pagamento não foi processado. Tente novamente.",
+          variant: "destructive",
+          duration: 5000,
+        });
+      }
+    }
+  });
 
   const checkPaymentMutation = useMutation({
     mutationFn: async (orderId: string) => {
@@ -46,8 +96,9 @@ export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: P
     },
     onSuccess: (data) => {
       if (data.success) {
+        setPaymentStatus('approved');
         toast({
-          title: "Pagamento confirmado!",
+          title: "✅ Pagamento confirmado!",
           description: data.message,
           duration: 5000,
         });
@@ -88,7 +139,11 @@ export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: P
     if (!isOpen) {
       setPixPayment(null);
       setIsLoading(false);
+      setPaymentStatus('pending');
       setTimeRemaining(1800);
+      setRetryCount(0);
+      setLastStatusCheck(null);
+      stopPolling();
     }
   }, [isOpen]);
 
@@ -101,11 +156,132 @@ export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: P
 
   // Countdown timer
   useEffect(() => {
-    if (isOpen && timeRemaining > 0) {
-      const timer = setTimeout(() => setTimeRemaining(time => time - 1), 1000);
-      return () => clearTimeout(timer);
+    if (isOpen && timeRemaining > 0 && paymentStatus === 'pending') {
+      countdownTimerRef.current = setTimeout(() => setTimeRemaining((time: number) => time - 1), 1000);
+      return () => {
+        if (countdownTimerRef.current) {
+          clearTimeout(countdownTimerRef.current);
+        }
+      };
     }
-  }, [timeRemaining, isOpen]);
+  }, [timeRemaining, isOpen, paymentStatus]);
+
+  // Enhanced polling with exponential backoff
+  useEffect(() => {
+    if (pixPayment && paymentStatus === 'pending') {
+      startPolling();
+    }
+    
+    return () => stopPolling();
+  }, [pixPayment, paymentStatus]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopPolling();
+      if (countdownTimerRef.current) {
+        clearTimeout(countdownTimerRef.current);
+      }
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const startPolling = () => {
+    if (pollingIntervalRef.current) return; // Already polling
+    
+    console.log('🔄 Starting payment status polling...');
+    
+    const checkPaymentStatus = async () => {
+      try {
+        const response = await fetch(`/api/mercadopago/payment/${pixPayment!.id}`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const paymentData = await response.json();
+        setLastStatusCheck(new Date());
+        setRetryCount(0); // Reset retry count on successful call
+        
+        console.log('💳 Payment status check result:', paymentData);
+        
+        if (paymentData.status === 'approved') {
+          setPaymentStatus('approved');
+          stopPolling();
+          
+          toast({
+            title: "✅ Pagamento aprovado!",
+            description: "Seu pedido foi confirmado com sucesso.",
+            duration: 5000,
+          });
+          
+          // Close PIX modal and call completion callback
+          onClose();
+          if (onPaymentComplete) {
+            onPaymentComplete();
+          }
+          
+          // Invalidate queries to refresh order data
+          queryClient.invalidateQueries({ queryKey: ['/api/orders'] });
+        } else if (paymentData.status === 'rejected') {
+          setPaymentStatus('rejected');
+          stopPolling();
+          
+          toast({
+            title: "❌ Pagamento rejeitado",
+            description: "O pagamento não foi processado. Tente novamente.",
+            variant: "destructive",
+            duration: 5000,
+          });
+        }
+      } catch (error) {
+        console.error('❌ Error checking payment status:', error);
+        handlePollingError();
+      }
+    };
+
+    // Initial check
+    checkPaymentStatus();
+    
+    // Start polling with 2-second interval for better responsiveness
+    pollingIntervalRef.current = setInterval(checkPaymentStatus, 2000);
+  };
+
+  const stopPolling = () => {
+    if (pollingIntervalRef.current) {
+      console.log('🛑 Stopping payment status polling...');
+      clearInterval(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
+    }
+  };
+
+  const handlePollingError = () => {
+    const newRetryCount = retryCount + 1;
+    setRetryCount(newRetryCount);
+    
+    // Stop polling temporarily and retry with exponential backoff
+    stopPolling();
+    
+    if (newRetryCount < 5) {
+      const backoffDelay = Math.min(1000 * Math.pow(2, newRetryCount), 30000); // Max 30 seconds
+      
+      console.log(`⏳ Retrying polling in ${backoffDelay}ms (attempt ${newRetryCount})`);
+      
+      retryTimeoutRef.current = setTimeout(() => {
+        if (paymentStatus === 'pending') {
+          startPolling();
+        }
+      }, backoffDelay);
+    } else {
+      toast({
+        title: "⚠️ Problema na verificação",
+        description: "Tivemos dificuldade para verificar o status. Use o botão 'Já Paguei' se necessário.",
+        variant: "destructive"
+      });
+    }
+  };
 
   const createPixPayment = async () => {
     setIsLoading(true);
@@ -144,6 +320,7 @@ export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: P
         onClose(); // Close modal since user will complete payment externally
       } else {
         setPixPayment(pixData);
+        console.log('💳 PIX payment created:', pixData);
       }
     } catch (error) {
       console.error('Error creating PIX payment:', error);
@@ -213,11 +390,39 @@ export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: P
 
           {/* Payment Status */}
           <div className="flex justify-center">
-            <Badge variant="secondary" className="flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              Aguardando pagamento - {formatTime(timeRemaining)}
-            </Badge>
+            {paymentStatus === 'pending' && (
+              <Badge variant="secondary" className="flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Aguardando pagamento - {formatTime(timeRemaining)}
+              </Badge>
+            )}
+            {paymentStatus === 'approved' && (
+              <Badge variant="default" className="flex items-center gap-2 bg-green-600">
+                <CheckCircle2 className="h-4 w-4" />
+                Pagamento aprovado
+              </Badge>
+            )}
+            {paymentStatus === 'rejected' && (
+              <Badge variant="destructive" className="flex items-center gap-2">
+                <CreditCard className="h-4 w-4" />
+                Pagamento rejeitado
+              </Badge>
+            )}
           </div>
+
+          {/* Connection Status */}
+          {retryCount > 0 && paymentStatus === 'pending' && (
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <AlertCircle className="h-4 w-4" />
+              <span>Verificando status... (tentativa {retryCount})</span>
+            </div>
+          )}
+
+          {lastStatusCheck && (
+            <div className="text-xs text-center text-muted-foreground">
+              Última verificação: {lastStatusCheck.toLocaleTimeString('pt-BR')}
+            </div>
+          )}
 
           {/* PIX Payment */}
           {isLoading ? (
@@ -292,17 +497,17 @@ export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: P
               <p>1. Abra o app do seu banco</p>
               <p>2. Escaneie o QR Code ou cole o código PIX</p>
               <p>3. Confirme o pagamento</p>
-              <p>4. O pedido será confirmado automaticamente</p>
+              <p>4. O pedido será confirmado automaticamente (em tempo real)</p>
             </CardContent>
           </Card>
 
-          {/* Payment Confirmation Button */}
-          {pixPayment && (
+          {/* Payment Confirmation Button - Fallback */}
+          {pixPayment && paymentStatus === 'pending' && (
             <Card className="bg-blue-50 border-blue-200">
               <CardContent className="pt-6">
                 <div className="text-center">
                   <p className="text-sm text-blue-700 mb-4">
-                    Após realizar o pagamento PIX, clique no botão abaixo para confirmar:
+                    Se o pagamento não for detectado automaticamente, clique no botão abaixo:
                   </p>
                   <Button 
                     onClick={handleCheckPayment}
@@ -322,9 +527,16 @@ export function PixPaymentModal({ isOpen, onClose, order, onPaymentComplete }: P
             <Button variant="outline" onClick={onClose} className="flex-1">
               Fechar
             </Button>
-            <Button onClick={() => createPixPayment()} variant="outline" className="flex-1">
-              Gerar novo PIX
-            </Button>
+            {paymentStatus === 'pending' && (
+              <Button onClick={() => createPixPayment()} variant="outline" className="flex-1">
+                Gerar novo PIX
+              </Button>
+            )}
+            {paymentStatus === 'approved' && onPaymentComplete && (
+              <Button onClick={onPaymentComplete} className="flex-1">
+                Continuar
+              </Button>
+            )}
           </div>
         </div>
       </DialogContent>
