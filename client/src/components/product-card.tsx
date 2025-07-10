@@ -16,16 +16,16 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
     <div className="product-card bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100">
       <div className="flex">
         {/* Product Image */}
-        <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex-shrink-0 overflow-hidden">
+        <div className="w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 flex-shrink-0 overflow-hidden rounded-2xl">
           <img 
             src={product.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"} 
             alt={product.name} 
-            className="w-full h-full object-cover rounded-xl"
+            className="w-full h-full object-cover rounded-2xl"
           />
         </div>
         
         {/* Product Info */}
-        <div className="flex-1 p-4 flex flex-col justify-between">
+        <div className="flex-1 p-6 flex flex-col justify-between">
           <div>
             <h3 className="font-bold text-base sm:text-lg text-gray-900 mb-1 leading-tight">
               {product.name}
