@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useCart } from "@/hooks/use-cart.js";
 import { useToast } from "@/hooks/use-toast.js";
 import { CheckoutModal } from "@/components/checkout-modal.js";
-import { OrderTrackingModal } from "@/components/order-tracking-modal.js";
 import { Button } from "@/components/ui/button.js";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.js";
 import { Badge } from "@/components/ui/badge.js";
@@ -15,9 +14,6 @@ export default function Checkout() {
   const { cart, updateQuantity, removeFromCart, applyCoupon, clearCart } = useCart();
   const { toast } = useToast();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [isOrderTrackingOpen, setIsOrderTrackingOpen] = useState(false);
-  const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
-  const [customerWhatsApp, setCustomerWhatsApp] = useState<string>("");
 
   const handleUpdateQuantity = (item: typeof cart.items[number], change: number) => {
     if (item.quantity + change <= 0) {
@@ -49,32 +45,25 @@ export default function Checkout() {
   };
 
   const handleOrderComplete = (order: Order, customerPhone?: string) => {
-    setCurrentOrder(order);
     clearCart();
     
     // Armazenar o WhatsApp do cliente para identificação automática
     if (customerPhone) {
-      setCustomerWhatsApp(customerPhone);
-      localStorage.setItem('customerWhatsApp', customerPhone);
+      const unformattedPhone = customerPhone.replace(/\D/g, '');
+      localStorage.setItem('customerWhatsApp', unformattedPhone);
       localStorage.setItem('lastPaymentOrder', order.id || '');
-      
-      // Aguardar um breve momento para garantir que o pedido foi processado
-      // e então redirecionar para a página de pedidos
-      setTimeout(() => {
-        setIsCheckoutOpen(false);
-        window.location.href = '/pedidos?from=payment-success';
-      }, 1500);
-      
-      toast({
-        title: "🎉 Pedido confirmado!",
-        description: "Redirecionando para Meus Pedidos...",
-        duration: 3000,
-      });
-    } else {
-      // Fallback para o comportamento original se não houver WhatsApp
-      setIsCheckoutOpen(false);
-      setIsOrderTrackingOpen(true);
     }
+    
+    // Sempre redirecionar para /pedidos com parâmetro de sucesso
+    setTimeout(() => {
+      window.location.href = '/pedidos?from=payment-success';
+    }, 1500);
+    
+    toast({
+      title: "🎉 Pedido confirmado!",
+      description: "Redirecionando para seus pedidos...",
+      duration: 3000,
+    });
   };
 
   const handleApplyCoupon = async (code: string, customerPhone?: string) => {
@@ -326,20 +315,7 @@ export default function Checkout() {
           }}
         />
 
-        {/* Order Tracking Modal */}
-        <OrderTrackingModal
-          isOpen={isOrderTrackingOpen}
-          onClose={() => setIsOrderTrackingOpen(false)}
-          order={currentOrder}
-          onViewHistory={() => {
-            setIsOrderTrackingOpen(false);
-            window.location.href = '/pedidos';
-          }}
-          onNewOrder={() => {
-            setIsOrderTrackingOpen(false);
-            window.location.href = '/cardapio';
-          }}
-        />
+
       </div>
     </>
   );
