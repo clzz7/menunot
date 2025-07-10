@@ -15,6 +15,7 @@ import { Cart, CustomerData } from "@/types.js";
 import { api } from "@/lib/api.js";
 import { useToast } from "@/hooks/use-toast.js";
 import { PixPaymentModal } from "./pix-payment-modal-simple.js";
+import { CardPaymentBrick } from "./CardPaymentBrick.js";
 
 // Formatting functions
 const formatWhatsApp = (value: string) => {
@@ -78,6 +79,7 @@ export function CheckoutModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [autoFillNotification, setAutoFillNotification] = useState(false);
   const [showPixModal, setShowPixModal] = useState(false);
+  const [showCardModal, setShowCardModal] = useState(false);
   const [currentOrder, setCurrentOrder] = useState<any>(null);
   const { toast } = useToast();
 
@@ -258,39 +260,20 @@ export function CheckoutModal({
         console.log('PIX modal should be showing now');
         return; // Don't call onOrderComplete yet, wait for PIX payment
       } else if (data.paymentMethod === 'CARD') {
-        try {
-          const preference = await api.mercadopago.createPreference({
-            orderId: order.id,
-            items: cart.items.map(item => ({
-              title: item.name,
-              quantity: item.quantity,
-              unit_price: item.price
-            })),
-            payer: {
-              name: data.name,
-              email: data.email || `${data.whatsapp.replace(/\D/g, '')}@noemail.com`,
-              phone: {
-                area_code: data.whatsapp.substring(3, 5),
-                number: data.whatsapp.substring(5)
-              }
-            }
-          }) as any;
-
-          // Redirect to MercadoPago checkout
-          window.open(preference.initPoint, '_blank');
-          
-          toast({
-            title: "Redirecionando para pagamento",
-            description: "Você será direcionado para completar o pagamento",
-          });
-        } catch (error) {
-          console.error('Error creating payment preference:', error);
-          toast({
-            title: "Erro no pagamento",
-            description: "Não foi possível processar o pagamento online",
-            variant: "destructive"
-          });
-        }
+        console.log('Setting up Card modal...');
+        const cardOrder = {
+          id: order.id,
+          orderNumber: order.order_number || order.orderNumber || `PED${Date.now().toString().slice(-6)}`,
+          total: cart.total,
+          customerName: data.name,
+          customerPhone: data.whatsapp,
+          customerEmail: data.email || `${data.whatsapp.replace(/\D/g, '')}@noemail.com`
+        };
+        console.log('Card order data:', cardOrder);
+        setCurrentOrder(cardOrder);
+        setShowCardModal(true);
+        console.log('Card modal should be showing now');
+        return; // Don't call onOrderComplete yet, wait for card payment
       } else {
         toast({
           title: "Pedido confirmado!",
@@ -574,7 +557,7 @@ export function CheckoutModal({
                       <div className="flex items-center space-x-2 p-3 border border-gray-200 rounded-lg">
                         <RadioGroupItem value="CARD" id="card" />
                         <Label htmlFor="card" className="flex items-center cursor-pointer">
-                          <span className="ml-2">Cartão na entrega</span>
+                          <span className="ml-2">Cartão de Crédito/Débito (Online)</span>
                         </Label>
                       </div>
                     </RadioGroup>
@@ -693,6 +676,57 @@ export function CheckoutModal({
             onClose();
           }}
         />
+      )}
+
+      {/* Card Payment Modal */}
+      {showCardModal && currentOrder && (
+        <Dialog open={showCardModal} onOpenChange={() => setShowCardModal(false)}>
+          <DialogContent className="max-w-lg mx-auto max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
+            <DialogHeader>
+              <DialogTitle>Pagamento com Cartão</DialogTitle>
+            </DialogHeader>
+            <CardPaymentBrick
+              amount={currentOrder.total}
+              orderId={currentOrder.id}
+              customerData={{
+                email: currentOrder.customerEmail,
+                firstName: currentOrder.customerName.split(' ')[0] || 'Cliente',
+                lastName: currentOrder.customerName.split(' ').slice(1).join(' ') || '',
+                phone: currentOrder.customerPhone.replace(/\D/g, ''),
+                document: '11144477735', // CPF de teste - implementar campo no formulário
+                documentType: 'CPF'
+              }}
+              onPaymentSuccess={(payment) => {
+                console.log('Payment success:', payment);
+                setShowCardModal(false);
+                toast({
+                  title: "✅ Pagamento aprovado!",
+                  description: `Pagamento processado com sucesso. Pedido #${currentOrder.orderNumber}`,
+                });
+                onOrderComplete(currentOrder);
+                onClose();
+              }}
+              onPaymentError={(error) => {
+                console.error('Payment error:', error);
+                toast({
+                  title: "❌ Erro no pagamento",
+                  description: "Não foi possível processar o pagamento. Verifique os dados do cartão.",
+                  variant: "destructive"
+                });
+              }}
+              onPaymentPending={(payment) => {
+                console.log('Payment pending:', payment);
+                setShowCardModal(false);
+                toast({
+                  title: "⏳ Pagamento pendente",
+                  description: `Pagamento em análise. Pedido #${currentOrder.orderNumber}`,
+                });
+                onOrderComplete(currentOrder);
+                onClose();
+              }}
+            />
+          </DialogContent>
+        </Dialog>
       )}
     </Dialog>
   );
