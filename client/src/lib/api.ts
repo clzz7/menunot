@@ -70,8 +70,10 @@ export const api = {
   // MercadoPago
   mercadopago: {
     getPublicKey: () => fetch("/api/mercadopago/public-key").then(res => res.json()),
+    getConfig: () => fetch("/api/mercadopago/config").then(res => res.json()),
     createPreference: (data: any) => apiRequest("POST", "/api/mercadopago/create-preference", data),
     createPix: (data: any) => apiRequest("POST", "/api/mercadopago/create-pix", data),
+    createCardPayment: (data: any) => apiRequest("POST", "/api/mercadopago/create-card-payment", data),
     getPaymentStatus: (paymentId: string) => fetch(`/api/mercadopago/payment/${paymentId}`).then(res => res.json())
   }
 };
