@@ -63,7 +63,7 @@ interface CheckoutModalProps {
   isOpen: boolean;
   onClose: () => void;
   cart: Cart;
-  onOrderComplete: (order: any) => void;
+  onOrderComplete: (order: any, customerPhone?: string) => void;
   onApplyCoupon: (code: string, customerPhone?: string) => Promise<void>;
   onBackToCart: () => void;
 }
@@ -279,7 +279,7 @@ export function CheckoutModal({
           title: "Pedido confirmado!",
           description: `Pedido #${order.order_number || order.orderNumber || order.id} foi criado com sucesso`,
         });
-        onOrderComplete(order);
+        onOrderComplete(order, data.whatsapp);
       }
 
     } catch (error: any) {
@@ -672,7 +672,7 @@ export function CheckoutModal({
           order={currentOrder}
           onPaymentComplete={() => {
             setShowPixModal(false);
-            onOrderComplete(currentOrder);
+            onOrderComplete(currentOrder, currentOrder.customerPhone);
             onClose();
           }}
         />
@@ -703,7 +703,7 @@ export function CheckoutModal({
                   title: "✅ Pagamento aprovado!",
                   description: `Pagamento processado com sucesso. Pedido #${currentOrder.orderNumber}`,
                 });
-                onOrderComplete(currentOrder);
+                onOrderComplete(currentOrder, currentOrder.customerPhone);
                 onClose();
               }}
               onPaymentError={(error) => {
@@ -721,7 +721,7 @@ export function CheckoutModal({
                   title: "⏳ Pagamento pendente",
                   description: `Pagamento em análise. Pedido #${currentOrder.orderNumber}`,
                 });
-                onOrderComplete(currentOrder);
+                onOrderComplete(currentOrder, currentOrder.customerPhone);
                 onClose();
               }}
             />
