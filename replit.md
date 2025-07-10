@@ -119,6 +119,9 @@ Changelog:
 - July 10, 2025: ✅ Fixed "Meus Pedidos" page layout issues - repositioned "Trocar Usuário" button and improved customer info display
 - July 10, 2025: ✅ Redesigned customer information section with organized card layout and colored icons
 - July 10, 2025: ✅ Created responsive grid layout for customer stats (phone, orders, total spent)
+- July 10, 2025: ✅ Updated menu card design with horizontal layout - image on left, details on right
+- July 10, 2025: ✅ Added product code display and improved typography for better readability
+- July 10, 2025: ✅ Enhanced responsive design for mobile and desktop menu viewing
 - July 10, 2025: ✅ Project migration from Replit Agent to Replit environment completed successfully
 - July 8, 2025: ✅ Fixed PIX payment authorization error with fallback to MercadoPago preferences
 - July 8, 2025: ✅ Added better error handling and CPF identification for PIX payments
