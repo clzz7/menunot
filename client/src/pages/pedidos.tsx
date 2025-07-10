@@ -566,28 +566,49 @@ export default function Pedidos() {
         {!showSearchForm && currentCustomerId && (
           <>
             {/* Header com informações do cliente */}
-            <div className="flex justify-between items-start mb-8">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Seus Pedidos</h1>
-                <div className="flex items-center space-x-4 text-gray-600">
-                  <div className="flex items-center space-x-1">
-                    <User className="w-4 h-4" />
-                    <span>{knownCustomerPhone}</span>
-                  </div>
-                  {totalOrders > 0 && (
-                    <>
-                      <span>•</span>
-                      <span>{totalOrders} pedido{totalOrders > 1 ? 's' : ''}</span>
-                      <span>•</span>
-                      <span>Total gasto: {formatCurrency(totalSpent)}</span>
-                    </>
-                  )}
-                </div>
+            <div className="mb-8">
+              <div className="flex justify-between items-start mb-4">
+                <h1 className="text-3xl font-bold text-gray-900">Seus Pedidos</h1>
+                <Button variant="outline" onClick={handleLogout} size="sm">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Trocar Usuário
+                </Button>
               </div>
-              <Button variant="outline" onClick={handleLogout} size="sm">
-                <LogOut className="w-4 h-4 mr-2" />
-                Trocar Usuário
-              </Button>
+              
+              {/* Customer info card */}
+              <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+                <CardContent className="p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="flex items-center space-x-2 text-gray-700">
+                      <User className="w-5 h-5 text-blue-600" />
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">Telefone</p>
+                        <p className="font-semibold">{knownCustomerPhone}</p>
+                      </div>
+                    </div>
+                    
+                    {totalOrders > 0 && (
+                      <>
+                        <div className="flex items-center space-x-2 text-gray-700">
+                          <Package className="w-5 h-5 text-green-600" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">Total de Pedidos</p>
+                            <p className="font-semibold">{totalOrders} pedido{totalOrders > 1 ? 's' : ''}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2 text-gray-700">
+                          <ShoppingCart className="w-5 h-5 text-purple-600" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">Total Gasto</p>
+                            <p className="font-semibold text-purple-700">{formatCurrency(totalSpent)}</p>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Loading State */}
