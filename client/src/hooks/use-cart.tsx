@@ -33,6 +33,8 @@ interface CartContextValue {
     freeDelivery?: boolean
   ) => void;
   clearCart: () => void;
+  triggerCartAnimation: () => void;
+  isCartAnimating: boolean;
 }
 
 const CartContext = createContext<CartContextValue | undefined>(undefined);
@@ -56,6 +58,13 @@ const calculateTotals = (
 // ---------------------------------------------------------------
 function useCartInternal(): CartContextValue {
   const [cart, setCart] = useState<Cart>(initialCart);
+  const [isCartAnimating, setIsCartAnimating] = useState(false);
+
+  /* --------------------------- TRIGGER CART ANIMATION -------------------------- */
+  const triggerCartAnimation = useCallback(() => {
+    setIsCartAnimating(true);
+    setTimeout(() => setIsCartAnimating(false), 500);
+  }, []);
 
   /* ----------------------------- ADD ITEM ----------------------------- */
   const addToCart = useCallback(
@@ -106,8 +115,11 @@ function useCartInternal(): CartContextValue {
           ...totals,
         } as Cart;
       });
+      
+      // Trigger cart animation when item is added
+      triggerCartAnimation();
     },
-    []
+    [triggerCartAnimation]
   );
 
   /* --------------------------- UPDATE QUANTITY -------------------------- */
@@ -233,6 +245,8 @@ function useCartInternal(): CartContextValue {
     applyDiscount,
     applyCoupon,
     clearCart,
+    triggerCartAnimation,
+    isCartAnimating,
   };
 }
 

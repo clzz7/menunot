@@ -49,12 +49,35 @@
   }
 }
 
+/* Cart Shake Animation */
+@keyframes cart-shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+  20%, 40%, 60%, 80% { transform: translateX(2px); }
+}
+
+/* Menu Icon Rotation Animation */
+@keyframes menu-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(180deg); }
+}
+
 .animate-toast-in {
   animation: toast-slide-in-from-bottom 0.3s ease-out, toast-fade-in 0.3s ease-out;
 }
 
 .animate-toast-out {
   animation: toast-slide-out-to-right 0.5s ease-in-out;
+}
+
+/* Cart Animation Classes */
+.cart-shake {
+  animation: cart-shake 0.5s ease-in-out;
+}
+
+.menu-rotate {
+  animation: menu-rotate 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out;
 }
 
 :root {

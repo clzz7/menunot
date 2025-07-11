@@ -17,7 +17,7 @@ import { motion } from "framer-motion";
 function Home() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [email, setEmail] = useState("");
-  const { cart, updateQuantity, removeFromCart } = useCart();
+  const { cart, updateQuantity, removeFromCart, isCartAnimating } = useCart();
   
   const { data: establishment } = useQuery({
     queryKey: ["/api/establishment"],
@@ -401,7 +401,9 @@ function Home() {
         <motion.button
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          className="fixed bottom-8 right-8 bg-primary text-primary-foreground rounded-full p-4 shadow-2xl z-50 btn-glow"
+          className={`fixed bottom-8 right-8 bg-primary text-primary-foreground rounded-full p-4 shadow-2xl z-50 btn-glow transition-all duration-300 ${
+            isCartAnimating ? 'cart-shake' : ''
+          }`}
           onClick={() => setIsCartOpen(true)}
         >
           <ShoppingBag className="w-6 h-6" />

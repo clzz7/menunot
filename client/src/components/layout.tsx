@@ -14,7 +14,7 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { cart } = useCart();
+  const { cart, isCartAnimating } = useCart();
 
   const { data: establishment } = useQuery({
     queryKey: ["/api/establishment"],
@@ -45,9 +45,13 @@ export default function Layout({ children }: LayoutProps) {
               {/* Mobile menu button */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100"
+                className="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100 transition-all duration-300"
               >
-                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                {isMobileMenuOpen ? (
+                  <X className="h-6 w-6 transition-transform duration-300 rotate-180" />
+                ) : (
+                  <Menu className="h-6 w-6 transition-transform duration-300" />
+                )}
               </button>
 
               {/* Logo and brand */}
@@ -107,7 +111,9 @@ export default function Layout({ children }: LayoutProps) {
               {/* Cart Button */}
               <Link href="/checkout">
                 <Button 
-                  className="relative bg-primary text-white hover:bg-orange-600 transition-colors flex items-center justify-center h-10"
+                  className={`relative bg-primary text-white hover:bg-orange-600 transition-all duration-300 flex items-center justify-center h-10 ${
+                    isCartAnimating ? 'cart-shake' : ''
+                  }`}
                 >
                   <ShoppingCart className="w-4 h-4 sm:mr-2" />
                   <span className="hidden sm:inline">Carrinho</span>
