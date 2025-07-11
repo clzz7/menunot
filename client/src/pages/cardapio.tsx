@@ -94,22 +94,35 @@ export default function Cardapio() {
         <div className="bg-gray-50 py-8">
           <div className="max-w-2xl mx-auto px-4">
             {/* Main Title */}
-            <h1 className="text-2xl md:text-3xl font-bold text-primary mb-3 tracking-wide text-left">
+            <h1 className="text-2xl md:text-3xl title-text title-gradient mb-3 tracking-wide text-left">
               {establishment?.name?.toUpperCase() || 'BURGER POINT'}
             </h1>
             
             {/* Description */}
-            <p className="text-base text-gray-700 mb-6 max-w-lg text-left">
+            <p className="text-base description-text mb-6 max-w-lg text-left">
               Você pode fazer seu pedido online! Navegue pelo nosso cardápio e escolha o que gostaria de pedir.
             </p>
             
             {/* Status Indicator */}
             {establishment && (
-              <div className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-full bg-white mb-6">
-                <div className={`w-2.5 h-2.5 rounded-full ${establishment.is_open ? 'bg-primary' : 'bg-red-500'}`} />
-                <span className="text-gray-700 text-sm">
-                  {establishment.is_open ? "Aceitando Pedidos" : "Fechado no momento"}
-                </span>
+              <div className="inline-flex items-center gap-3 mb-6">
+                <button className="status-button inline-flex items-center gap-2">
+                  {establishment.is_open ? (
+                    <>
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Aceitando Pedidos
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                      Fechado no momento
+                    </>
+                  )}
+                </button>
               </div>
             )}
             

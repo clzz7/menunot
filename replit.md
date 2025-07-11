@@ -116,6 +116,12 @@ The application has been successfully migrated to PostgreSQL:
 ## Changelog
 ```
 Changelog:
+- July 11, 2025: ✅ Implemented modern typography with Montserrat and Roboto fonts for better readability
+- July 11, 2025: ✅ Redesigned title with gradient styling (orange #FF6B35 to #FF8C42) and improved letter spacing
+- July 11, 2025: ✅ Redesigned status button with gradient green background, rounded corners, and micro-animation
+- July 11, 2025: ✅ Added check/cross icons to status button for better visual feedback
+- July 11, 2025: ✅ Implemented subtle pulsing animation for status button every 3 seconds
+- July 11, 2025: ✅ Enhanced typography hierarchy with improved line-height and color contrast
 - July 11, 2025: ✅ Redesigned hero header with professional banner layout inspired by modern restaurant designs
 - July 11, 2025: ✅ Implemented hero image with food photography and content area with cream background 
 - July 11, 2025: ✅ Added "PEDIDOS ONLINE" title in green-800, order type selector (Retirada/Delivery)
