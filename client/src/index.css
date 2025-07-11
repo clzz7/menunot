@@ -64,11 +64,10 @@
   background-color: currentColor;
   transition: all 0.3s ease;
   transform-origin: center;
-  margin: 2px 0;
 }
 
 .hamburger-line:nth-child(1) {
-  transform: translateY(0);
+  transform: translateY(-6px);
 }
 
 .hamburger-line:nth-child(2) {
@@ -76,13 +75,12 @@
 }
 
 .hamburger-line:nth-child(3) {
-  transform: translateY(0);
+  transform: translateY(6px);
 }
 
 /* When menu is open, transform to X */
 .hamburger-open .hamburger-line:nth-child(1) {
-  transform: translateY(6px) rotate(45deg);
-  margin: 0;
+  transform: translateY(0) rotate(45deg);
 }
 
 .hamburger-open .hamburger-line:nth-child(2) {
@@ -91,8 +89,7 @@
 }
 
 .hamburger-open .hamburger-line:nth-child(3) {
-  transform: translateY(-6px) rotate(-45deg);
-  margin: 0;
+  transform: translateY(0) rotate(-45deg);
 }
 
 .animate-toast-in {
