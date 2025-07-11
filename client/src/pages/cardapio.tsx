@@ -91,33 +91,33 @@ export default function Cardapio() {
         </div>
         
         {/* Content Area */}
-        <div className="bg-cream-50 py-16">
-          <div className="max-w-2xl mx-auto px-6 text-center">
-            {/* Main Title - Larger and more prominent */}
-            <h1 className="hero-title text-4xl md:text-5xl lg:text-6xl text-green-800 mb-6 tracking-wider uppercase">
+        <div className="bg-cream-50 py-12">
+          <div className="max-w-4xl mx-auto px-4 text-center">
+            {/* Main Title */}
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-green-800 mb-4 tracking-wide">
               PEDIDOS ONLINE
             </h1>
             
-            {/* Description - Better spacing and typography */}
-            <p className="hero-text text-lg md:text-xl text-gray-700 mb-10 max-w-xl mx-auto leading-relaxed">
+            {/* Description */}
+            <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-2xl mx-auto leading-relaxed">
               Você pode fazer seu pedido online! Navegue pelo nosso cardápio e escolha o que gostaria de pedir.
             </p>
             
-            {/* Status Indicator - More prominent pill design */}
+            {/* Status Indicator */}
             {establishment && (
-              <div className="inline-flex items-center gap-3 px-8 py-4 border border-gray-300 rounded-full bg-white mb-10 shadow-sm">
+              <div className="inline-flex items-center gap-3 px-6 py-3 border border-gray-300 rounded-full bg-white mb-8">
                 <div className={`w-3 h-3 rounded-full ${establishment.is_open ? 'bg-green-500' : 'bg-red-500'}`} />
-                <span className="hero-text text-gray-700 font-medium text-base">
+                <span className="text-gray-700 font-medium">
                   {establishment.is_open ? "Aceitando Pedidos" : "Fechado no momento"}
                 </span>
               </div>
             )}
             
-            {/* Order Type Selector - Cleaner segmented control */}
-            <div className="inline-flex border-2 border-green-800 rounded-full overflow-hidden mb-12">
+            {/* Order Type Selector */}
+            <div className="inline-flex border-2 border-green-800 rounded-full overflow-hidden mb-8">
               <button
                 onClick={() => setOrderType("pickup")}
-                className={`hero-button px-10 py-4 text-base transition-all ${
+                className={`px-8 py-3 font-medium transition-all ${
                   orderType === "pickup" 
                     ? "bg-green-800 text-cream-50" 
                     : "bg-transparent text-green-800 hover:bg-green-50"
@@ -127,7 +127,7 @@ export default function Cardapio() {
               </button>
               <button
                 onClick={() => setOrderType("delivery")}
-                className={`hero-button px-10 py-4 text-base transition-all ${
+                className={`px-8 py-3 font-medium transition-all ${
                   orderType === "delivery" 
                     ? "bg-green-800 text-cream-50" 
                     : "bg-transparent text-green-800 hover:bg-green-50"
@@ -137,32 +137,30 @@ export default function Cardapio() {
               </button>
             </div>
             
-            {/* Order Info - Left-aligned within centered container */}
-            <div className="max-w-md mx-auto">
-              <div className="space-y-4 text-left">
-                <div className="flex items-start gap-3 text-gray-700">
-                  <Clock className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                  <span className="hero-text text-base">
-                    Tempo de {orderType === "pickup" ? "retirada" : "entrega"}: Até 30 minutos
+            {/* Order Info */}
+            <div className="space-y-3 text-left max-w-sm mx-auto">
+              <div className="flex items-center gap-3 text-gray-700">
+                <Clock className="w-5 h-5" />
+                <span>
+                  Tempo de {orderType === "pickup" ? "retirada" : "entrega"}: Até 30 minutos
+                </span>
+              </div>
+              
+              <div className="flex items-center gap-3 text-gray-700">
+                <MapPin className="w-5 h-5" />
+                <div>
+                  <span>
+                    {orderType === "pickup" ? "Endereço de retirada" : "Área de entrega"}: 
                   </span>
+                  <br />
+                  <span className="text-sm">Rua das Flores, 123, Centro, São Paulo, SP</span>
                 </div>
-                
-                <div className="flex items-start gap-3 text-gray-700">
-                  <MapPin className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                  <div className="hero-text text-base">
-                    <span>
-                      {orderType === "pickup" ? "Endereço de retirada" : "Área de entrega"}:
-                    </span>
-                    <br />
-                    <span className="text-sm">Rua das Flores, 123, Centro, São Paulo, SP</span>
-                  </div>
-                </div>
-                
-                <div className="pt-2">
-                  <button className="hero-text text-green-800 underline text-sm hover:text-green-600 transition-colors">
-                    Alterar
-                  </button>
-                </div>
+              </div>
+              
+              <div className="pt-2">
+                <button className="text-green-800 underline text-sm hover:text-green-600 transition-colors">
+                  Alterar
+                </button>
               </div>
             </div>
           </div>
