@@ -116,6 +116,15 @@ The application has been successfully migrated to PostgreSQL:
 ## Changelog
 ```
 Changelog:
+- July 11, 2025: ✅ Implemented improved layout and spacing with max-width: 400px container and centered design
+- July 11, 2025: ✅ Added subtle background gradient from white to #F8F9FA for better visual hierarchy
+- July 11, 2025: ✅ Increased padding from 16px to 24px for better mobile experience
+- July 11, 2025: ✅ Updated section spacing from 16px to 32px for cleaner visual separation
+- July 11, 2025: ✅ Redesigned essential information cards with 2x2 grid layout and colored icons
+- July 11, 2025: ✅ Added delivery time (25-30 min), fee (R$ 4,99), distance (2.5km), and minimum order (R$ 25,00) cards
+- July 11, 2025: ✅ Implemented #F5F5F5 background with 12px border-radius for information cards
+- July 11, 2025: ✅ Added hover effects and micro-animations to information cards
+- July 11, 2025: ✅ Enhanced typography with professional color scheme for card labels and values
 - July 11, 2025: ✅ Implemented modern typography with Montserrat and Roboto fonts for better readability
 - July 11, 2025: ✅ Redesigned title with gradient styling (orange #FF6B35 to #FF8C42) and improved letter spacing
 - July 11, 2025: ✅ Redesigned status button with gradient green background, rounded corners, and micro-animation

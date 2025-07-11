@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input.js";
 import { Button } from "@/components/ui/button.js";
-import { Search, Clock, MapPin } from "lucide-react";
+import { Search, Clock, MapPin, DollarSign, ShoppingBag } from "lucide-react";
 import { ProductCard } from "@/components/product-card.js";
 import { CartSidebar } from "@/components/cart-sidebar.js";
 import { useCart } from "@/hooks/use-cart.js";
@@ -90,9 +90,9 @@ export default function Cardapio() {
           />
         </div>
         
-        {/* Content Area */}
-        <div className="bg-gray-50 py-8">
-          <div className="max-w-2xl mx-auto px-4">
+        {/* Content Area - Updated with new layout */}
+        <div className="bg-gradient-to-b from-white to-gray-50 py-8">
+          <div className="max-w-md mx-auto px-6">
             {/* Main Title */}
             <h1 className="text-2xl md:text-3xl title-text title-gradient mb-3 tracking-wide text-left">
               {establishment?.name?.toUpperCase() || 'BURGER POINT'}
@@ -105,7 +105,7 @@ export default function Cardapio() {
             
             {/* Status Indicator */}
             {establishment && (
-              <div className="inline-flex items-center gap-3 mb-6">
+              <div className="inline-flex items-center gap-3 mb-8">
                 <button className="status-button inline-flex items-center gap-2">
                   {establishment.is_open ? (
                     <>
@@ -126,41 +126,54 @@ export default function Cardapio() {
               </div>
             )}
             
-            {/* Order Info - All Left Aligned */}
-            <div className="space-y-2 text-left max-w-xs">
-              <div className="flex items-start gap-2 text-gray-700">
-                <Clock className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <span className="text-sm">
-                  Tempo de entrega: Até 30 minutos
-                </span>
-              </div>
-              
-              <div className="flex items-start gap-2 text-gray-700">
-                <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <div className="text-sm">
-                  <div>
-                    Área de entrega:
-                  </div>
-                  <div className="text-gray-600">
-                    Rua das Flores, 123, Centro, São Paulo, SP
-                  </div>
+            {/* Informações Essenciais - Grid 2x2 */}
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              <div className="info-card">
+                <Clock className="info-card-icon text-amber-600" />
+                <div className="info-card-content">
+                  <div className="info-card-label">Entrega</div>
+                  <div className="info-card-value">25-30 min</div>
                 </div>
               </div>
               
-              <div className="pt-1">
-                <button className="text-primary underline text-sm hover:text-primary/80 transition-colors">
-                  Alterar
-                </button>
+              <div className="info-card">
+                <DollarSign className="info-card-icon text-green-600" />
+                <div className="info-card-content">
+                  <div className="info-card-label">Taxa</div>
+                  <div className="info-card-value">R$ 4,99</div>
+                </div>
               </div>
+              
+              <div className="info-card">
+                <MapPin className="info-card-icon text-blue-600" />
+                <div className="info-card-content">
+                  <div className="info-card-label">Distância</div>
+                  <div className="info-card-value">2.5km</div>
+                </div>
+              </div>
+              
+              <div className="info-card">
+                <ShoppingBag className="info-card-icon text-purple-600" />
+                <div className="info-card-content">
+                  <div className="info-card-label">Mínimo</div>
+                  <div className="info-card-value">R$ 25,00</div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="pt-1">
+              <button className="text-primary underline text-sm hover:text-primary/80 transition-colors">
+                Alterar endereço
+              </button>
             </div>
           </div>
         </div>
       </section>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10 bg-gray-50">
+      <div className="max-w-md mx-auto px-6 pb-10 bg-gradient-to-b from-gray-50 to-white">
         {/* Category Navigation */}
-        <div className="mb-6">
+        <div className="mb-8">
           <div className="flex space-x-4 overflow-x-auto pb-2">
             <Button
               variant={selectedCategory === "all" ? "default" : "outline"}
@@ -183,7 +196,7 @@ export default function Cardapio() {
         </div>
 
         {/* Search Bar */}
-        <div className="mb-6">
+        <div className="mb-8">
           <div className="relative">
             <Input
               type="text"
@@ -197,7 +210,7 @@ export default function Cardapio() {
         </div>
 
         {/* Products Grid */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           {selectedCategory === "all" ? (
             // Show all categories
             categories.map((category: Category) => {

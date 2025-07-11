@@ -163,6 +163,10 @@
   --warning-foreground: hsl(0,0%,0%);
   --ring: hsl(24.6, 95%, 53.1%);
   --radius: 1rem;
+  
+  /* Info cards styling */
+  --info-card-bg: hsl(0, 0%, 96%); /* #F5F5F5 */
+  --info-card-radius: 12px;
 }
 
 .dark {
@@ -201,6 +205,44 @@
     @apply font-sans antialiased bg-background text-foreground;
     overflow-x: hidden;
   }
+}
+
+/* Info cards styling */
+.info-card {
+  background: var(--info-card-bg);
+  border-radius: var(--info-card-radius);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.info-card:hover {
+  background: hsl(0, 0%, 94%);
+  transform: translateY(-1px);
+}
+
+.info-card-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.info-card-content {
+  flex: 1;
+}
+
+.info-card-label {
+  font-size: 12px;
+  color: hsl(0, 0%, 40%);
+  margin-bottom: 2px;
+}
+
+.info-card-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: hsl(0, 0%, 20%);
 }
 
 @layer components {
