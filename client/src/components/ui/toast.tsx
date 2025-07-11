@@ -42,51 +42,16 @@ const Toast = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Root>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root> &
     VariantProps<typeof toastVariants>
->(({ className, variant, onOpenChange, ...props }, ref) => {
-  const [progress, setProgress] = React.useState(100);
-
-  React.useEffect(() => {
-    const duration = 4000; // 4 seconds
-    const interval = 50; // Update every 50ms
-    const decrement = (interval / duration) * 100;
-
-    const timer = setInterval(() => {
-      setProgress(prev => {
-        const newProgress = prev - decrement;
-        if (newProgress <= 0) {
-          clearInterval(timer);
-          // Use setTimeout to avoid setState during render
-          setTimeout(() => {
-            if (onOpenChange) {
-              onOpenChange(false);
-            }
-          }, 0);
-          return 0;
-        }
-        return newProgress;
-      });
-    }, interval);
-
-    return () => clearInterval(timer);
-  }, [onOpenChange]);
-
+>(({ className, variant, ...props }, ref) => {
   return (
     <ToastPrimitives.Root
       ref={ref}
       className={cn(toastVariants({ variant }), className)}
-      onOpenChange={onOpenChange}
+      duration={4000}
       {...props}
     >
       <div className="flex-1">
         {props.children}
-      </div>
-      
-      {/* Progress bar */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200/30 dark:bg-gray-700/30 rounded-b-2xl overflow-hidden">
-        <div 
-          className="h-full bg-gradient-to-r from-orange-500 to-yellow-500 transition-all duration-75 ease-linear"
-          style={{ width: `${progress}%` }}
-        />
       </div>
     </ToastPrimitives.Root>
   )
