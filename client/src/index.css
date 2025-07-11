@@ -144,7 +144,8 @@
   font-weight: 700;
   letter-spacing: -0.5px;
 }
-  
+
+:root {
   /* Custom colors for hero design */
   --cream-50: hsl(45, 29%, 97%);
   --green-800: hsl(155, 45%, 22%);
