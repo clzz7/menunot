@@ -82,7 +82,7 @@ export default function Cardapio() {
       {/* Hero Banner */}
       <section className="w-full">
         {/* Hero Image */}
-        <div className="w-full h-48 md:h-56 lg:h-64 relative overflow-hidden">
+        <div className="w-full h-40 md:h-44 lg:h-48 relative overflow-hidden">
           <img 
             src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=2024&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
             alt="Deliciosos hambúrgueres artesanais"
