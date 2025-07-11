@@ -3,12 +3,26 @@
  */
 
 export const formatCurrency = (value: number | string | undefined | null): string => {
-  // Handle undefined, null, empty string, or NaN values
-  if (value === undefined || value === null || value === '' || isNaN(Number(value))) {
+  // Handle undefined, null values
+  if (value === undefined || value === null) {
     return 'R$ 0,00';
   }
   
-  const numValue = Number(value);
+  // Convert to number more carefully
+  let numValue: number;
+  if (typeof value === 'string') {
+    if (value.trim() === '') {
+      return 'R$ 0,00';
+    }
+    numValue = parseFloat(value);
+  } else {
+    numValue = Number(value);
+  }
+  
+  // Handle NaN and invalid numbers
+  if (isNaN(numValue)) {
+    return 'R$ 0,00';
+  }
   
   // Handle negative numbers
   if (numValue < 0) {

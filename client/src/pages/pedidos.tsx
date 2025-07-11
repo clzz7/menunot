@@ -227,12 +227,19 @@ export default function Pedidos() {
   };
 
   const formatCurrency = (value: number | string | undefined | null) => {
-    // Handle undefined, null, empty string, or NaN values
-    if (value === undefined || value === null || value === '' || isNaN(Number(value))) {
+    // Handle undefined, null values
+    if (value === undefined || value === null) {
       return 'R$ 0,00';
     }
     
-    const numValue = Number(value);
+    // Convert to number
+    const numValue = typeof value === 'string' ? parseFloat(value) : Number(value);
+    
+    // Handle NaN and invalid numbers
+    if (isNaN(numValue)) {
+      return 'R$ 0,00';
+    }
+    
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
