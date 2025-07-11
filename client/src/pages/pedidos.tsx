@@ -226,11 +226,17 @@ export default function Pedidos() {
     return product?.name || 'Produto não encontrado';
   };
 
-  const formatCurrency = (value: number | string) => {
+  const formatCurrency = (value: number | string | undefined | null) => {
+    // Handle undefined, null, empty string, or NaN values
+    if (value === undefined || value === null || value === '' || isNaN(Number(value))) {
+      return 'R$ 0,00';
+    }
+    
+    const numValue = Number(value);
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
-    }).format(Number(value));
+    }).format(numValue);
   };
 
   const formatDate = (date: Date | string) => {

@@ -114,7 +114,10 @@ export function CouponsManagement() {
     }
   });
 
-  const formatCurrency = (value: number | string) => {
+  const formatCurrency = (value: number | string | undefined | null) => {
+    if (value === undefined || value === null || value === '' || isNaN(Number(value))) {
+      return 'R$ 0,00';
+    }
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
