@@ -227,6 +227,9 @@ export default function Pedidos() {
   };
 
   const formatCurrency = (value: number | string | undefined | null) => {
+    // Debug log
+    console.log('formatCurrency called with:', value, 'type:', typeof value);
+    
     // Handle undefined, null values
     if (value === undefined || value === null) {
       return 'R$ 0,00';
@@ -237,13 +240,17 @@ export default function Pedidos() {
     
     // Handle NaN and invalid numbers
     if (isNaN(numValue)) {
+      console.log('NaN detected for value:', value);
       return 'R$ 0,00';
     }
     
-    return new Intl.NumberFormat('pt-BR', {
+    const result = new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
     }).format(numValue);
+    
+    console.log('formatCurrency result:', result);
+    return result;
   };
 
   const formatDate = (date: Date | string) => {
