@@ -159,7 +159,7 @@ export default function Cardapio() {
                     )}
                   </h2>
                   
-                  <div className="grid gap-4">
+                  <div className="bg-white rounded-lg overflow-hidden">
                     {categoryProducts.map((product: Product) => (
                       <ProductCard
                         key={product.id}
@@ -173,7 +173,7 @@ export default function Cardapio() {
             })
           ) : (
             // Show filtered products
-            <div className="grid gap-4">
+            <div className="bg-white rounded-lg overflow-hidden">
               {filteredProducts.map((product: Product) => (
                 <ProductCard
                   key={product.id}

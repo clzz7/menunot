@@ -119,7 +119,8 @@ Changelog:
 - July 11, 2025: ✅ Redesigned menu cards with professional layout following specific design requirements
 - July 11, 2025: ✅ Implemented two-column layout (40% image, 60% text) with rounded corners and shadow effects
 - July 11, 2025: ✅ Added custom color palette with professional typography hierarchy
-- July 11, 2025: ✅ Removed allergen icons and optimized button positioning for cleaner design
+- July 11, 2025: ✅ Removed allergen icons and optimized button positioning for cleaner design  
+- July 11, 2025: ✅ Implemented minimalist card design with separator lines instead of borders and shadows
 - July 11, 2025: ✅ Applied consistent spacing and visual hierarchy for product information
 - July 11, 2025: ✅ Enhanced product card aesthetics with glassmorphism shadow effects
 - July 10, 2025: ✅ Fixed "Meus Pedidos" page layout issues - repositioned "Trocar Usuário" button and improved customer info display

@@ -14,12 +14,12 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
 
   return (
     <div 
-      className="rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden"
+      className="border-b border-gray-200 last:border-b-0"
       style={{ backgroundColor: 'var(--card-bg)' }}
     >
-      <div className="flex h-36 sm:h-40">
+      <div className="flex h-36 sm:h-40 py-4">
         {/* Coluna da Imagem (40% da largura) */}
-        <div className="w-2/5 flex-shrink-0 p-4">
+        <div className="w-2/5 flex-shrink-0 pr-4">
           <div className="w-full h-full rounded-xl overflow-hidden">
             <img 
               src={product.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"} 
@@ -30,7 +30,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
         </div>
         
         {/* Coluna de Texto (60% da largura) */}
-        <div className="w-3/5 p-4 flex flex-col justify-between">
+        <div className="w-3/5 pl-4 flex flex-col justify-between">
           <div className="flex-1">
             {/* Título do Prato */}
             <h3 
