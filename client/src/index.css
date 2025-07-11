@@ -104,7 +104,7 @@
 
 /* Modern status button with gradient and animation */
 .status-button {
-  background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+  background: linear-gradient(135deg, #E55A2B 0%, #FF6B35 100%);
   border-radius: 25px;
   padding: 12px 20px;
   color: white;
@@ -113,22 +113,22 @@
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+  box-shadow: 0 4px 15px rgba(229, 90, 43, 0.2);
   animation: pulse-glow 3s ease-in-out infinite;
 }
 
 .status-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 6px 20px rgba(229, 90, 43, 0.3);
 }
 
 /* Pulsing animation for status button */
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+    box-shadow: 0 4px 15px rgba(229, 90, 43, 0.2);
   }
   50% {
-    box-shadow: 0 4px 20px rgba(76, 175, 80, 0.4);
+    box-shadow: 0 4px 20px rgba(229, 90, 43, 0.4);
   }
 }
 
