@@ -116,13 +116,6 @@ The application has been successfully migrated to PostgreSQL:
 ## Changelog
 ```
 Changelog:
-- July 11, 2025: ✅ Major UI redesign implementing modern restaurant design principles  
-- July 11, 2025: ✅ Added typography refinements with Montserrat/Roboto fonts and gradient effects
-- July 11, 2025: ✅ Implemented 5-star rating system with 4.8 rating display  
-- July 11, 2025: ✅ Created information cards grid (delivery time, fee, distance, minimum order)
-- July 11, 2025: ✅ Added "Most Ordered Today" section with horizontal product carousel
-- July 11, 2025: ✅ Enhanced category navigation with icons and hover animations
-- July 11, 2025: ✅ Redesigned search bar with improved placeholder and focus states
 - July 11, 2025: ✅ Redesigned hero header with professional banner layout inspired by modern restaurant designs
 - July 11, 2025: ✅ Implemented hero image with food photography and content area with cream background 
 - July 11, 2025: ✅ Added "PEDIDOS ONLINE" title in green-800, order type selector (Retirada/Delivery)
