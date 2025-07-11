@@ -245,6 +245,43 @@
   color: hsl(0, 0%, 20%);
 }
 
+/* Rating system styles */
+.rating-stars {
+  color: #FFD700;
+  fill: #FFD700;
+}
+
+/* Category button improvements */
+.category-button {
+  height: 48px;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+}
+
+.category-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.category-button.active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
+/* Search bar improvements */
+.search-input {
+  height: 44px;
+  background: #F8F9FA;
+  border: 1px solid #E0E0E0;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  background: white;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+}
+
 @layer components {
   /* Glassmorphism effects */
   .glass {

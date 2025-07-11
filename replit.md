@@ -116,7 +116,16 @@ The application has been successfully migrated to PostgreSQL:
 ## Changelog
 ```
 Changelog:
-- July 11, 2025: ✅ Implemented improved layout and spacing with max-width: 400px container and centered design
+- July 11, 2025: ✅ Implemented rating system with 5 golden stars (#FFD700), 4.8 rating, and 324 reviews count
+- July 11, 2025: ✅ Added category information display after bullet point in rating section
+- July 11, 2025: ✅ Enhanced category navigation with 48px height buttons and personalized icons
+- July 11, 2025: ✅ Added Grid icon for "Todos", Sandwich icon for "Hambúrgueres", and Beef icon for "Batatas"
+- July 11, 2025: ✅ Implemented smooth transitions and hover effects for category buttons
+- July 11, 2025: ✅ Redesigned search bar with 44px height, #F8F9FA background, and #E0E0E0 border
+- July 11, 2025: ✅ Added enhanced placeholder text and focus micro-interactions with colored border
+- July 11, 2025: ✅ Implemented CSS animations for button states and search input transitions
+- July 11, 2025: ✅ Added box-shadow effects for active category buttons with primary color
+- July 11, 2025: ✅ Improved layout and spacing with max-width: 400px container and centered design
 - July 11, 2025: ✅ Added subtle background gradient from white to #F8F9FA for better visual hierarchy
 - July 11, 2025: ✅ Increased padding from 16px to 24px for better mobile experience
 - July 11, 2025: ✅ Updated section spacing from 16px to 32px for cleaner visual separation

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input.js";
 import { Button } from "@/components/ui/button.js";
-import { Search, Clock, MapPin, DollarSign, ShoppingBag } from "lucide-react";
+import { Search, Clock, MapPin, DollarSign, ShoppingBag, Grid3X3, Sandwich, Beef, Star } from "lucide-react";
 import { ProductCard } from "@/components/product-card.js";
 import { CartSidebar } from "@/components/cart-sidebar.js";
 import { useCart } from "@/hooks/use-cart.js";
@@ -98,6 +98,23 @@ export default function Cardapio() {
               {establishment?.name?.toUpperCase() || 'BURGER POINT'}
             </h1>
             
+            {/* Rating System */}
+            <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center">
+                {[...Array(5)].map((_, i) => (
+                  <Star 
+                    key={i} 
+                    className="w-4 h-4 rating-stars" 
+                    style={{ color: '#FFD700', fill: '#FFD700' }}
+                  />
+                ))}
+              </div>
+              <span className="font-bold text-gray-800">4.8</span>
+              <span className="text-gray-500 text-sm">(324 avaliações)</span>
+              <span className="text-gray-500 text-sm">•</span>
+              <span className="text-gray-500 text-sm">Hambúrgueres</span>
+            </div>
+            
             {/* Description */}
             <p className="text-base description-text mb-6 max-w-lg text-left">
               Você pode fazer seu pedido online! Navegue pelo nosso cardápio e escolha o que gostaria de pedir.
@@ -174,24 +191,43 @@ export default function Cardapio() {
       <div className="max-w-md mx-auto px-6 pb-10 bg-gradient-to-b from-gray-50 to-white">
         {/* Category Navigation */}
         <div className="mb-8">
-          <div className="flex space-x-4 overflow-x-auto pb-2">
+          <div className="flex space-x-3 overflow-x-auto pb-2">
             <Button
               variant={selectedCategory === "all" ? "default" : "outline"}
               onClick={() => setSelectedCategory("all")}
-              className={`flex-shrink-0 ${selectedCategory === "all" ? 'bg-primary text-white' : ''}`}
+              className={`flex-shrink-0 h-12 px-4 flex items-center gap-2 transition-all duration-200 ${
+                selectedCategory === "all" 
+                  ? 'bg-primary text-white shadow-md' 
+                  : 'bg-gray-50 hover:bg-gray-100 border-gray-200'
+              }`}
             >
+              <Grid3X3 className="w-4 h-4" />
               Todos
             </Button>
-            {categories.map((category: Category) => (
-              <Button
-                key={category.id}
-                variant={selectedCategory === category.name ? "default" : "outline"}
-                onClick={() => setSelectedCategory(category.name)}
-                className={`flex-shrink-0 whitespace-nowrap ${selectedCategory === category.name ? 'bg-primary text-white' : ''}`}
-              >
-                {category.name}
-              </Button>
-            ))}
+            {categories.map((category: Category) => {
+              const isActive = selectedCategory === category.name;
+              const getCategoryIcon = (name: string) => {
+                if (name.toLowerCase().includes('hambúrguer')) return <Sandwich className="w-4 h-4" />;
+                if (name.toLowerCase().includes('batata') || name.toLowerCase().includes('porção')) return <Beef className="w-4 h-4" />;
+                return <Grid3X3 className="w-4 h-4" />;
+              };
+              
+              return (
+                <Button
+                  key={category.id}
+                  variant={isActive ? "default" : "outline"}
+                  onClick={() => setSelectedCategory(category.name)}
+                  className={`flex-shrink-0 h-12 px-4 flex items-center gap-2 whitespace-nowrap transition-all duration-200 ${
+                    isActive 
+                      ? 'bg-primary text-white shadow-md' 
+                      : 'bg-gray-50 hover:bg-gray-100 border-gray-200'
+                  }`}
+                >
+                  {getCategoryIcon(category.name)}
+                  {category.name}
+                </Button>
+              );
+            })}
           </div>
         </div>
 
@@ -200,10 +236,10 @@ export default function Cardapio() {
           <div className="relative">
             <Input
               type="text"
-              placeholder="Buscar produtos..."
+              placeholder="Busque por hambúrgueres, bebidas, sobremesas..."
               value={searchTerm}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-3"
+              className="h-11 pl-10 pr-4 bg-gray-50 border-gray-200 focus:border-primary focus:bg-white transition-all duration-200 placeholder:text-gray-400"
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           </div>
