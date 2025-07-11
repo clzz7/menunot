@@ -85,7 +85,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
               {/* Linha de Preço e Código */}
               <div className="flex items-center gap-3">
                 <span 
-                  className="text-base font-semibold"
+                  className="text-lg font-bold"
                   style={{ color: 'var(--card-secondary)' }}
                 >
                   {new Intl.NumberFormat('pt-BR', {

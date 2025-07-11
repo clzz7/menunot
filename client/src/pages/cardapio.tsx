@@ -196,9 +196,9 @@ export default function Cardapio() {
             <h2 className="text-lg font-bold text-gray-900">MAIS PEDIDOS HOJE</h2>
           </div>
           
-          <div className="flex space-x-4 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex space-x-6 overflow-x-auto pb-2 scrollbar-hide">
             {productsArray.slice(0, 3).map((product: Product) => (
-              <div key={product.id} className="flex-shrink-0 w-48 bg-white rounded-lg border border-gray-100 p-3 shadow-sm featured-card cursor-pointer btn-interactive"
+              <div key={product.id} className="flex-shrink-0 w-48 bg-white rounded-lg border border-gray-100 p-4 shadow-sm featured-card cursor-pointer btn-interactive"
                 onClick={() => handleAddToCart(product)}>
                 <div className="relative">
                   <img 

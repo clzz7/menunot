@@ -116,6 +116,11 @@ The application has been successfully migrated to PostgreSQL:
 ## Changelog
 ```
 Changelog:
+- July 11, 2025: ✅ Updated primary color to #E55A2B for order acceptance button background
+- July 11, 2025: ✅ Enhanced typography hierarchy with price font size increased to 18px (text-lg) and bold weight
+- July 11, 2025: ✅ Improved spacing in "Mais Pedidos" cards: increased padding from 12px to 16px (p-3 to p-4)
+- July 11, 2025: ✅ Enhanced card spacing: increased gap between featured cards from 16px to 24px (space-x-4 to space-x-6)
+- July 11, 2025: ✅ Applied consistent pricing typography across all product cards and featured section
 - July 11, 2025: ✅ Added "Mais Pedidos Hoje" featured section with horizontal carousel before categories
 - July 11, 2025: ✅ Implemented popular items cards with 80x80px images, prices, and "Mais Pedido" badges
 - July 11, 2025: ✅ Created visual badges system: "NOVIDADE" (red), "PROMOÇÃO" (green), "VEGETARIANO" (light green)
