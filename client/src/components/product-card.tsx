@@ -27,58 +27,57 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
         </div>
         
         {/* Coluna de Texto (60% da largura) */}
-        <div className="w-3/5 pl-4 flex flex-col justify-between min-h-32 sm:min-h-36">
-          <div className="flex-1">
-            {/* Título do Prato */}
-            <h3 
-              className="font-bold text-lg mb-2 leading-tight"
-              style={{ color: 'var(--card-title)' }}
-            >
-              {product.name.length > 30 ? `${product.name.substring(0, 30)}...` : product.name}
-            </h3>
-            
-            {/* Linha de Preço e Código */}
-            <div className="flex items-center gap-3 mb-2">
-              <span 
-                className="text-base font-semibold"
-                style={{ color: 'var(--card-secondary)' }}
+        <div className="w-3/5 pl-4 flex flex-col justify-center">
+          <div className="flex items-start justify-between mb-2">
+            <div className="flex-1">
+              {/* Título do Prato */}
+              <h3 
+                className="font-bold text-lg mb-1 leading-tight"
+                style={{ color: 'var(--card-title)' }}
               >
-                {new Intl.NumberFormat('pt-BR', {
-                  style: 'currency',
-                  currency: 'BRL'
-                }).format(Number(product.price))}
-              </span>
-              <span 
-                className="text-sm"
-                style={{ color: 'var(--card-secondary)' }}
-              >
-                Cód: {product.id}
-              </span>
+                {product.name.length > 30 ? `${product.name.substring(0, 30)}...` : product.name}
+              </h3>
+              
+              {/* Linha de Preço e Código */}
+              <div className="flex items-center gap-3">
+                <span 
+                  className="text-base font-semibold"
+                  style={{ color: 'var(--card-secondary)' }}
+                >
+                  {new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                  }).format(Number(product.price))}
+                </span>
+                <span 
+                  className="text-sm"
+                  style={{ color: 'var(--card-secondary)' }}
+                >
+                  Cód: {product.id}
+                </span>
+              </div>
             </div>
             
-            {/* Descrição do Prato */}
-            {product.description && (
-              <p 
-                className="text-sm mb-3 line-clamp-2"
-                style={{ color: 'var(--card-secondary)' }}
-              >
-                {product.description}
-              </p>
-            )}
-          </div>
-          
-          {/* Botão de Adicionar */}
-          <div className="flex justify-end mt-auto">
+            {/* Botão redondo pequeno */}
             <Button 
               onClick={handleAddToCart}
               disabled={!product.is_active}
-              className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-4 py-2 text-sm font-medium transition-colors"
+              className="bg-orange-500 hover:bg-orange-600 text-white rounded-full p-2 ml-4 flex-shrink-0 transition-colors"
               size="sm"
             >
-              <Plus className="w-4 h-4 mr-1" />
-              Adicionar
+              <Plus className="w-4 h-4" />
             </Button>
           </div>
+          
+          {/* Descrição do Prato */}
+          {product.description && (
+            <p 
+              className="text-sm line-clamp-2"
+              style={{ color: 'var(--card-secondary)' }}
+            >
+              {product.description}
+            </p>
+          )}
         </div>
       </div>
     </div>
