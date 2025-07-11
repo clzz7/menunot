@@ -54,7 +54,7 @@ function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Background Pattern */}
@@ -107,10 +107,10 @@ function Home() {
 
         {/* Floating Elements */}
         <motion.div
-          className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl"
+          className="absolute top-20 left-4 w-64 h-64 bg-primary/20 rounded-full blur-3xl"
           animate={{
-            x: [0, 30, 0],
-            y: [0, -30, 0],
+            x: [0, 20, 0],
+            y: [0, -20, 0],
           }}
           transition={{
             duration: 10,
@@ -119,10 +119,10 @@ function Home() {
           }}
         />
         <motion.div
-          className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl"
+          className="absolute bottom-20 right-4 w-80 h-80 bg-secondary/20 rounded-full blur-3xl"
           animate={{
-            x: [0, -30, 0],
-            y: [0, 30, 0],
+            x: [0, -20, 0],
+            y: [0, 20, 0],
           }}
           transition={{
             duration: 12,
