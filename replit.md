@@ -116,6 +116,11 @@ The application has been successfully migrated to PostgreSQL:
 ## Changelog
 ```
 Changelog:
+- July 11, 2025: ✅ Removed all badges and micro legends from product cards for cleaner design
+- July 11, 2025: ✅ Eliminated "NOVIDADE", "PROMOÇÃO", "VEGETARIANO" badges from product cards
+- July 11, 2025: ✅ Removed "Mais Pedido" badges from featured section cards
+- July 11, 2025: ✅ Cleaned up CSS animations and badge-related styles for better performance
+- July 11, 2025: ✅ Simplified product card layout removing visual pollution from overlay elements
 - July 11, 2025: ✅ Reduced hero banner height for better mobile experience (h-48→h-40, md:h-56→md:h-44, lg:h-64→lg:h-48)
 - July 11, 2025: ✅ Updated primary color to #E55A2B for order acceptance button background
 - July 11, 2025: ✅ Enhanced typography hierarchy with price font size increased to 18px (text-lg) and bold weight

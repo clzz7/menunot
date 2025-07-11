@@ -302,19 +302,7 @@
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
-/* Badge animations */
-.badge-animate {
-  animation: badge-pulse 2s infinite;
-}
-
-@keyframes badge-pulse {
-  0%, 100% { 
-    transform: scale(1); 
-  }
-  50% { 
-    transform: scale(1.05); 
-  }
-}
+/* Badge animations - removed for cleaner design */
 
 /* Scrollbar hide */
 .scrollbar-hide {

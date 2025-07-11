@@ -206,9 +206,6 @@ export default function Cardapio() {
                     alt={product.name}
                     className="w-20 h-20 rounded-lg object-cover mx-auto"
                   />
-                  <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full badge-animate">
-                    <span className="font-medium">Mais Pedido</span>
-                  </div>
                 </div>
                 <div className="mt-3 text-center">
                   <h3 className="font-semibold text-gray-900 text-sm line-clamp-1">{product.name}</h3>
