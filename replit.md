@@ -121,6 +121,8 @@ Changelog:
 - July 11, 2025: ✅ Added custom color palette with professional typography hierarchy
 - July 11, 2025: ✅ Removed allergen icons and optimized button positioning for cleaner design  
 - July 11, 2025: ✅ Implemented minimalist card design with separator lines instead of borders and shadows
+- July 11, 2025: ✅ Added professional product images for all menu items using Unsplash API
+- July 11, 2025: ✅ Updated all 10 products with appropriate high-quality photos matching their descriptions
 - July 11, 2025: ✅ Applied consistent spacing and visual hierarchy for product information
 - July 11, 2025: ✅ Enhanced product card aesthetics with glassmorphism shadow effects
 - July 10, 2025: ✅ Fixed "Meus Pedidos" page layout issues - repositioned "Trocar Usuário" button and improved customer info display
