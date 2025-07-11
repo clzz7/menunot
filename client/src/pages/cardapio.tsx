@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input.js";
 import { Button } from "@/components/ui/button.js";
-import { Search, Clock, MapPin, DollarSign, ShoppingBag, Grid3X3, Sandwich, Beef, Star } from "lucide-react";
+import { Search, Clock, MapPin, DollarSign, ShoppingBag, Grid3X3, Sandwich, Beef, Star, Flame, Tag, Leaf, Sparkles } from "lucide-react";
 import { ProductCard } from "@/components/product-card.js";
 import { CartSidebar } from "@/components/cart-sidebar.js";
 import { useCart } from "@/hooks/use-cart.js";
@@ -189,13 +189,45 @@ export default function Cardapio() {
 
       {/* Main Content */}
       <div className="max-w-md mx-auto px-6 pb-10 bg-gradient-to-b from-gray-50 to-white">
+        {/* Featured Section - Mais Pedidos Hoje */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <Flame className="w-5 h-5 text-red-500" />
+            <h2 className="text-lg font-bold text-gray-900">MAIS PEDIDOS HOJE</h2>
+          </div>
+          
+          <div className="flex space-x-4 overflow-x-auto pb-2 scrollbar-hide">
+            {productsArray.slice(0, 3).map((product: Product) => (
+              <div key={product.id} className="flex-shrink-0 w-48 bg-white rounded-lg border border-gray-100 p-3 shadow-sm featured-card cursor-pointer btn-interactive"
+                onClick={() => handleAddToCart(product)}>
+                <div className="relative">
+                  <img 
+                    src={product.image || "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=80&h=80&fit=crop"}
+                    alt={product.name}
+                    className="w-20 h-20 rounded-lg object-cover mx-auto"
+                  />
+                  <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full badge-animate">
+                    <span className="font-medium">Mais Pedido</span>
+                  </div>
+                </div>
+                <div className="mt-3 text-center">
+                  <h3 className="font-semibold text-gray-900 text-sm line-clamp-1">{product.name}</h3>
+                  <p className="text-lg font-bold text-primary mt-1">
+                    R$ {product.price.toFixed(2).replace('.', ',')}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Category Navigation */}
         <div className="mb-8">
           <div className="flex space-x-3 overflow-x-auto pb-2">
             <Button
               variant={selectedCategory === "all" ? "default" : "outline"}
               onClick={() => setSelectedCategory("all")}
-              className={`flex-shrink-0 h-12 px-4 flex items-center gap-2 transition-all duration-200 ${
+              className={`flex-shrink-0 h-12 px-4 flex items-center gap-2 btn-interactive ${
                 selectedCategory === "all" 
                   ? 'bg-primary text-white shadow-md' 
                   : 'bg-gray-50 hover:bg-gray-100 border-gray-200'
@@ -217,7 +249,7 @@ export default function Cardapio() {
                   key={category.id}
                   variant={isActive ? "default" : "outline"}
                   onClick={() => setSelectedCategory(category.name)}
-                  className={`flex-shrink-0 h-12 px-4 flex items-center gap-2 whitespace-nowrap transition-all duration-200 ${
+                  className={`flex-shrink-0 h-12 px-4 flex items-center gap-2 whitespace-nowrap btn-interactive ${
                     isActive 
                       ? 'bg-primary text-white shadow-md' 
                       : 'bg-gray-50 hover:bg-gray-100 border-gray-200'

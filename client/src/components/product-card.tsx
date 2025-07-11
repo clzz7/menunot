@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button.js";
-import { Plus } from "lucide-react";
+import { Plus, Tag, Sparkles, Leaf } from "lucide-react";
 import { Product } from "@shared/schema.js";
 
 interface ProductCardProps {
@@ -12,17 +12,61 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
     onAddToCart(product);
   };
 
+  // Determine badges based on product properties
+  const getBadges = () => {
+    const badges = [];
+    
+    // Mock logic for demonstration - in real app, these would be product properties
+    if (product.id === "1" || product.id === "2") {
+      badges.push({ type: "novidade", text: "NOVIDADE", icon: Sparkles });
+    }
+    
+    if (product.id === "3" || product.id === "4") {
+      badges.push({ type: "promocao", text: "PROMOÇÃO", icon: Tag });
+    }
+    
+    if (product.name.toLowerCase().includes("veggie") || product.name.toLowerCase().includes("vegetariano")) {
+      badges.push({ type: "vegetariano", text: "VEGETARIANO", icon: Leaf });
+    }
+    
+    return badges;
+  };
+
+  const badges = getBadges();
+
   return (
-    <div className="border-b border-gray-200 last:border-b-0 bg-gray-50">
+    <div className="border-b border-gray-200 last:border-b-0 bg-gray-50 hover:bg-gray-100 transition-all duration-200">
       <div className="flex py-4 px-4">
         {/* Coluna da Imagem (40% da largura) */}
         <div className="w-2/5 flex-shrink-0 pr-4">
-          <div className="w-full h-32 sm:h-36 rounded-xl overflow-hidden">
+          <div className="w-full h-32 sm:h-36 rounded-xl overflow-hidden relative">
             <img 
               src={product.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"} 
               alt={product.name} 
               className="w-full h-full object-cover"
             />
+            {/* Badges overlay */}
+            {badges.length > 0 && (
+              <div className="absolute top-2 left-2 flex flex-col gap-1">
+                {badges.map((badge, index) => {
+                  const Icon = badge.icon;
+                  return (
+                    <div
+                      key={index}
+                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                        badge.type === "novidade" ? "bg-red-500 text-white" :
+                        badge.type === "promocao" ? "bg-green-500 text-white" :
+                        badge.type === "vegetariano" ? "bg-green-100 text-green-800" :
+                        "bg-gray-500 text-white"
+                      }`}
+                    >
+                      <Icon className="w-3 h-3" />
+                      {badge.text}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
         

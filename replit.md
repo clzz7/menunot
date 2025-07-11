@@ -116,6 +116,16 @@ The application has been successfully migrated to PostgreSQL:
 ## Changelog
 ```
 Changelog:
+- July 11, 2025: ✅ Added "Mais Pedidos Hoje" featured section with horizontal carousel before categories
+- July 11, 2025: ✅ Implemented popular items cards with 80x80px images, prices, and "Mais Pedido" badges
+- July 11, 2025: ✅ Created visual badges system: "NOVIDADE" (red), "PROMOÇÃO" (green), "VEGETARIANO" (light green)
+- July 11, 2025: ✅ Added personalized icons for badges: Sparkles, Tag, and Leaf respectively
+- July 11, 2025: ✅ Implemented comprehensive micro-interactions with scale(1.02) hover effects
+- July 11, 2025: ✅ Added skeleton loading animation with gradient background for loading states
+- July 11, 2025: ✅ Created smooth transitions (0.3s ease) for all interactive elements
+- July 11, 2025: ✅ Implemented badge pulse animation every 2 seconds for featured items
+- July 11, 2025: ✅ Added scroll-hide functionality for horizontal carousels
+- July 11, 2025: ✅ Enhanced product cards with hover effects and badges overlay system
 - July 11, 2025: ✅ Implemented rating system with 5 golden stars (#FFD700), 4.8 rating, and 324 reviews count
 - July 11, 2025: ✅ Added category information display after bullet point in rating section
 - July 11, 2025: ✅ Enhanced category navigation with 48px height buttons and personalized icons
