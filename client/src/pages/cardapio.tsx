@@ -91,7 +91,7 @@ export default function Cardapio() {
         </div>
         
         {/* Content Area */}
-        <div className="bg-cream-50 py-8">
+        <div className="bg-gray-50 py-8">
           <div className="max-w-2xl mx-auto px-4">
             {/* Main Title */}
             <h1 className="text-2xl md:text-3xl font-bold text-primary mb-3 tracking-wide text-left">
@@ -145,7 +145,7 @@ export default function Cardapio() {
       </section>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10 bg-gray-50">
         {/* Category Navigation */}
         <div className="mb-6">
           <div className="flex space-x-4 overflow-x-auto pb-2">
