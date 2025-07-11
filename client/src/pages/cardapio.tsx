@@ -95,7 +95,7 @@ export default function Cardapio() {
           <div className="max-w-2xl mx-auto px-4">
             {/* Main Title */}
             <h1 className="text-2xl md:text-3xl font-bold text-primary mb-3 tracking-wide text-left">
-              PEDIDOS ONLINE
+              {establishment?.name?.toUpperCase() || 'BURGER POINT'}
             </h1>
             
             {/* Description */}
