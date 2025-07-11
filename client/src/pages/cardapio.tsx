@@ -3,7 +3,8 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input.js";
 import { Button } from "@/components/ui/button.js";
-import { Search, Clock, MapPin } from "lucide-react";
+import { Badge } from "@/components/ui/badge.js";
+import { Search, Clock, MapPin, Check, Star, Flame, Grid3X3, Beef, Utensils, DollarSign, MapPinIcon, ShoppingBag } from "lucide-react";
 import { ProductCard } from "@/components/product-card.js";
 import { CartSidebar } from "@/components/cart-sidebar.js";
 import { useCart } from "@/hooks/use-cart.js";
@@ -91,54 +92,101 @@ export default function Cardapio() {
         </div>
         
         {/* Content Area */}
-        <div className="bg-gray-50 py-8">
-          <div className="max-w-2xl mx-auto px-4">
-            {/* Main Title */}
-            <h1 className="text-2xl md:text-3xl font-bold text-primary mb-3 tracking-wide text-left">
+        <div className="bg-gradient-to-b from-white to-gray-50 py-8">
+          <div className="max-w-md mx-auto px-6">
+            {/* Main Title with Gradient */}
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent mb-2 tracking-wide text-left font-['Montserrat',sans-serif] drop-shadow-sm">
               {establishment?.name?.toUpperCase() || 'BURGER POINT'}
             </h1>
             
+            {/* Rating and Category */}
+            <div className="flex items-center gap-2 mb-4 text-left">
+              <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                ))}
+                <span className="font-semibold text-sm ml-1">4.8</span>
+                <span className="text-gray-600 text-sm">(324 avaliações)</span>
+              </div>
+              <span className="text-gray-600 text-sm">• Hambúrgueres</span>
+            </div>
+            
             {/* Description */}
-            <p className="text-base text-gray-700 mb-6 max-w-lg text-left">
+            <p className="text-base text-gray-700 mb-6 max-w-lg text-left font-['Roboto',sans-serif] leading-relaxed">
               Você pode fazer seu pedido online! Navegue pelo nosso cardápio e escolha o que gostaria de pedir.
             </p>
             
-            {/* Status Indicator */}
+            {/* Status Indicator with Animation */}
             {establishment && (
-              <div className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-full bg-white mb-6">
-                <div className={`w-2.5 h-2.5 rounded-full ${establishment.is_open ? 'bg-primary' : 'bg-red-500'}`} />
-                <span className="text-gray-700 text-sm">
+              <div className="inline-flex items-center gap-2 px-4 py-3 rounded-3xl bg-gradient-to-r from-green-500 to-green-600 text-white mb-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 animate-pulse">
+                <Check className="w-4 h-4" />
+                <span className="text-sm font-medium">
                   {establishment.is_open ? "Aceitando Pedidos" : "Fechado no momento"}
                 </span>
               </div>
             )}
             
-            {/* Order Info - All Left Aligned */}
-            <div className="space-y-2 text-left max-w-xs">
-              <div className="flex items-start gap-2 text-gray-700">
-                <Clock className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <span className="text-sm">
-                  Tempo de entrega: Até 30 minutos
-                </span>
-              </div>
-              
-              <div className="flex items-start gap-2 text-gray-700">
-                <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            {/* Information Cards Grid */}
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              <div className="bg-gray-100 rounded-xl p-3 flex items-center gap-2">
+                <Clock className="w-4 h-4 text-primary" />
                 <div className="text-sm">
-                  <div>
-                    Área de entrega:
-                  </div>
-                  <div className="text-gray-600">
-                    Rua das Flores, 123, Centro, São Paulo, SP
-                  </div>
+                  <div className="font-medium text-gray-900">25-30 min</div>
+                  <div className="text-gray-600 text-xs">Entrega</div>
                 </div>
               </div>
               
-              <div className="pt-1">
-                <button className="text-primary underline text-sm hover:text-primary/80 transition-colors">
-                  Alterar
-                </button>
+              <div className="bg-gray-100 rounded-xl p-3 flex items-center gap-2">
+                <DollarSign className="w-4 h-4 text-green-600" />
+                <div className="text-sm">
+                  <div className="font-medium text-gray-900">R$ 4,99</div>
+                  <div className="text-gray-600 text-xs">Taxa</div>
+                </div>
               </div>
+              
+              <div className="bg-gray-100 rounded-xl p-3 flex items-center gap-2">
+                <MapPinIcon className="w-4 h-4 text-blue-600" />
+                <div className="text-sm">
+                  <div className="font-medium text-gray-900">2.5km</div>
+                  <div className="text-gray-600 text-xs">Distância</div>
+                </div>
+              </div>
+              
+              <div className="bg-gray-100 rounded-xl p-3 flex items-center gap-2">
+                <ShoppingBag className="w-4 h-4 text-purple-600" />
+                <div className="text-sm">
+                  <div className="font-medium text-gray-900">R$ 25,00</div>
+                  <div className="text-gray-600 text-xs">Pedido mín.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Popular Items Section */}
+        <div className="bg-white py-6 border-b border-gray-100">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Flame className="w-5 h-5 text-red-500" />
+              <h2 className="text-lg font-bold text-gray-900">MAIS PEDIDOS HOJE</h2>
+            </div>
+            <div className="flex gap-4 overflow-x-auto pb-2">
+              {featuredProducts.slice(0, 3).map((product: Product) => (
+                <div key={product.id} className="flex-shrink-0 bg-gray-50 rounded-xl p-4 w-64">
+                  <div className="flex items-center gap-3">
+                    <img 
+                      src={product.image || `https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=80&h=80&fit=crop`}
+                      alt={product.name}
+                      className="w-16 h-16 rounded-lg object-cover"
+                    />
+                    <div className="flex-1">
+                      <Badge className="bg-red-100 text-red-700 text-xs mb-1">Mais Pedido</Badge>
+                      <h3 className="font-semibold text-sm text-gray-900">{product.name}</h3>
+                      <p className="text-primary font-bold text-sm">R$ {product.price.toFixed(2)}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -146,38 +194,50 @@ export default function Cardapio() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10 bg-gray-50">
-        {/* Category Navigation */}
+        {/* Category Navigation Enhanced */}
         <div className="mb-6">
-          <div className="flex space-x-4 overflow-x-auto pb-2">
+          <div className="flex space-x-3 overflow-x-auto pb-2">
             <Button
               variant={selectedCategory === "all" ? "default" : "outline"}
               onClick={() => setSelectedCategory("all")}
-              className={`flex-shrink-0 ${selectedCategory === "all" ? 'bg-primary text-white' : ''}`}
+              className={`flex-shrink-0 h-12 px-4 rounded-xl transition-all duration-300 flex items-center gap-2 hover:scale-105 ${
+                selectedCategory === "all" ? 'bg-primary text-white shadow-lg' : 'hover:bg-gray-100'
+              }`}
             >
+              <Grid3X3 className="w-4 h-4" />
               Todos
             </Button>
-            {categories.map((category: Category) => (
-              <Button
-                key={category.id}
-                variant={selectedCategory === category.name ? "default" : "outline"}
-                onClick={() => setSelectedCategory(category.name)}
-                className={`flex-shrink-0 whitespace-nowrap ${selectedCategory === category.name ? 'bg-primary text-white' : ''}`}
-              >
-                {category.name}
-              </Button>
-            ))}
+            {categories.map((category: Category) => {
+              const isActive = selectedCategory === category.name;
+              const icon = category.name.toLowerCase().includes('hambúrguer') ? Beef : Utensils;
+              const IconComponent = icon;
+              
+              return (
+                <Button
+                  key={category.id}
+                  variant={isActive ? "default" : "outline"}
+                  onClick={() => setSelectedCategory(category.name)}
+                  className={`flex-shrink-0 whitespace-nowrap h-12 px-4 rounded-xl transition-all duration-300 flex items-center gap-2 hover:scale-105 ${
+                    isActive ? 'bg-primary text-white shadow-lg' : 'hover:bg-gray-100'
+                  }`}
+                >
+                  <IconComponent className="w-4 h-4" />
+                  {category.name}
+                </Button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Search Bar */}
+        {/* Enhanced Search Bar */}
         <div className="mb-6">
           <div className="relative">
             <Input
               type="text"
-              placeholder="Buscar produtos..."
+              placeholder="Busque por hambúrgueres, bebidas, sobremesas..."
               value={searchTerm}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-3"
+              className="h-11 pl-10 pr-4 bg-gray-50 border border-gray-200 rounded-xl transition-all duration-300 focus:border-primary focus:bg-white focus:shadow-lg"
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           </div>
