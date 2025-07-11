@@ -116,6 +116,11 @@ The application has been successfully migrated to PostgreSQL:
 ## Changelog
 ```
 Changelog:
+- July 11, 2025: ✅ Unified color scheme with warm orange/amber tones replacing random blue/green/purple colors
+- July 11, 2025: ✅ Updated status icons and customer info cards to use consistent color palette
+- July 11, 2025: ✅ Corrected Hot Dog product image (was showing pizza, now shows proper hot dog)
+- July 11, 2025: ✅ Removed progress bar from toast notifications for cleaner design
+- July 11, 2025: ✅ Simplified toast system using native Radix UI duration instead of custom progress bar
 - July 11, 2025: ✅ Redesigned menu cards with professional layout following specific design requirements
 - July 11, 2025: ✅ Implemented two-column layout (40% image, 60% text) with rounded corners and shadow effects
 - July 11, 2025: ✅ Added custom color palette with professional typography hierarchy

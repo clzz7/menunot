@@ -246,17 +246,17 @@ export default function Pedidos() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'PENDING':
-        return <Clock className="w-4 h-4 text-yellow-500" />;
+        return <Clock className="w-4 h-4 text-amber-600" />;
       case 'CONFIRMED':
       case 'PREPARING':
-        return <RefreshCw className="w-4 h-4 text-blue-500" />;
+        return <RefreshCw className="w-4 h-4 text-orange-600" />;
       case 'READY':
       case 'OUT_DELIVERY':
-        return <Package className="w-4 h-4 text-orange-500" />;
+        return <Package className="w-4 h-4 text-orange-700" />;
       case 'DELIVERED':
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
+        return <CheckCircle className="w-4 h-4 text-green-600" />;
       case 'CANCELLED':
-        return <XCircle className="w-4 h-4 text-red-500" />;
+        return <XCircle className="w-4 h-4 text-red-600" />;
       default:
         return <Clock className="w-4 h-4 text-gray-500" />;
     }
@@ -576,11 +576,11 @@ export default function Pedidos() {
               </div>
               
               {/* Customer info card */}
-              <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+              <Card className="bg-gradient-to-r from-orange-50 to-amber-50 border-orange-200">
                 <CardContent className="p-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="flex items-center space-x-2 text-gray-700">
-                      <User className="w-5 h-5 text-blue-600" />
+                      <User className="w-5 h-5 text-orange-600" />
                       <div>
                         <p className="text-sm font-medium text-gray-500">Telefone</p>
                         <p className="font-semibold">{knownCustomerPhone}</p>
@@ -590,7 +590,7 @@ export default function Pedidos() {
                     {totalOrders > 0 && (
                       <>
                         <div className="flex items-center space-x-2 text-gray-700">
-                          <Package className="w-5 h-5 text-green-600" />
+                          <Package className="w-5 h-5 text-amber-600" />
                           <div>
                             <p className="text-sm font-medium text-gray-500">Total de Pedidos</p>
                             <p className="font-semibold">{totalOrders} pedido{totalOrders > 1 ? 's' : ''}</p>
@@ -598,10 +598,10 @@ export default function Pedidos() {
                         </div>
                         
                         <div className="flex items-center space-x-2 text-gray-700">
-                          <ShoppingCart className="w-5 h-5 text-purple-600" />
+                          <ShoppingCart className="w-5 h-5 text-orange-700" />
                           <div>
                             <p className="text-sm font-medium text-gray-500">Total Gasto</p>
-                            <p className="font-semibold text-purple-700">{formatCurrency(totalSpent)}</p>
+                            <p className="font-semibold text-orange-800">{formatCurrency(totalSpent)}</p>
                           </div>
                         </div>
                       </>

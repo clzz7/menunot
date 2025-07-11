@@ -72,19 +72,19 @@ export default function Rastreamento() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'PENDING':
-        return <Clock className="w-6 h-6 text-yellow-500" />;
+        return <Clock className="w-6 h-6 text-amber-600" />;
       case 'CONFIRMED':
-        return <CheckCircle className="w-6 h-6 text-blue-500" />;
+        return <CheckCircle className="w-6 h-6 text-orange-600" />;
       case 'PREPARING':
-        return <RefreshCw className="w-6 h-6 text-blue-500" />;
+        return <RefreshCw className="w-6 h-6 text-orange-600" />;
       case 'READY':
-        return <Package className="w-6 h-6 text-orange-500" />;
+        return <Package className="w-6 h-6 text-orange-700" />;
       case 'OUT_DELIVERY':
-        return <Truck className="w-6 h-6 text-orange-500" />;
+        return <Truck className="w-6 h-6 text-orange-700" />;
       case 'DELIVERED':
-        return <MapPin className="w-6 h-6 text-green-500" />;
+        return <MapPin className="w-6 h-6 text-green-600" />;
       case 'CANCELLED':
-        return <XCircle className="w-6 h-6 text-red-500" />;
+        return <XCircle className="w-6 h-6 text-red-600" />;
       default:
         return <Clock className="w-6 h-6 text-gray-500" />;
     }
@@ -105,11 +105,11 @@ export default function Rastreamento() {
 
   const getStatusColor = (status: string) => {
     const colorMap: Record<string, string> = {
-      'PENDING': 'bg-yellow-100 text-yellow-800',
-      'CONFIRMED': 'bg-blue-100 text-blue-800',
-      'PREPARING': 'bg-blue-100 text-blue-800',
-      'READY': 'bg-orange-100 text-orange-800',
-      'OUT_DELIVERY': 'bg-orange-100 text-orange-800',
+      'PENDING': 'bg-amber-100 text-amber-800',
+      'CONFIRMED': 'bg-orange-100 text-orange-800',
+      'PREPARING': 'bg-orange-100 text-orange-800',
+      'READY': 'bg-orange-200 text-orange-900',
+      'OUT_DELIVERY': 'bg-orange-200 text-orange-900',
       'DELIVERED': 'bg-green-100 text-green-800',
       'CANCELLED': 'bg-red-100 text-red-800'
     };
