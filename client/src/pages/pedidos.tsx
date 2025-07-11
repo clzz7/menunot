@@ -227,9 +227,6 @@ export default function Pedidos() {
   };
 
   const formatCurrency = (value: number | string | undefined | null) => {
-    // Debug log
-    console.log('formatCurrency called with:', value, 'type:', typeof value);
-    
     // Handle undefined, null values
     if (value === undefined || value === null) {
       return 'R$ 0,00';
@@ -240,17 +237,13 @@ export default function Pedidos() {
     
     // Handle NaN and invalid numbers
     if (isNaN(numValue)) {
-      console.log('NaN detected for value:', value);
       return 'R$ 0,00';
     }
     
-    const result = new Intl.NumberFormat('pt-BR', {
+    return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
     }).format(numValue);
-    
-    console.log('formatCurrency result:', result);
-    return result;
   };
 
   const formatDate = (date: Date | string) => {
@@ -363,16 +356,16 @@ export default function Pedidos() {
                   {orderItems.map((item: any) => (
                     <div key={item.id} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
                       <div className="flex-1">
-                        <p className="font-medium text-sm">{getProductName(item.product_id)}</p>
+                        <p className="font-medium text-sm">{item.product_name || getProductName(item.product_id)}</p>
                         <p className="text-sm text-gray-500">
-                          {item.quantity}x {formatCurrency(item.unit_price)}
+                          {item.quantity}x {formatCurrency(item.product_price || item.unit_price)}
                         </p>
                         {item.observations && (
                           <p className="text-xs text-gray-400 mt-1">Obs: {item.observations}</p>
                         )}
                       </div>
                       <span className="font-medium text-sm">
-                        {formatCurrency(item.total)}
+                        {formatCurrency(item.subtotal || item.total)}
                       </span>
                     </div>
                   ))}
