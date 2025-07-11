@@ -1,0 +1,49 @@
+1. Estrutura Geral e Layout
+O design é composto por duas seções principais: uma imagem de banner superior e uma área de conteúdo informativa abaixo.
+
+Banner de Imagem (Hero Image):
+Ocupa toda a largura da parte superior da seção.
+A imagem é de alta qualidade e mostra uma variedade de pratos de comida (como massas, raviólis, salada) em um fundo escuro, criando um visual apetitoso e convidativo.
+A imagem não tem sobreposições de texto ou cor, servindo puramente como um elemento visual de impacto.
+Área de Conteúdo:
+Fundo: Possui um fundo de cor sólida, um branco suave ou creme muito claro (ex: #F9F7F3), que contrasta com a imagem escura acima.
+Alinhamento: Todo o conteúdo dentro desta área (títulos, botões, informações) é centralizado horizontalmente na página.
+Espaçamento: Há um espaçamento vertical generoso e consistente entre cada elemento, criando um layout limpo, organizado e fácil de ler.
+2. Elementos de Conteúdo (em ordem de aparição)
+Título Principal ("ONLINE ORDERING"):
+Estilo de Texto: Todo em maiúsculas (UPPERCASE).
+Tipografia: Fonte sans-serif moderna, com peso negrito (bold). A fonte tem uma aparência forte e clara.
+Cor: Verde escuro e sóbrio (ex: #1A472A).
+Tamanho: É o maior elemento de texto, estabelecendo a hierarquia visual primária.
+Parágrafo de Descrição:
+Texto: "You can order online! Browse our menu items and choose what you'd like to order from us."
+Tipografia: A mesma família de fontes sans-serif do título, mas em peso regular ou normal.
+Cor: Preto ou cinza muito escuro (ex: #333333), para ser facilmente legível sem competir com a cor de destaque do título.
+Tamanho: Significativamente menor que o título.
+Indicador de Status ("Accepting Orders"):
+Formato: Um "pill button" (botão em formato de pílula) com contorno.
+Estilo: Borda fina em cinza claro e fundo branco/creme (o mesmo da área de conteúdo). Não é um botão preenchido.
+Conteúdo Interno: Um pequeno círculo verde vivo (#2E8B57) à esquerda, seguido pelo texto.
+Tipografia do Texto: Fonte sans-serif, peso regular, na mesma cor cinza escura do parágrafo de descrição.
+Seletor de Tipo de Pedido (Pickup / Delivery):
+Formato: Um único componente em formato de pílula, dividido visualmente em duas metades iguais. É um controle segmentado.
+Borda: Uma borda fina na cor verde escura do título contorna todo o componente.
+Estado Selecionado ("Pickup"):
+Fundo preenchido com a cor verde escura (#1A472A).
+Texto na cor do fundo da página (branco/creme) para alto contraste.
+Estado Não Selecionado ("Delivery"):
+Fundo transparente (mostrando a cor de fundo da página).
+Texto na cor verde escura do título.
+Tipografia: Fonte sans-serif, peso regular ou semi-negrito.
+Linhas de Informação (Tempo e Endereço):
+Layout: Organizadas como uma lista alinhada à esquerda, mas o bloco inteiro é centralizado na página. Cada item é composto por um ícone seguido de texto.
+Ícones: Ícones de linha, finos e simples. Um relógio para o tempo e um pino de mapa para o endereço. A cor dos ícones é o mesmo cinza escuro dos textos informativos.
+Texto Principal: "Pickup time: Up to 30 minutes" e "Pickup Address: 500 terry francine, San Francisco, CA".
+Tipografia: Fonte sans-serif, peso regular, cor cinza escura.
+Link "Change": Posicionado diretamente abaixo da linha de tempo. Estilizado com um sublinhado para indicar claramente que é um link clicável. Usa a mesma fonte e cor do texto informativo.
+3. Resumo da Paleta de Cores e Tipografia
+Cor de Fundo: Branco Suave / Creme Claro (~#F9F7F3).
+Cor Primária / Destaque: Verde Escuro (~#1A472A).
+Cor do Texto Geral: Cinza Escuro / Quase Preto (~#333333).
+Cor do Status "Ativo": Verde Vivo (~#2E8B57 ou similar).
+Fonte: Uma única família de fontes sans-serif moderna e geométrica (como Poppins, Lato, ou Gilroy) com pesos Bold e Regular.
