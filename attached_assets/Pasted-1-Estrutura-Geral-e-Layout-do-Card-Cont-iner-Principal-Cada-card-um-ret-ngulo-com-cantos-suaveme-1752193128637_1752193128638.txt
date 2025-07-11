@@ -1,0 +1,42 @@
+1. Estrutura Geral e Layout do Card
+Contêiner Principal: Cada card é um retângulo com cantos suavemente arredondados. Possui um fundo branco sólido (#FFFFFF).
+Sombra e Elevação: Uma sombra sutil e difusa é aplicada ao redor de todo o card, criando um efeito de profundidade que o faz parecer flutuar sobre o fundo da página. A sombra é mais escura e concentrada perto das bordas e se espalha suavemente.
+Layout de Duas Colunas: O card é dividido em duas colunas principais.
+Coluna Esquerda (Aproximadamente 40% da largura): Dedicada exclusivamente à imagem do prato.
+Coluna Direita (Aproximadamente 60% da largura): Contém todas as informações textuais (título, preço, código, descrição e ícones de alérgenos).
+Espaçamento Interno (Padding): Há um preenchimento (padding) consistente ao redor de todo o conteúdo dentro do card, garantindo que nenhum elemento toque as bordas. O espaço entre a coluna da imagem e a coluna de texto também é bem definido.
+2. Coluna da Imagem (Esquerda)
+Formato da Imagem: A imagem do prato é contida dentro de um quadrado com cantos arredondados, espelhando a forma do card principal, mas com um raio de curvatura um pouco maior.
+Conteúdo da Imagem: As fotos são de alta qualidade, com iluminação profissional, mostrando o prato de forma apetitosa. O prato está geralmente centralizado e em foco nítido.
+3. Coluna de Texto (Direita)
+A coluna de texto é organizada verticalmente com uma hierarquia visual clara. Todos os textos estão alinhados à esquerda.
+
+Título do Prato:
+Texto: "Entradinha Camarão à Milanesa..." ou "Entradinha Isca de Peixe 130g". Nomes longos são abreviados com reticências (...).
+Tipografia: Fonte sans-serif moderna e limpa. O peso é negrito (bold).
+Tamanho: É o maior elemento de texto do card, estabelecendo a hierarquia principal.
+Cor: Preto ou um cinza muito escuro (ex: #212121).
+Linha de Preço e Código:
+Layout: Disposta em uma única linha logo abaixo do título.
+Preço: Formatado como "R$ XX,00". A fonte parece ter um peso ligeiramente mais forte ou ser um pouco maior que o texto do código ao lado.
+Código: Formatado como "Cód: XXXX".
+Tipografia (ambos): A mesma fonte sans-serif do título, mas em peso regular.
+Tamanho: Menor que o título, mas maior que a descrição.
+Cor (ambos): Cinza de tom médio (ex: #5F5F5F), consistente para ambos os elementos para criar uma unidade visual.
+Descrição do Prato:
+Texto: Uma ou duas frases curtas descrevendo os ingredientes e acompanhamentos. Ex: "Camarão à milanesa com gergelim. Acompanha molho tártaro."
+Tipografia: Fonte sans-serif em peso regular.
+Tamanho: O menor corpo de texto principal, garantindo legibilidade sem competir com o título.
+Cor: O mesmo cinza de tom médio usado na linha de preço e código (#5F5F5F).
+Ícones de Alérgenos/Ingredientes:
+Posicionamento: Localizados na base da coluna de texto, alinhados à esquerda.
+Estilo: Ícones circulares com uma borda fina. O pictograma dentro é um gráfico simples e estilizado.
+Cores: A borda e o pictograma do ícone possuem uma cor de destaque, um tom de marrom claro ou dourado queimado. O fundo do círculo é branco.
+Exemplos: Ícones para ovo, glúten (trigo), crustáceos (caranguejo) e peixe.
+4. Resumo da Paleta de Cores e Tipografia
+Fundo do Card: Branco (#FFFFFF).
+Sombra: Cinza suave e transparente.
+Texto Principal (Título): Preto / Cinza Escuro (~#212121).
+Texto Secundário (Preço, Cód, Descrição): Cinza Médio (~#5F5F5F).
+Cor de Destaque (Ícones): Marrom Claro / Dourado Queimado (~#C0955D).
+Fonte: Utilizar uma única família de fontes sans-serif versátil (como Montserrat, Lato ou Nunito Sans) com variações de peso (Bold para o título, Regular para o resto).

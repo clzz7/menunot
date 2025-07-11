@@ -73,6 +73,12 @@
   --accent: hsl(24, 95%, 53%);
   --accent-foreground: hsl(60, 9.1%, 97.8%);
   --destructive: hsl(0, 84.2%, 60.2%);
+  
+  /* Custom Product Card Colors */
+  --card-bg: hsl(0, 0%, 100%); /* #FFFFFF */
+  --card-title: hsl(0, 0%, 13%); /* #212121 */
+  --card-secondary: hsl(0, 0%, 37%); /* #5F5F5F */
+  --card-accent: hsl(32, 46%, 63%); /* #C0955D */
   --destructive-foreground: hsl(60, 9.1%, 97.8%);
   --success: hsl(142, 76%, 36%);
   --success-foreground: hsl(0, 0%, 100%);
