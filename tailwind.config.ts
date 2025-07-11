@@ -61,6 +61,13 @@ export default {
           border: "var(--sidebar-border)",
           ring: "var(--sidebar-ring)",
         },
+        cream: {
+          50: "var(--cream-50)",
+        },
+        green: {
+          500: "var(--green-500)",
+          800: "var(--green-800)",
+        },
       },
       keyframes: {
         "accordion-down": {

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input.js";
 import { Button } from "@/components/ui/button.js";
-import { Search, Clock } from "lucide-react";
+import { Search, Clock, MapPin } from "lucide-react";
 import { ProductCard } from "@/components/product-card.js";
 import { CartSidebar } from "@/components/cart-sidebar.js";
 import { useCart } from "@/hooks/use-cart.js";
@@ -15,6 +15,7 @@ export default function Cardapio() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [orderType, setOrderType] = useState<"pickup" | "delivery">("pickup");
   const { cart, addToCart, updateQuantity, removeFromCart } = useCart();
   const { toast } = useToast();
 
@@ -78,27 +79,90 @@ export default function Cardapio() {
 
   return (
     <>
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-pink-100 via-purple-50 to-yellow-50 pt-20 pb-10">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center">
-            <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-4">Cardápio</h1>
-            <p className="text-xl text-gray-600 mb-8">
-              Explore nossos pratos deliciosos
+      {/* Hero Banner */}
+      <section className="w-full">
+        {/* Hero Image */}
+        <div className="w-full h-64 md:h-80 lg:h-96 relative overflow-hidden">
+          <img 
+            src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=2024&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Deliciosa variedade de pratos"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        
+        {/* Content Area */}
+        <div className="bg-cream-50 py-12">
+          <div className="max-w-4xl mx-auto px-4 text-center">
+            {/* Main Title */}
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-green-800 mb-4 tracking-wide">
+              PEDIDOS ONLINE
+            </h1>
+            
+            {/* Description */}
+            <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-2xl mx-auto leading-relaxed">
+              Você pode fazer seu pedido online! Navegue pelo nosso cardápio e escolha o que gostaria de pedir.
             </p>
+            
+            {/* Status Indicator */}
             {establishment && (
-              <div className="flex items-center justify-center gap-2">
-                <span className={`flex h-3 w-3 rounded-full ${establishment.is_open ? "bg-green-500" : "bg-red-500"} animate-pulse`} />
-                <span className={`font-medium ${establishment.is_open ? 'text-green-600' : 'text-red-600'}`}>
+              <div className="inline-flex items-center gap-3 px-6 py-3 border border-gray-300 rounded-full bg-white mb-8">
+                <div className={`w-3 h-3 rounded-full ${establishment.is_open ? 'bg-green-500' : 'bg-red-500'}`} />
+                <span className="text-gray-700 font-medium">
                   {establishment.is_open ? "Aceitando Pedidos" : "Fechado no momento"}
-                </span>
-                <span className="text-gray-600">|</span>
-                <span className="flex items-center gap-1 text-gray-600">
-                  <Clock className="w-4 h-4" />
-                  30-45 min
                 </span>
               </div>
             )}
+            
+            {/* Order Type Selector */}
+            <div className="inline-flex border-2 border-green-800 rounded-full overflow-hidden mb-8">
+              <button
+                onClick={() => setOrderType("pickup")}
+                className={`px-8 py-3 font-medium transition-all ${
+                  orderType === "pickup" 
+                    ? "bg-green-800 text-cream-50" 
+                    : "bg-transparent text-green-800 hover:bg-green-50"
+                }`}
+              >
+                Retirada
+              </button>
+              <button
+                onClick={() => setOrderType("delivery")}
+                className={`px-8 py-3 font-medium transition-all ${
+                  orderType === "delivery" 
+                    ? "bg-green-800 text-cream-50" 
+                    : "bg-transparent text-green-800 hover:bg-green-50"
+                }`}
+              >
+                Delivery
+              </button>
+            </div>
+            
+            {/* Order Info */}
+            <div className="space-y-3 text-left max-w-sm mx-auto">
+              <div className="flex items-center gap-3 text-gray-700">
+                <Clock className="w-5 h-5" />
+                <span>
+                  Tempo de {orderType === "pickup" ? "retirada" : "entrega"}: Até 30 minutos
+                </span>
+              </div>
+              
+              <div className="flex items-center gap-3 text-gray-700">
+                <MapPin className="w-5 h-5" />
+                <div>
+                  <span>
+                    {orderType === "pickup" ? "Endereço de retirada" : "Área de entrega"}: 
+                  </span>
+                  <br />
+                  <span className="text-sm">Rua das Flores, 123, Centro, São Paulo, SP</span>
+                </div>
+              </div>
+              
+              <div className="pt-2">
+                <button className="text-green-800 underline text-sm hover:text-green-600 transition-colors">
+                  Alterar
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </section>

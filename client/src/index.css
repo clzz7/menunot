@@ -74,6 +74,11 @@
   --accent-foreground: hsl(60, 9.1%, 97.8%);
   --destructive: hsl(0, 84.2%, 60.2%);
   
+  /* Custom colors for hero design */
+  --cream-50: hsl(45, 29%, 97%);
+  --green-800: hsl(155, 45%, 22%);
+  --green-500: hsl(134, 61%, 41%);
+  
   /* Custom Product Card Colors */
   --card-bg: hsl(0, 0%, 100%); /* #FFFFFF */
   --card-title: hsl(0, 0%, 13%); /* #212121 */

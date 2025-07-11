@@ -116,6 +116,11 @@ The application has been successfully migrated to PostgreSQL:
 ## Changelog
 ```
 Changelog:
+- July 11, 2025: ✅ Redesigned hero header with professional banner layout inspired by modern restaurant designs
+- July 11, 2025: ✅ Implemented hero image with food photography and content area with cream background 
+- July 11, 2025: ✅ Added "PEDIDOS ONLINE" title in green-800, order type selector (Retirada/Delivery)
+- July 11, 2025: ✅ Created custom color palette with cream-50, green-800, and green-500 variables
+- July 11, 2025: ✅ Added order information section with time and address details
 - July 11, 2025: ✅ Unified color scheme with warm orange/amber tones replacing random blue/green/purple colors
 - July 11, 2025: ✅ Updated status icons and customer info cards to use consistent color palette
 - July 11, 2025: ✅ Corrected Hot Dog product image (was showing pizza, now shows proper hot dog)
