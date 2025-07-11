@@ -45,13 +45,15 @@ export default function Layout({ children }: LayoutProps) {
               {/* Mobile menu button */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100 transition-all duration-300"
+                className={`md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100 transition-all duration-300 ${
+                  isMobileMenuOpen ? 'hamburger-open' : ''
+                }`}
               >
-                {isMobileMenuOpen ? (
-                  <X className="h-6 w-6 transition-transform duration-300 rotate-180" />
-                ) : (
-                  <Menu className="h-6 w-6 transition-transform duration-300" />
-                )}
+                <div className="w-6 h-6 flex flex-col justify-center items-center">
+                  <span className="hamburger-line"></span>
+                  <span className="hamburger-line"></span>
+                  <span className="hamburger-line"></span>
+                </div>
               </button>
 
               {/* Logo and brand */}

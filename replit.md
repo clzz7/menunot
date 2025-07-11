@@ -116,6 +116,10 @@ The application has been successfully migrated to PostgreSQL:
 ## Changelog
 ```
 Changelog:
+- July 11, 2025: ✅ Implemented smooth hamburger menu transition from 3 lines to X with CSS animations
+- July 11, 2025: ✅ Added cart shake animation when items are added to cart
+- July 11, 2025: ✅ Enhanced microinteractions with smooth transitions and visual feedback
+- July 11, 2025: ✅ Created custom CSS animations for cart buttons and menu icon transformations
 - July 11, 2025: ✅ Removed all badges and micro legends from product cards for cleaner design
 - July 11, 2025: ✅ Eliminated "NOVIDADE", "PROMOÇÃO", "VEGETARIANO" badges from product cards
 - July 11, 2025: ✅ Removed "Mais Pedido" badges from featured section cards

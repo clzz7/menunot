@@ -56,10 +56,40 @@
   20%, 40%, 60%, 80% { transform: translateX(2px); }
 }
 
-/* Menu Icon Rotation Animation */
-@keyframes menu-rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(180deg); }
+/* Hamburger Menu Animation */
+.hamburger-line {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background-color: currentColor;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.hamburger-line:nth-child(1) {
+  transform: translateY(-6px);
+}
+
+.hamburger-line:nth-child(2) {
+  transform: translateY(0);
+}
+
+.hamburger-line:nth-child(3) {
+  transform: translateY(6px);
+}
+
+/* When menu is open, transform to X */
+.hamburger-open .hamburger-line:nth-child(1) {
+  transform: translateY(0) rotate(45deg);
+}
+
+.hamburger-open .hamburger-line:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.hamburger-open .hamburger-line:nth-child(3) {
+  transform: translateY(0) rotate(-45deg);
 }
 
 .animate-toast-in {
