@@ -82,10 +82,10 @@ export default function Cardapio() {
       {/* Hero Banner */}
       <section className="w-full">
         {/* Hero Image */}
-        <div className="w-full h-64 md:h-80 lg:h-96 relative overflow-hidden">
+        <div className="w-full h-48 md:h-56 lg:h-64 relative overflow-hidden">
           <img 
-            src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=2024&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="Deliciosa variedade de pratos"
+            src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=2024&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Deliciosos hambúrgueres artesanais"
             className="w-full h-full object-cover"
           />
         </div>
@@ -94,7 +94,7 @@ export default function Cardapio() {
         <div className="bg-cream-50 py-8">
           <div className="max-w-2xl mx-auto px-4">
             {/* Main Title */}
-            <h1 className="text-2xl md:text-3xl font-bold text-green-800 mb-3 tracking-wide text-left">
+            <h1 className="text-2xl md:text-3xl font-bold text-primary mb-3 tracking-wide text-left">
               PEDIDOS ONLINE
             </h1>
             
@@ -106,43 +106,19 @@ export default function Cardapio() {
             {/* Status Indicator */}
             {establishment && (
               <div className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-full bg-white mb-6">
-                <div className={`w-2.5 h-2.5 rounded-full ${establishment.is_open ? 'bg-green-500' : 'bg-red-500'}`} />
+                <div className={`w-2.5 h-2.5 rounded-full ${establishment.is_open ? 'bg-primary' : 'bg-red-500'}`} />
                 <span className="text-gray-700 text-sm">
                   {establishment.is_open ? "Aceitando Pedidos" : "Fechado no momento"}
                 </span>
               </div>
             )}
             
-            {/* Order Type Selector */}
-            <div className="inline-flex border border-green-800 rounded-full overflow-hidden mb-6">
-              <button
-                onClick={() => setOrderType("pickup")}
-                className={`px-6 py-2.5 text-sm font-medium transition-all ${
-                  orderType === "pickup" 
-                    ? "bg-green-800 text-cream-50" 
-                    : "bg-transparent text-green-800 hover:bg-green-50"
-                }`}
-              >
-                Retirada
-              </button>
-              <button
-                onClick={() => setOrderType("delivery")}
-                className={`px-6 py-2.5 text-sm font-medium transition-all ${
-                  orderType === "delivery" 
-                    ? "bg-green-800 text-cream-50" 
-                    : "bg-transparent text-green-800 hover:bg-green-50"
-                }`}
-              >
-                Delivery
-              </button>
-            </div>
-            
             {/* Order Info - All Left Aligned */}
             <div className="space-y-2 text-left max-w-xs">
               <div className="flex items-start gap-2 text-gray-700">
                 <Clock className="w-4 h-4 mt-0.5 flex-shrink-0" />
                 <span className="text-sm">
-                  Tempo de {orderType === "pickup" ? "retirada" : "entrega"}: Até 30 minutos
+                  Tempo de entrega: Até 30 minutos
                 </span>
               </div>
               
@@ -150,7 +126,7 @@ export default function Cardapio() {
                 <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
                 <div className="text-sm">
                   <div>
-                    {orderType === "pickup" ? "Endereço de retirada" : "Área de entrega"}:
+                    Área de entrega:
                   </div>
                   <div className="text-gray-600">
                     Rua das Flores, 123, Centro, São Paulo, SP
@@ -159,7 +135,7 @@ export default function Cardapio() {
               </div>
               
               <div className="pt-1">
-                <button className="text-green-800 underline text-sm hover:text-green-600 transition-colors">
+                <button className="text-primary underline text-sm hover:text-primary/80 transition-colors">
                   Alterar
                 </button>
               </div>
