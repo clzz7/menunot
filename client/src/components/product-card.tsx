@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button.js";
-import { Plus, Wheat, Egg, Fish, ShellIcon } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Product } from "@shared/schema.js";
 
 interface ProductCardProps {
@@ -7,41 +7,10 @@ interface ProductCardProps {
   onAddToCart: (product: Product) => void;
 }
 
-// Ícones de alérgenos baseados no produto
-const allergenIcons = {
-  gluten: Wheat,
-  egg: Egg,
-  fish: Fish,
-  shellfish: ShellIcon,
-};
-
 export function ProductCard({ product, onAddToCart }: ProductCardProps) {
   const handleAddToCart = () => {
     onAddToCart(product);
   };
-
-  // Detectar alérgenos baseado no nome/descrição do produto
-  const detectAllergens = () => {
-    const allergens = [];
-    const text = `${product.name} ${product.description}`.toLowerCase();
-    
-    if (text.includes('camarão') || text.includes('crustáceo')) {
-      allergens.push('shellfish');
-    }
-    if (text.includes('peixe') || text.includes('fish')) {
-      allergens.push('fish');
-    }
-    if (text.includes('ovo') || text.includes('milanesa')) {
-      allergens.push('egg');
-    }
-    if (text.includes('trigo') || text.includes('glúten') || text.includes('farinha')) {
-      allergens.push('gluten');
-    }
-    
-    return allergens;
-  };
-
-  const allergens = detectAllergens();
 
   return (
     <div 
@@ -101,35 +70,15 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
             )}
           </div>
           
-          {/* Parte inferior com ícones e botão */}
-          <div className="flex items-center justify-between">
-            {/* Ícones de Alérgenos */}
-            <div className="flex items-center gap-2">
-              {allergens.map((allergen) => {
-                const IconComponent = allergenIcons[allergen as keyof typeof allergenIcons];
-                return (
-                  <div
-                    key={allergen}
-                    className="w-6 h-6 rounded-full border bg-white flex items-center justify-center"
-                    style={{ borderColor: 'var(--card-accent)' }}
-                  >
-                    <IconComponent 
-                      className="w-3 h-3" 
-                      style={{ color: 'var(--card-accent)' }}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-            
-            {/* Botão de Adicionar */}
+          {/* Botão de Adicionar */}
+          <div className="flex justify-end">
             <Button 
               onClick={handleAddToCart}
               disabled={!product.is_active}
-              className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-4 py-1 text-sm font-medium transition-colors"
+              className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-4 py-2 text-sm font-medium transition-colors"
               size="sm"
             >
-              <Plus className="w-3 h-3 mr-1" />
+              <Plus className="w-4 h-4 mr-1" />
               Adicionar
             </Button>
           </div>
