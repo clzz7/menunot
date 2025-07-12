@@ -90,11 +90,11 @@ export default function Cardapio() {
           />
         </div>
         
-        {/* Content Area - Updated with new layout */}
+        {/* Content Area - Responsive Container */}
         <div className="bg-gradient-to-b from-white to-gray-50 py-8">
-          <div className="max-w-md mx-auto px-6">
+          <div className="max-w-md mx-auto lg:max-w-6xl px-6">
             {/* Main Title */}
-            <h1 className="text-2xl md:text-3xl title-text title-gradient mb-3 tracking-wide text-left">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl title-text title-gradient mb-3 tracking-wide text-left">
               {establishment?.name?.toUpperCase() || 'BURGER POINT'}
             </h1>
             
@@ -143,8 +143,8 @@ export default function Cardapio() {
               </div>
             )}
             
-            {/* Informações Essenciais - Grid 2x2 */}
-            <div className="grid grid-cols-2 gap-3 mb-6">
+            {/* Informações Essenciais - Responsive Grid */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
               <div className="info-card">
                 <Clock className="info-card-icon text-amber-600" />
                 <div className="info-card-content">
@@ -187,40 +187,65 @@ export default function Cardapio() {
         </div>
       </section>
 
-      {/* Main Content */}
-      <div className="max-w-md mx-auto px-6 pb-10 bg-gradient-to-b from-gray-50 to-white">
-        {/* Featured Section - Mais Pedidos Hoje */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-4">
+      {/* Main Content - Responsive Container */}
+      <div className="max-w-md mx-auto lg:max-w-6xl px-6 pb-10 bg-gradient-to-b from-gray-50 to-white">
+        {/* Featured Section - Mais Pedidos Hoje - Responsive Layout */}
+        <div className="mb-8 lg:mb-12">
+          <div className="flex items-center gap-2 mb-4 lg:mb-6">
             <Flame className="w-5 h-5 text-red-500" />
-            <h2 className="text-lg font-bold text-gray-900">MAIS PEDIDOS HOJE</h2>
+            <h2 className="text-lg lg:text-xl font-bold text-gray-900">MAIS PEDIDOS HOJE</h2>
           </div>
           
-          <div className="flex space-x-6 overflow-x-auto pb-2 scrollbar-hide">
-            {productsArray.slice(0, 3).map((product: Product) => (
-              <div key={product.id} className="flex-shrink-0 w-48 bg-white rounded-lg border border-gray-100 p-4 shadow-sm featured-card cursor-pointer btn-interactive"
-                onClick={() => handleAddToCart(product)}>
-                <div className="relative">
-                  <img 
-                    src={product.image || "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=80&h=80&fit=crop"}
-                    alt={product.name}
-                    className="w-20 h-20 rounded-lg object-cover mx-auto"
-                  />
+          {/* Mobile: Scroll horizontal | Desktop: Grid horizontal centralizado */}
+          <div className="lg:flex lg:justify-center lg:gap-6 lg:flex-wrap">
+            <div className="flex lg:hidden space-x-6 overflow-x-auto pb-2 scrollbar-hide">
+              {productsArray.slice(0, 3).map((product: Product) => (
+                <div key={product.id} className="flex-shrink-0 w-48 bg-white rounded-lg border border-gray-100 p-4 shadow-sm featured-card cursor-pointer btn-interactive"
+                  onClick={() => handleAddToCart(product)}>
+                  <div className="relative">
+                    <img 
+                      src={product.image || "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=80&h=80&fit=crop"}
+                      alt={product.name}
+                      className="w-20 h-20 rounded-lg object-cover mx-auto"
+                    />
+                  </div>
+                  <div className="mt-3 text-center">
+                    <h3 className="font-semibold text-gray-900 text-sm line-clamp-1">{product.name}</h3>
+                    <p className="text-lg font-bold text-primary mt-1">
+                      R$ {product.price.toFixed(2).replace('.', ',')}
+                    </p>
+                  </div>
                 </div>
-                <div className="mt-3 text-center">
-                  <h3 className="font-semibold text-gray-900 text-sm line-clamp-1">{product.name}</h3>
-                  <p className="text-lg font-bold text-primary mt-1">
-                    R$ {product.price.toFixed(2).replace('.', ',')}
-                  </p>
+              ))}
+            </div>
+            
+            {/* Desktop: Grid centralizado */}
+            <div className="hidden lg:flex lg:justify-center lg:gap-6 lg:flex-wrap lg:max-w-4xl lg:mx-auto">
+              {productsArray.slice(0, 4).map((product: Product) => (
+                <div key={product.id} className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm featured-card cursor-pointer btn-interactive hover:shadow-lg transition-all duration-300 w-64"
+                  onClick={() => handleAddToCart(product)}>
+                  <div className="relative mb-4">
+                    <img 
+                      src={product.image || "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&h=200&fit=crop"}
+                      alt={product.name}
+                      className="w-24 h-24 rounded-xl object-cover mx-auto"
+                    />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="font-semibold text-gray-900 text-base mb-2 line-clamp-1">{product.name}</h3>
+                    <p className="text-xl font-bold text-primary">
+                      R$ {product.price.toFixed(2).replace('.', ',')}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Category Navigation */}
+        {/* Category Navigation - Responsive */}
         <div className="mb-8">
-          <div className="flex space-x-3 overflow-x-auto pb-2">
+          <div className="flex space-x-3 overflow-x-auto lg:overflow-x-visible lg:flex-wrap lg:justify-center pb-2">
             <Button
               variant={selectedCategory === "all" ? "default" : "outline"}
               onClick={() => setSelectedCategory("all")}
@@ -260,22 +285,22 @@ export default function Cardapio() {
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="mb-8">
-          <div className="relative">
+        {/* Search Bar - Responsive */}
+        <div className="mb-8 lg:mb-12">
+          <div className="relative max-w-md lg:max-w-lg mx-auto">
             <Input
               type="text"
               placeholder="Busque por hambúrgueres, bebidas, sobremesas..."
               value={searchTerm}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-              className="h-11 pl-10 pr-4 bg-gray-50 border-gray-200 focus:border-primary focus:bg-white transition-all duration-200 placeholder:text-gray-400"
+              className="h-11 lg:h-12 pl-10 pr-4 bg-gray-50 border-gray-200 focus:border-primary focus:bg-white transition-all duration-200 placeholder:text-gray-400"
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           </div>
         </div>
 
-        {/* Products Grid */}
-        <div className="space-y-8">
+        {/* Products Grid - Responsive Layout */}
+        <div className="space-y-8 lg:space-y-12">
           {selectedCategory === "all" ? (
             // Show all categories
             categories.map((category: Category) => {
@@ -284,19 +309,35 @@ export default function Cardapio() {
               
               return (
                 <div key={category.id} className="category-section">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                  <h2 className="text-xl lg:text-2xl font-semibold text-gray-900 mb-4 lg:mb-6 flex items-center">
                     {category.name}
                     {category.description && (
                       <span className="ml-2 text-sm text-gray-500">({category.description})</span>
                     )}
                   </h2>
                   
-                  <div className="bg-gray-50 rounded-lg overflow-hidden">
+                  {/* Responsive Grid: Mobile (list) | Desktop (grid) */}
+                  <div className="lg:hidden">
+                    <div className="bg-gray-50 rounded-lg overflow-hidden">
+                      {categoryProducts.map((product: Product) => (
+                        <ProductCard
+                          key={product.id}
+                          product={product}
+                          onAddToCart={handleAddToCart}
+                          variant="list"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Desktop Grid */}
+                  <div className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
                     {categoryProducts.map((product: Product) => (
                       <ProductCard
                         key={product.id}
                         product={product}
                         onAddToCart={handleAddToCart}
+                        variant="grid"
                       />
                     ))}
                   </div>
@@ -305,14 +346,32 @@ export default function Cardapio() {
             })
           ) : (
             // Show filtered products
-            <div className="bg-gray-50 rounded-lg overflow-hidden">
-              {filteredProducts.map((product: Product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onAddToCart={handleAddToCart}
-                />
-              ))}
+            <div>
+              {/* Mobile List */}
+              <div className="lg:hidden">
+                <div className="bg-gray-50 rounded-lg overflow-hidden">
+                  {filteredProducts.map((product: Product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onAddToCart={handleAddToCart}
+                      variant="list"
+                    />
+                  ))}
+                </div>
+              </div>
+              
+              {/* Desktop Grid */}
+              <div className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+                {filteredProducts.map((product: Product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onAddToCart={handleAddToCart}
+                    variant="grid"
+                  />
+                ))}
+              </div>
             </div>
           )}
           

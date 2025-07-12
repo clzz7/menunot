@@ -206,7 +206,8 @@ function Home() {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Responsive Grid for Products */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
             {featuredProducts.map((product, index) => (
               <motion.div
                 key={product.id}
@@ -214,33 +215,60 @@ function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 viewport={{ once: true }}
+                className="group"
               >
-                <Card className="glass-card overflow-hidden card-hover group">
-                  {product.imageUrl && (
-                    <div className="relative h-64 overflow-hidden">
-                      <img 
-                        src={product.imageUrl} 
-                        alt={product.name}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <Card className="glass-card overflow-hidden card-hover group h-full">
+                  {/* Product Image */}
+                  <div className="relative h-48 md:h-56 lg:h-64 overflow-hidden">
+                    <img 
+                      src={product.image || "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop"} 
+                      alt={product.name}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    
+                    {/* Price Badge - Visible on hover */}
+                    <div className="absolute top-4 right-4 bg-primary/90 text-white px-3 py-1 rounded-full text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      {new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                      }).format(Number(product.price))}
                     </div>
-                  )}
-                  <div className="p-6">
-                    <div className="flex justify-between items-start mb-3">
-                      <h3 className="text-xl font-semibold">{product.name}</h3>
-                      <span className="text-gradient text-xl font-bold">
-                        R$ {product.price.toFixed(2)}
-                      </span>
+                  </div>
+                  
+                  {/* Product Info */}
+                  <div className="p-4 md:p-6 flex flex-col flex-grow">
+                    <div className="flex flex-col flex-grow">
+                      <h3 className="text-lg md:text-xl font-semibold mb-2 group-hover:text-primary transition-colors line-clamp-1">
+                        {product.name}
+                      </h3>
+                      
+                      {product.description && (
+                        <p className="text-sm md:text-base text-muted-foreground mb-4 line-clamp-2 flex-grow">
+                          {product.description}
+                        </p>
+                      )}
                     </div>
-                    <p className="text-muted-foreground mb-4 line-clamp-2">
-                      {product.description}
-                    </p>
-                    <Link href="/cardapio">
-                      <Button className="w-full rounded-full">
-                        Ver Detalhes
-                      </Button>
-                    </Link>
+                    
+                    {/* Desktop: Show price and button | Mobile: Show button only */}
+                    <div className="mt-auto">
+                      <div className="flex items-center justify-between mb-4 md:hidden">
+                        <span className="text-gradient text-xl font-bold">
+                          {new Intl.NumberFormat('pt-BR', {
+                            style: 'currency',
+                            currency: 'BRL'
+                          }).format(Number(product.price))}
+                        </span>
+                      </div>
+                      
+                      <Link href="/cardapio">
+                        <Button className="w-full rounded-full hover:shadow-lg transition-all duration-300 group/btn">
+                          <span className="group-hover/btn:scale-105 transition-transform">
+                            Ver Detalhes
+                          </span>
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
                 </Card>
               </motion.div>
@@ -252,7 +280,7 @@ function Home() {
               <Button 
                 size="lg" 
                 variant="outline"
-                className="rounded-full px-8"
+                className="rounded-full px-8 py-6 text-lg hover:shadow-xl transition-all duration-300"
               >
                 Ver Menu Completo
                 <ArrowRight className="w-5 h-5 ml-2" />
