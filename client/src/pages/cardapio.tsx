@@ -80,50 +80,48 @@ export default function Cardapio() {
   return (
     <>
       {/* Hero Banner */}
-      <section className="w-full">
-        {/* Hero Image */}
-        <div className="w-full h-40 md:h-44 lg:h-48 relative overflow-hidden">
-          <img 
-            src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=2024&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="Deliciosos hambúrgueres artesanais"
-            className="w-full h-full object-cover"
-          />
+      <section className="hero-banner">
+        <img 
+          src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=2024&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          alt="Deliciosos hambúrgueres artesanais"
+          className="w-full h-full object-cover"
+        />
+        <div className="hero-content">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            {establishment?.name?.toUpperCase() || 'BURGER POINT'}
+          </h1>
+          <p className="text-lg opacity-90">
+            Você pode fazer seu pedido online! Navegue pelo nosso cardápio e escolha o que gostaria de pedir.
+          </p>
         </div>
-        
-        {/* Content Area - Updated with new layout */}
-        <div className="bg-gradient-to-b from-white to-gray-50 py-8">
-          <div className="max-w-md mx-auto px-6">
-            {/* Main Title */}
-            <h1 className="text-2xl md:text-3xl title-text title-gradient mb-3 tracking-wide text-left">
-              {establishment?.name?.toUpperCase() || 'BURGER POINT'}
-            </h1>
-            
+      </section>
+
+      {/* Main Content */}
+      <div className="main-container">
+        {/* Hero Info Section */}
+        <section className="py-12 bg-gradient-to-b from-gray-50 to-white">
+          <div className="max-w-4xl mx-auto px-6">
             {/* Rating System */}
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-6">
               <div className="flex items-center">
                 {[...Array(5)].map((_, i) => (
                   <Star 
                     key={i} 
-                    className="w-4 h-4 rating-stars" 
+                    className="w-5 h-5 rating-stars" 
                     style={{ color: '#FFD700', fill: '#FFD700' }}
                   />
                 ))}
               </div>
-              <span className="font-bold text-gray-800">4.8</span>
-              <span className="text-gray-500 text-sm">(324 avaliações)</span>
-              <span className="text-gray-500 text-sm">•</span>
-              <span className="text-gray-500 text-sm">Hambúrgueres</span>
+              <span className="font-bold text-gray-800 text-lg">4.8</span>
+              <span className="text-gray-500">(324 avaliações)</span>
+              <span className="text-gray-500">•</span>
+              <span className="text-gray-500">Hambúrgueres</span>
             </div>
-            
-            {/* Description */}
-            <p className="text-base description-text mb-6 max-w-lg text-left">
-              Você pode fazer seu pedido online! Navegue pelo nosso cardápio e escolha o que gostaria de pedir.
-            </p>
             
             {/* Status Indicator */}
             {establishment && (
-              <div className="inline-flex items-center gap-3 mb-8">
-                <button className="status-button inline-flex items-center gap-2">
+              <div className="mb-8">
+                <button className="status-button">
                   {establishment.is_open ? (
                     <>
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -144,7 +142,7 @@ export default function Cardapio() {
             )}
             
             {/* Informações Essenciais - Grid 2x2 */}
-            <div className="grid grid-cols-2 gap-3 mb-6">
+            <div className="grid grid-cols-2 gap-6 mb-8">
               <div className="info-card">
                 <Clock className="info-card-icon text-amber-600" />
                 <div className="info-card-content">
@@ -178,61 +176,49 @@ export default function Cardapio() {
               </div>
             </div>
             
-            <div className="pt-1">
-              <button className="text-primary underline text-sm hover:text-primary/80 transition-colors">
+            <div className="text-center">
+              <button className="text-primary underline hover:text-primary/80 transition-colors">
                 Alterar endereço
               </button>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Main Content */}
-      <div className="max-w-md mx-auto px-6 pb-10 bg-gradient-to-b from-gray-50 to-white">
         {/* Featured Section - Mais Pedidos Hoje */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Flame className="w-5 h-5 text-red-500" />
-            <h2 className="text-lg font-bold text-gray-900">MAIS PEDIDOS HOJE</h2>
+        <section className="featured-section">
+          <div className="featured-title">
+            <Flame className="w-6 h-6 text-red-500" />
+            MAIS PEDIDOS HOJE
           </div>
           
-          <div className="flex space-x-6 overflow-x-auto pb-2 scrollbar-hide">
-            {productsArray.slice(0, 3).map((product: Product) => (
-              <div key={product.id} className="flex-shrink-0 w-48 bg-white rounded-lg border border-gray-100 p-4 shadow-sm featured-card cursor-pointer btn-interactive"
+          <div className="featured-cards scrollbar-hide">
+            {productsArray.slice(0, 4).map((product: Product) => (
+              <div key={product.id} className="featured-card"
                 onClick={() => handleAddToCart(product)}>
-                <div className="relative">
-                  <img 
-                    src={product.image || "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=80&h=80&fit=crop"}
-                    alt={product.name}
-                    className="w-20 h-20 rounded-lg object-cover mx-auto"
-                  />
-                </div>
-                <div className="mt-3 text-center">
-                  <h3 className="font-semibold text-gray-900 text-sm line-clamp-1">{product.name}</h3>
-                  <p className="text-lg font-bold text-primary mt-1">
-                    R$ {product.price.toFixed(2).replace('.', ',')}
-                  </p>
+                <img 
+                  src={product.image || "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=80&h=80&fit=crop"}
+                  alt={product.name}
+                  className="featured-card-image"
+                />
+                <div className="featured-card-title">{product.name}</div>
+                <div className="featured-card-price">
+                  R$ {product.price.toFixed(2).replace('.', ',')}
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
         {/* Category Navigation */}
-        <div className="mb-8">
-          <div className="flex space-x-3 overflow-x-auto pb-2">
-            <Button
-              variant={selectedCategory === "all" ? "default" : "outline"}
+        <section className="mb-12">
+          <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide">
+            <button
               onClick={() => setSelectedCategory("all")}
-              className={`flex-shrink-0 h-12 px-4 flex items-center gap-2 btn-interactive ${
-                selectedCategory === "all" 
-                  ? 'bg-primary text-white shadow-md' 
-                  : 'bg-gray-50 hover:bg-gray-100 border-gray-200'
-              }`}
+              className={`filter-button ${selectedCategory === "all" ? 'active' : 'inactive'}`}
             >
               <Grid3X3 className="w-4 h-4" />
               Todos
-            </Button>
+            </button>
             {categories.map((category: Category) => {
               const isActive = selectedCategory === category.name;
               const getCategoryIcon = (name: string) => {
@@ -242,88 +228,92 @@ export default function Cardapio() {
               };
               
               return (
-                <Button
+                <button
                   key={category.id}
-                  variant={isActive ? "default" : "outline"}
                   onClick={() => setSelectedCategory(category.name)}
-                  className={`flex-shrink-0 h-12 px-4 flex items-center gap-2 whitespace-nowrap btn-interactive ${
-                    isActive 
-                      ? 'bg-primary text-white shadow-md' 
-                      : 'bg-gray-50 hover:bg-gray-100 border-gray-200'
-                  }`}
+                  className={`filter-button ${isActive ? 'active' : 'inactive'}`}
                 >
                   {getCategoryIcon(category.name)}
                   {category.name}
-                </Button>
+                </button>
               );
             })}
           </div>
-        </div>
+        </section>
 
         {/* Search Bar */}
-        <div className="mb-8">
-          <div className="relative">
+        <section className="mb-12">
+          <div className="relative max-w-2xl mx-auto">
             <Input
               type="text"
               placeholder="Busque por hambúrgueres, bebidas, sobremesas..."
               value={searchTerm}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-              className="h-11 pl-10 pr-4 bg-gray-50 border-gray-200 focus:border-primary focus:bg-white transition-all duration-200 placeholder:text-gray-400"
+              className="search-input"
             />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           </div>
-        </div>
+        </section>
 
         {/* Products Grid */}
-        <div className="space-y-8">
+        <section className="pb-20">
           {selectedCategory === "all" ? (
             // Show all categories
-            categories.map((category: Category) => {
-              const categoryProducts = productsByCategory[category.id] || [];
-              if (categoryProducts.length === 0) return null;
-              
-              return (
-                <div key={category.id} className="category-section">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    {category.name}
-                    {category.description && (
-                      <span className="ml-2 text-sm text-gray-500">({category.description})</span>
-                    )}
-                  </h2>
-                  
-                  <div className="bg-gray-50 rounded-lg overflow-hidden">
-                    {categoryProducts.map((product: Product) => (
-                      <ProductCard
-                        key={product.id}
-                        product={product}
-                        onAddToCart={handleAddToCart}
-                      />
-                    ))}
+            <div className="space-y-20">
+              {categories.map((category: Category) => {
+                const categoryProducts = productsByCategory[category.id] || [];
+                if (categoryProducts.length === 0) return null;
+                
+                return (
+                  <div key={category.id}>
+                    <h2 className="section-title">
+                      {category.name}
+                      {category.description && (
+                        <span className="text-base text-gray-500 font-normal ml-2">
+                          ({category.description})
+                        </span>
+                      )}
+                    </h2>
+                    
+                    <div className="products-grid">
+                      {categoryProducts.map((product: Product) => (
+                        <ProductCard
+                          key={product.id}
+                          product={product}
+                          onAddToCart={handleAddToCart}
+                        />
+                      ))}
+                    </div>
                   </div>
-                </div>
-              );
-            })
+                );
+              })}
+            </div>
           ) : (
             // Show filtered products
-            <div className="bg-gray-50 rounded-lg overflow-hidden">
-              {filteredProducts.map((product: Product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onAddToCart={handleAddToCart}
-                />
-              ))}
+            <div>
+              <h2 className="section-title">
+                {selectedCategory}
+              </h2>
+              <div className="products-grid">
+                {filteredProducts.map((product: Product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onAddToCart={handleAddToCart}
+                  />
+                ))}
+              </div>
             </div>
           )}
           
           {filteredProducts.length === 0 && (
-            <div className="text-center py-12">
-              <Search className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum produto encontrado</h3>
+            <div className="text-center py-20">
+              <Search className="w-16 h-16 mx-auto text-gray-400 mb-6" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Nenhum produto encontrado</h3>
               <p className="text-gray-500">Tente buscar por outro termo ou categoria</p>
             </div>
           )}
-        </div>
+        </section>
 
         {/* Cart Sidebar */}
         <CartSidebar
