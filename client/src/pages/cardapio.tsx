@@ -79,132 +79,75 @@ export default function Cardapio() {
 
   return (
     <>
-      {/* Hero Banner */}
-      <section className="w-full">
-        {/* Hero Image */}
-        <div className="w-full h-40 md:h-44 lg:h-48 relative overflow-hidden">
-          <img 
-            src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=2024&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="Deliciosos hambúrgueres artesanais"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        
-        {/* Content Area - Updated with new layout */}
-        <div className="bg-gradient-to-b from-white to-gray-50 py-8">
-          <div className="max-w-md mx-auto px-6">
-            {/* Main Title */}
-            <h1 className="text-2xl md:text-3xl title-text title-gradient mb-3 tracking-wide text-left">
-              {establishment?.name?.toUpperCase() || 'BURGER POINT'}
-            </h1>
-            
-            {/* Rating System */}
-            <div className="flex items-center gap-2 mb-4">
-              <div className="flex items-center">
-                {[...Array(5)].map((_, i) => (
-                  <Star 
-                    key={i} 
-                    className="w-4 h-4 rating-stars" 
-                    style={{ color: '#FFD700', fill: '#FFD700' }}
-                  />
-                ))}
-              </div>
-              <span className="font-bold text-gray-800">4.8</span>
-              <span className="text-gray-500 text-sm">(324 avaliações)</span>
-              <span className="text-gray-500 text-sm">•</span>
-              <span className="text-gray-500 text-sm">Hambúrgueres</span>
-            </div>
-            
-            {/* Description */}
-            <p className="text-base description-text mb-6 max-w-lg text-left">
-              Você pode fazer seu pedido online! Navegue pelo nosso cardápio e escolha o que gostaria de pedir.
-            </p>
-            
-            {/* Status Indicator */}
-            {establishment && (
-              <div className="inline-flex items-center gap-3 mb-8">
-                <button className="status-button inline-flex items-center gap-2">
-                  {establishment.is_open ? (
-                    <>
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      Aceitando Pedidos
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                      </svg>
-                      Fechado no momento
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
-            
-            {/* Informações Essenciais - Grid 2x2 */}
-            <div className="grid grid-cols-2 gap-3 mb-6">
-              <div className="info-card">
-                <Clock className="info-card-icon text-amber-600" />
-                <div className="info-card-content">
-                  <div className="info-card-label">Entrega</div>
-                  <div className="info-card-value">25-30 min</div>
-                </div>
-              </div>
-              
-              <div className="info-card">
-                <DollarSign className="info-card-icon text-green-600" />
-                <div className="info-card-content">
-                  <div className="info-card-label">Taxa</div>
-                  <div className="info-card-value">R$ 4,99</div>
-                </div>
-              </div>
-              
-              <div className="info-card">
-                <MapPin className="info-card-icon text-blue-600" />
-                <div className="info-card-content">
-                  <div className="info-card-label">Distância</div>
-                  <div className="info-card-value">2.5km</div>
-                </div>
-              </div>
-              
-              <div className="info-card">
-                <ShoppingBag className="info-card-icon text-purple-600" />
-                <div className="info-card-content">
-                  <div className="info-card-label">Mínimo</div>
-                  <div className="info-card-value">R$ 25,00</div>
-                </div>
+      {/* Header Section */}
+      <section className="w-full bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-6 py-6">
+          {/* ONLINE ORDERING - Main Title */}
+          <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            ONLINE ORDERING
+          </h1>
+          
+          {/* Description */}
+          <p className="text-gray-600 mb-4 text-lg">
+            You can order online! Browse our menu items and choose what you'd like to order from us.
+          </p>
+          
+          {/* Status Indicator */}
+          {establishment && (
+            <div className="my-4">
+              <div className="inline-flex items-center gap-2 text-green-700 text-base font-medium">
+                {establishment.is_open ? (
+                  <>
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    Accepting Orders
+                  </>
+                ) : (
+                  <>
+                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                    Fechado no momento
+                  </>
+                )}
               </div>
             </div>
-            
-            <div className="pt-1">
-              <button className="text-primary underline text-sm hover:text-primary/80 transition-colors">
-                Alterar endereço
+          )}
+          
+          {/* Pickup Information */}
+          <div className="flex flex-wrap items-center gap-6 text-gray-700">
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              <span>Pickup time: Up to 30 minutes</span>
+              <button className="text-orange-500 underline hover:text-orange-600 transition-colors ml-2">
+                Change
               </button>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4" />
+              <span>Pickup Address: 500 terry francine, San Francisco, CA</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* Main Content */}
-      <div className="max-w-md mx-auto px-6 pb-10 bg-gradient-to-b from-gray-50 to-white">
+      <div className="max-w-md lg:max-w-7xl mx-auto px-6 pb-10 bg-gradient-to-b from-gray-50 to-white">
         {/* Featured Section - Mais Pedidos Hoje */}
-        <div className="mb-8">
+        <div className="mb-8 pt-8">
           <div className="flex items-center gap-2 mb-4">
             <Flame className="w-5 h-5 text-red-500" />
             <h2 className="text-lg font-bold text-gray-900">MAIS PEDIDOS HOJE</h2>
           </div>
           
-          <div className="flex space-x-6 overflow-x-auto pb-2 scrollbar-hide">
-            {productsArray.slice(0, 3).map((product: Product) => (
-              <div key={product.id} className="flex-shrink-0 w-48 bg-white rounded-lg border border-gray-100 p-4 shadow-sm featured-card cursor-pointer btn-interactive"
+          {/* Grid responsivo para produtos em destaque */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
+            {productsArray.slice(0, 4).map((product: Product) => (
+              <div key={product.id} className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm featured-card cursor-pointer btn-interactive"
                 onClick={() => handleAddToCart(product)}>
                 <div className="relative">
                   <img 
                     src={product.image || "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=80&h=80&fit=crop"}
                     alt={product.name}
-                    className="w-20 h-20 rounded-lg object-cover mx-auto"
+                    className="w-20 h-20 lg:w-24 lg:h-24 rounded-lg object-cover mx-auto"
                   />
                 </div>
                 <div className="mt-3 text-center">
@@ -262,7 +205,7 @@ export default function Cardapio() {
 
         {/* Search Bar */}
         <div className="mb-8">
-          <div className="relative">
+          <div className="relative lg:max-w-md">
             <Input
               type="text"
               placeholder="Busque por hambúrgueres, bebidas, sobremesas..."
@@ -291,13 +234,15 @@ export default function Cardapio() {
                     )}
                   </h2>
                   
-                  <div className="bg-gray-50 rounded-lg overflow-hidden">
+                  {/* Grid responsivo: 1 coluna no mobile, 3 colunas em telas grandes */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     {categoryProducts.map((product: Product) => (
-                      <ProductCard
-                        key={product.id}
-                        product={product}
-                        onAddToCart={handleAddToCart}
-                      />
+                      <div key={product.id} className="bg-gray-50 rounded-lg overflow-hidden">
+                        <ProductCard
+                          product={product}
+                          onAddToCart={handleAddToCart}
+                        />
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -305,13 +250,14 @@ export default function Cardapio() {
             })
           ) : (
             // Show filtered products
-            <div className="bg-gray-50 rounded-lg overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               {filteredProducts.map((product: Product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onAddToCart={handleAddToCart}
-                />
+                <div key={product.id} className="bg-gray-50 rounded-lg overflow-hidden">
+                  <ProductCard
+                    product={product}
+                    onAddToCart={handleAddToCart}
+                  />
+                </div>
               ))}
             </div>
           )}

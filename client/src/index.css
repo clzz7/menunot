@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Nunito+Sans:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -133,17 +134,26 @@
   --radius: 0.5rem;
 }
 
-/* Custom fonts */
+/* Custom fonts - Agora usando fontes mais arredondadas */
+.font-nunito {
+  font-family: 'Nunito', sans-serif;
+}
+
+.font-nunito-sans {
+  font-family: 'Nunito Sans', sans-serif;
+}
+
+/* Mantendo compatibilidade com classes antigas, mas usando Nunito */
 .font-montserrat {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Nunito', sans-serif;
 }
 
 .font-poppins {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Nunito', sans-serif;
 }
 
 .font-roboto {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Nunito Sans', sans-serif;
 }
 
 /* Modern gradient text for title */
@@ -185,15 +195,15 @@
   }
 }
 
-/* Improved typography */
+/* Improved typography - Agora usando Nunito */
 .description-text {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Nunito Sans', sans-serif;
   line-height: 1.5;
   color: #333333;
 }
 
 .title-text {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Nunito', sans-serif;
   font-weight: 700;
   letter-spacing: -0.5px;
 }
@@ -440,9 +450,9 @@
   
   .hero-pattern {
     background-image: 
-      radial-gradient(circle at 20% 80%, hsl(24.6, 95%, 53.1%, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, hsl(36, 100%, 57%, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 40% 40%, hsl(45, 90%, 60%, 0.05) 0%, transparent 50%);
+      radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
   }
   
   /* Smooth animations */

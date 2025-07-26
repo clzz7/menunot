@@ -259,13 +259,13 @@ export default function Pedidos() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'PENDING':
-        return <Clock className="w-4 h-4 text-amber-600" />;
+        return <Clock className="w-4 h-4 text-primary" />;
       case 'CONFIRMED':
       case 'PREPARING':
-        return <RefreshCw className="w-4 h-4 text-orange-600" />;
+        return <RefreshCw className="w-4 h-4 text-primary" />;
       case 'READY':
       case 'OUT_DELIVERY':
-        return <Package className="w-4 h-4 text-orange-700" />;
+        return <Package className="w-4 h-4 text-primary" />;
       case 'DELIVERED':
         return <CheckCircle className="w-4 h-4 text-green-600" />;
       case 'CANCELLED':
@@ -330,7 +330,7 @@ export default function Pedidos() {
                         e.stopPropagation();
                         handleRepeatOrder(order);
                       }}
-                      className="text-primary hover:text-orange-600"
+                      className="text-primary hover:text-primary/80"
                     >
                       <RotateCcw className="w-3 h-3 mr-1" />
                       Repetir
@@ -489,7 +489,7 @@ export default function Pedidos() {
                       }
                     }}
                   />
-                  <Button onClick={handleSearchOrders} className="bg-primary hover:bg-orange-600">
+                  <Button onClick={handleSearchOrders} className="bg-primary hover:bg-primary/90">
                     Buscar
                   </Button>
                 </div>

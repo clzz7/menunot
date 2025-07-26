@@ -106,7 +106,7 @@ export function CartSidebar({
 
               <Button 
                 onClick={onCheckout}
-                className="w-full bg-primary text-white hover:bg-orange-600 transition-colors"
+                className="w-full bg-primary text-white hover:bg-primary/90 transition-colors"
                 size="lg"
               >
                 Finalizar Pedido

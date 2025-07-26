@@ -113,7 +113,7 @@ export default function Layout({ children }: LayoutProps) {
               {/* Cart Button */}
               <Link href="/checkout">
                 <Button 
-                  className={`relative bg-primary text-white hover:bg-orange-600 transition-all duration-300 flex items-center justify-center h-10 ${
+                  className={`relative bg-primary text-white hover:bg-primary/90 transition-all duration-300 flex items-center justify-center h-10 ${
                     isCartAnimating ? 'cart-shake' : ''
                   }`}
                 >

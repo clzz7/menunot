@@ -72,15 +72,15 @@ export default function Rastreamento() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'PENDING':
-        return <Clock className="w-6 h-6 text-amber-600" />;
+        return <Clock className="w-6 h-6 text-primary" />;
       case 'CONFIRMED':
-        return <CheckCircle className="w-6 h-6 text-orange-600" />;
+        return <CheckCircle className="w-6 h-6 text-primary" />;
       case 'PREPARING':
-        return <RefreshCw className="w-6 h-6 text-orange-600" />;
+        return <RefreshCw className="w-6 h-6 text-primary" />;
       case 'READY':
-        return <Package className="w-6 h-6 text-orange-700" />;
+        return <Package className="w-6 h-6 text-primary" />;
       case 'OUT_DELIVERY':
-        return <Truck className="w-6 h-6 text-orange-700" />;
+        return <Truck className="w-6 h-6 text-primary" />;
       case 'DELIVERED':
         return <MapPin className="w-6 h-6 text-green-600" />;
       case 'CANCELLED':
@@ -105,11 +105,11 @@ export default function Rastreamento() {
 
   const getStatusColor = (status: string) => {
     const colorMap: Record<string, string> = {
-      'PENDING': 'bg-amber-100 text-amber-800',
-      'CONFIRMED': 'bg-orange-100 text-orange-800',
-      'PREPARING': 'bg-orange-100 text-orange-800',
-      'READY': 'bg-orange-200 text-orange-900',
-      'OUT_DELIVERY': 'bg-orange-200 text-orange-900',
+      'PENDING': 'bg-primary/10 text-primary',
+      'CONFIRMED': 'bg-primary/10 text-primary',
+      'PREPARING': 'bg-primary/10 text-primary',
+      'READY': 'bg-primary/20 text-primary',
+      'OUT_DELIVERY': 'bg-primary/20 text-primary',
       'DELIVERED': 'bg-green-100 text-green-800',
       'CANCELLED': 'bg-red-100 text-red-800'
     };
@@ -176,7 +176,7 @@ export default function Rastreamento() {
           <Button 
             onClick={handleTrackOrder} 
             disabled={isLoading}
-            className="w-full md:w-auto bg-primary hover:bg-orange-600"
+            className="w-full md:w-auto bg-primary hover:bg-primary/90"
           >
             {isLoading ? 'Buscando...' : 'Rastrear Pedido'}
           </Button>
