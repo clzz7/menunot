@@ -10,11 +10,14 @@ import Pedidos from "@/pages/pedidos.js";
 import Checkout from "@/pages/checkout.js";
 import Rastreamento from "@/pages/rastreamento.js";
 import Admin from "@/pages/admin.js";
+import Login from "@/pages/login.js";
 import NotFound from "@/pages/not-found.js";
 import PaymentSuccess from "@/pages/payment-success.js";
 import PaymentFailure from "@/pages/payment-failure.js";
 import PaymentPending from "@/pages/payment-pending.js";
 import { CartProvider } from "@/hooks/use-cart.js";
+import { AuthProvider } from "@/hooks/use-auth.js";
+import { ProtectedRoute } from "@/components/protected-route.js";
 
 function Router() {
   return (
@@ -24,7 +27,12 @@ function Router() {
       <Route path="/pedidos" component={Pedidos} />
       <Route path="/checkout" component={Checkout} />
       <Route path="/rastreamento" component={Rastreamento} />
-      <Route path="/admin" component={Admin} />
+      <Route path="/login" component={Login} />
+      <Route path="/admin">
+        <ProtectedRoute>
+          <Admin />
+        </ProtectedRoute>
+      </Route>
       <Route path="/payment/success" component={PaymentSuccess} />
       <Route path="/payment/failure" component={PaymentFailure} />
       <Route path="/payment/pending" component={PaymentPending} />
@@ -36,14 +44,16 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <CartProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Layout>
-            <Router />
-          </Layout>
-        </TooltipProvider>
-      </CartProvider>
+      <AuthProvider>
+        <CartProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Layout>
+              <Router />
+            </Layout>
+          </TooltipProvider>
+        </CartProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

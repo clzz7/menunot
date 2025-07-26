@@ -11,11 +11,13 @@ import { SettingsPage } from "@/components/admin/settings.js";
 import { useWebSocket } from "@/hooks/use-websocket.js";
 import { useToast } from "@/hooks/use-toast.js";
 import { Badge } from "@/components/ui/badge.js";
+import { useAuth } from "@/hooks/use-auth.js";
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [notifications, setNotifications] = useState<number>(0);
   const { toast } = useToast();
+  const { user, logout } = useAuth();
 
   // WebSocket for real-time admin updates
   useWebSocket((message) => {
@@ -41,6 +43,10 @@ export default function Admin() {
     setNotifications(0);
   };
 
+  const handleLogout = () => {
+    logout();
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Admin Header */}
@@ -60,8 +66,8 @@ export default function Admin() {
                 <Bell className="w-4 h-4 mr-2" />
                 Notificações
               </Button>
-              <span className="text-sm text-gray-600">Admin</span>
-              <Button variant="ghost" size="sm">
+              <span className="text-sm text-gray-600">{user?.username || 'Admin'}</span>
+              <Button variant="ghost" size="sm" onClick={handleLogout}>
                 <LogOut className="w-4 h-4" />
               </Button>
             </div>

@@ -6,6 +6,7 @@ import {
   orders, 
   orderItems, 
   coupons,
+  users,
   type Establishment,
   type InsertEstablishment,
   type Customer,
@@ -19,7 +20,9 @@ import {
   type OrderItem,
   type InsertOrderItem,
   type Coupon,
-  type InsertCoupon
+  type InsertCoupon,
+  type User,
+  type InsertUser
 } from "@shared/schema.js";
 import { db } from "./db.js";
 import { eq, and, desc, sql } from "drizzle-orm";
@@ -69,6 +72,10 @@ export interface IStorage {
   createCoupon(coupon: InsertCoupon): Promise<Coupon>;
   updateCoupon(id: string, data: Partial<InsertCoupon>): Promise<Coupon>;
   incrementCouponUsage(id: string): Promise<void>;
+  
+  // Users
+  getUserByUsername(username: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
   
   // Statistics
   getDashboardStats(establishmentId: string): Promise<{
@@ -359,6 +366,23 @@ export class DatabaseStorage implements IStorage {
       .update(coupons)
       .set({ usage_count: sql`${coupons.usage_count} + 1` })
       .where(eq(coupons.id, id));
+  }
+
+  // Users
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(user: InsertUser): Promise<User> {
+    const [created] = await db
+      .insert(users)
+      .values(user)
+      .returning();
+    return created;
   }
 
   // Statistics

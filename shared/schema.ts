@@ -151,7 +151,7 @@ export const coupons = pgTable("coupons", {
 
 // Users table (for authentication)
 export const users = pgTable("users", {
-  id: integer("id").primaryKey(),
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   created_at: timestamp("created_at").notNull().defaultNow()

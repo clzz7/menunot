@@ -12,6 +12,14 @@ import {
   insertProductSchema,
   insertCategorySchema
 } from "@shared/schema";
+import { 
+  loginSchema, 
+  generateToken, 
+  hashPassword, 
+  verifyPassword, 
+  requireAuth,
+  type AuthRequest 
+} from "./auth.js";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
@@ -36,7 +44,279 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   }
 
-  // Establishments
+  // ==================== ROTAS DE AUTENTICAÇÃO ====================
+  
+  // Login
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { username, password } = loginSchema.parse(req.body);
+      
+      // Buscar usuário no banco
+      const user = await storage.getUserByUsername(username);
+      if (!user) {
+        return res.status(401).json({ error: "Credenciais inválidas" });
+      }
+      
+      // Verificar senha
+      const isValidPassword = await verifyPassword(password, user.password);
+      if (!isValidPassword) {
+        return res.status(401).json({ error: "Credenciais inválidas" });
+      }
+      
+      // Gerar token
+      const token = generateToken({ id: user.id, username: user.username });
+      
+      res.json({
+        success: true,
+        token,
+        user: {
+          id: user.id,
+          username: user.username
+        }
+      });
+    } catch (error) {
+      console.error("Error during login:", error);
+      res.status(400).json({ error: "Dados de login inválidos" });
+    }
+  });
+
+  // Verificar token
+  app.get("/api/auth/verify", requireAuth, async (req: AuthRequest, res) => {
+    res.json({
+      success: true,
+      user: req.user
+    });
+  });
+
+  // Logout (apenas retorna sucesso, pois JWT é stateless)
+  app.post("/api/auth/logout", (req, res) => {
+    res.json({ success: true, message: "Logout realizado com sucesso" });
+  });
+
+  // Criar usuário admin (apenas para setup inicial)
+  app.post("/api/auth/setup", async (req, res) => {
+    try {
+      // Verificar se já existe algum usuário
+      const existingUser = await storage.getUserByUsername("admin");
+      if (existingUser) {
+        return res.status(400).json({ error: "Sistema já foi configurado" });
+      }
+
+      const { username, password } = loginSchema.parse(req.body);
+      
+      // Hash da senha
+      const hashedPassword = await hashPassword(password);
+      
+      // Criar usuário
+      const user = await storage.createUser({
+        username,
+        password: hashedPassword
+      });
+      
+      res.status(201).json({
+        success: true,
+        message: "Usuário admin criado com sucesso",
+        user: {
+          id: user.id,
+          username: user.username
+        }
+      });
+    } catch (error) {
+      console.error("Error creating admin user:", error);
+      res.status(400).json({ error: "Erro ao criar usuário admin" });
+    }
+  });
+
+  // ==================== ROTAS PROTEGIDAS ====================
+
+  // Dashboard statistics (PROTEGIDA)
+  app.get("/api/dashboard/stats", requireAuth, async (req: AuthRequest, res) => {
+    try {
+      const establishment = await storage.getEstablishment();
+      if (!establishment) {
+        return res.status(404).json({ error: "Establishment not found" });
+      }
+      
+      const stats = await storage.getDashboardStats(establishment.id);
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+      res.status(500).json({ error: "Failed to fetch dashboard statistics" });
+    }
+  });
+
+  // Orders management (PROTEGIDAS)
+  app.get("/api/orders", requireAuth, async (req: AuthRequest, res) => {
+    try {
+      const establishment = await storage.getEstablishment();
+      if (!establishment) {
+        return res.status(404).json({ error: "Establishment not found" });
+      }
+      
+      const orders = await storage.getOrders(establishment.id);
+      res.json(orders);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      res.status(500).json({ error: "Failed to fetch orders" });
+    }
+  });
+
+  app.put("/api/orders/:id/status", requireAuth, async (req: AuthRequest, res) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+      
+      const updated = await storage.updateOrderStatus(id, status, new Date());
+      
+      // Broadcast status update
+      broadcast({
+        type: 'ORDER_STATUS_UPDATE',
+        orderId: id,
+        status,
+        timestamp: new Date()
+      });
+      
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      res.status(500).json({ error: "Failed to update order status" });
+    }
+  });
+
+  // Products management (PROTEGIDAS)
+  app.post("/api/products", requireAuth, async (req: AuthRequest, res) => {
+    try {
+      const product = await storage.createProduct(req.body as any);
+      res.status(201).json(product);
+    } catch (error) {
+      console.error("Error creating product:", error);
+      res.status(400).json({ error: "Invalid product data" });
+    }
+  });
+
+  app.put("/api/products/:id", requireAuth, async (req: AuthRequest, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateProduct(id, req.body);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating product:", error);
+      res.status(500).json({ error: "Failed to update product" });
+    }
+  });
+
+  // Categories management (PROTEGIDAS)
+  app.post("/api/categories", requireAuth, async (req: AuthRequest, res) => {
+    try {
+      const validatedData = insertCategorySchema.parse(req.body);
+      const category = await storage.createCategory(validatedData);
+      res.status(201).json(category);
+    } catch (error) {
+      console.error("Error creating category:", error);
+      res.status(400).json({ error: "Invalid category data" });
+    }
+  });
+
+  // Coupons management (PROTEGIDAS)
+  app.get("/api/coupons", requireAuth, async (req: AuthRequest, res) => {
+    try {
+      const establishment = await storage.getEstablishment();
+      if (!establishment) {
+        return res.status(404).json({ error: "Establishment not found" });
+      }
+      
+      const coupons = await storage.getCoupons(establishment.id);
+      res.json(coupons);
+    } catch (error) {
+      console.error("Error fetching coupons:", error);
+      res.status(500).json({ error: "Failed to fetch coupons" });
+    }
+  });
+
+  app.post("/api/coupons", requireAuth, async (req: AuthRequest, res) => {
+    try {
+      const establishment = await storage.getEstablishment();
+      if (!establishment) {
+        return res.status(404).json({ error: "Establishment not found" });
+      }
+
+      // Transform data to match database schema
+      const couponData = {
+        id: req.body.id || `coupon-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        code: req.body.code?.toUpperCase(),
+        name: req.body.name,
+        description: req.body.description,
+        establishment_id: establishment.id,
+        type: req.body.type || 'percentage',
+        value: Number(req.body.value) || 0,
+        minimum_order: Number(req.body.minimumOrder) || 0,
+        maximum_discount: req.body.maxDiscount ? Number(req.body.maxDiscount) : null,
+        usage_limit: req.body.usageLimit ? Number(req.body.usageLimit) : null,
+        usage_count: 0,
+        valid_from: new Date(req.body.validFrom),
+        valid_until: req.body.validUntil ? new Date(req.body.validUntil) : null,
+        is_active: req.body.isActive !== false,
+        free_delivery: req.body.freeDelivery === true || req.body.free_delivery === true
+      };
+
+      const validatedData = insertCouponSchema.parse(couponData);
+      const coupon = await storage.createCoupon(validatedData);
+      res.status(201).json(coupon);
+    } catch (error) {
+      console.error("Error creating coupon:", error);
+      res.status(400).json({ error: "Invalid coupon data" });
+    }
+  });
+
+  app.put("/api/coupons/:id", requireAuth, async (req: AuthRequest, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateCoupon(id, req.body);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating coupon:", error);
+      res.status(500).json({ error: "Failed to update coupon" });
+    }
+  });
+
+  app.delete("/api/coupons/:id", requireAuth, async (req: AuthRequest, res) => {
+    try {
+      const { id } = req.params;
+      // Note: We don't have a delete method in storage, so we'll mark as inactive
+      const updated = await storage.updateCoupon(id, { isActive: false });
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting coupon:", error);
+      res.status(500).json({ error: "Failed to delete coupon" });
+    }
+  });
+
+  // Customers management (PROTEGIDA)
+  app.get("/api/customers", requireAuth, async (req: AuthRequest, res) => {
+    try {
+      const customers = await storage.getCustomers();
+      res.json(customers);
+    } catch (error) {
+      console.error("Error fetching customers:", error);
+      res.status(500).json({ error: "Failed to fetch customers" });
+    }
+  });
+
+  // Establishment management (PROTEGIDA)
+  app.put("/api/establishment/:id", requireAuth, async (req: AuthRequest, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateEstablishment(id, req.body);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating establishment:", error);
+      res.status(500).json({ error: "Failed to update establishment" });
+    }
+  });
+
+  // ==================== ROTAS PÚBLICAS ====================
+
+  // Establishments (público - para clientes)
   app.get("/api/establishment", async (req, res) => {
     try {
       const establishment = await storage.getEstablishment();
@@ -67,16 +347,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/establishment/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const updated = await storage.updateEstablishment(id, req.body);
-      res.json(updated);
-    } catch (error) {
-      console.error("Error updating establishment:", error);
-      res.status(500).json({ error: "Failed to update establishment" });
-    }
-  });
+
 
   // Customers
   app.get("/api/customer/:whatsapp", async (req, res) => {
@@ -101,15 +372,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/customers", async (req, res) => {
-    try {
-      const customers = await storage.getCustomers();
-      res.json(customers);
-    } catch (error) {
-      console.error("Error fetching customers:", error);
-      res.status(500).json({ error: "Failed to fetch customers" });
-    }
-  });
+
 
   // Categories
   app.get("/api/categories", async (req, res) => {
@@ -180,16 +443,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/categories", async (req, res) => {
-    try {
-      const validatedData = insertCategorySchema.parse(req.body);
-      const category = await storage.createCategory(validatedData);
-      res.status(201).json(category);
-    } catch (error) {
-      console.error("Error creating category:", error);
-      res.status(400).json({ error: "Invalid category data" });
-    }
-  });
+
 
   // Products
   app.get("/api/products", async (req, res) => {
@@ -297,42 +551,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/products", async (req, res) => {
-    try {
-      const product = await storage.createProduct(req.body as any);
-      res.status(201).json(product);
-    } catch (error) {
-      console.error("Error creating product:", error);
-      res.status(400).json({ error: "Invalid product data" });
-    }
-  });
 
-  app.put("/api/products/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const updated = await storage.updateProduct(id, req.body);
-      res.json(updated);
-    } catch (error) {
-      console.error("Error updating product:", error);
-      res.status(500).json({ error: "Failed to update product" });
-    }
-  });
 
-  // Orders
-  app.get("/api/orders", async (req, res) => {
-    try {
-      const establishment = await storage.getEstablishment();
-      if (!establishment) {
-        return res.status(404).json({ error: "Establishment not found" });
-      }
-      
-      const orders = await storage.getOrders(establishment.id);
-      res.json(orders);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-      res.status(500).json({ error: "Failed to fetch orders" });
-    }
-  });
+  // Orders (públicas para clientes)
 
   app.get("/api/orders/customer/:customerId", async (req, res) => {
     try {
@@ -460,27 +681,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/orders/:id/status", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { status } = req.body;
-      
-      const updated = await storage.updateOrderStatus(id, status, new Date());
-      
-      // Broadcast status update
-      broadcast({
-        type: 'ORDER_STATUS_UPDATE',
-        orderId: id,
-        status,
-        timestamp: new Date()
-      });
-      
-      res.json(updated);
-    } catch (error) {
-      console.error("Error updating order status:", error);
-      res.status(500).json({ error: "Failed to update order status" });
-    }
-  });
+
 
   app.get("/api/orders/:id/items", async (req, res) => {
     try {
@@ -543,21 +744,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Coupons
-  app.get("/api/coupons", async (req, res) => {
-    try {
-      const establishment = await storage.getEstablishment();
-      if (!establishment) {
-        return res.status(404).json({ error: "Establishment not found" });
-      }
-      
-      const coupons = await storage.getCoupons(establishment.id);
-      res.json(coupons);
-    } catch (error) {
-      console.error("Error fetching coupons:", error);
-      res.status(500).json({ error: "Failed to fetch coupons" });
-    }
-  });
+  // Coupons (públicas para validação)
 
   app.post("/api/coupons/validate", async (req, res) => {
     try {
@@ -600,79 +787,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/coupons", async (req, res) => {
-    try {
-      const establishment = await storage.getEstablishment();
-      if (!establishment) {
-        return res.status(404).json({ error: "Establishment not found" });
-      }
 
-      // Transform data to match database schema
-      const couponData = {
-        id: req.body.id || `coupon-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        code: req.body.code?.toUpperCase(),
-        name: req.body.name,
-        description: req.body.description,
-        establishment_id: establishment.id,
-        type: req.body.type || 'percentage',
-        value: Number(req.body.value) || 0,
-        minimum_order: Number(req.body.minimumOrder) || 0,
-        maximum_discount: req.body.maxDiscount ? Number(req.body.maxDiscount) : null,
-        usage_limit: req.body.usageLimit ? Number(req.body.usageLimit) : null,
-        usage_count: 0,
-        valid_from: new Date(req.body.validFrom),
-        valid_until: req.body.validUntil ? new Date(req.body.validUntil) : null,
-        is_active: req.body.isActive !== false,
-        free_delivery: req.body.freeDelivery === true || req.body.free_delivery === true
-      };
 
-      const validatedData = insertCouponSchema.parse(couponData);
-      const coupon = await storage.createCoupon(validatedData);
-      res.status(201).json(coupon);
-    } catch (error) {
-      console.error("Error creating coupon:", error);
-      res.status(400).json({ error: "Invalid coupon data" });
-    }
-  });
 
-  app.put("/api/coupons/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const updated = await storage.updateCoupon(id, req.body);
-      res.json(updated);
-    } catch (error) {
-      console.error("Error updating coupon:", error);
-      res.status(500).json({ error: "Failed to update coupon" });
-    }
-  });
-
-  app.delete("/api/coupons/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      // Note: We don't have a delete method in storage, so we'll mark as inactive
-      const updated = await storage.updateCoupon(id, { isActive: false });
-      res.json({ success: true });
-    } catch (error) {
-      console.error("Error deleting coupon:", error);
-      res.status(500).json({ error: "Failed to delete coupon" });
-    }
-  });
-
-  // Dashboard statistics
-  app.get("/api/dashboard/stats", async (req, res) => {
-    try {
-      const establishment = await storage.getEstablishment();
-      if (!establishment) {
-        return res.status(404).json({ error: "Establishment not found" });
-      }
-      
-      const stats = await storage.getDashboardStats(establishment.id);
-      res.json(stats);
-    } catch (error) {
-      console.error("Error fetching dashboard stats:", error);
-      res.status(500).json({ error: "Failed to fetch dashboard statistics" });
-    }
-  });
 
   // MercadoPago routes
   app.get("/api/mercadopago/public-key", (req, res) => {
