@@ -59,40 +59,41 @@
 
 /* Hamburger Menu Animation */
 .hamburger-line {
-  display: block;
-  width: 16px; /* Reduzido ainda mais para 16px */
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 16px;
   height: 2px;
   background-color: currentColor;
   transition: all 0.3s ease;
-  transform-origin: center center; /* Garantindo que a rotação seja no centro */
-  margin: 0 auto; /* Centraliza as linhas */
-  position: relative; /* Para melhor controle de posicionamento */
+  transform-origin: center center;
+  transform: translateX(-50%) translateY(-50%);
 }
 
 .hamburger-line:nth-child(1) {
-  transform: translateY(-4px); /* Reduzido para -4px */
+  transform: translateX(-50%) translateY(-50%) translateY(-4px);
 }
 
 .hamburger-line:nth-child(2) {
-  transform: translateY(0);
+  transform: translateX(-50%) translateY(-50%);
 }
 
 .hamburger-line:nth-child(3) {
-  transform: translateY(4px); /* Reduzido para 4px */
+  transform: translateX(-50%) translateY(-50%) translateY(4px);
 }
 
 /* When menu is open, transform to X */
 .hamburger-open .hamburger-line:nth-child(1) {
-  transform: translateY(0) rotate(45deg);
+  transform: translateX(-50%) translateY(-50%) rotate(45deg);
 }
 
 .hamburger-open .hamburger-line:nth-child(2) {
   opacity: 0;
-  transform: scaleX(0);
+  transform: translateX(-50%) translateY(-50%) scaleX(0);
 }
 
 .hamburger-open .hamburger-line:nth-child(3) {
-  transform: translateY(0) rotate(-45deg);
+  transform: translateX(-50%) translateY(-50%) rotate(-45deg);
 }
 
 .animate-toast-in {
