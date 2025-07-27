@@ -18,6 +18,7 @@
     "network-info": "node scripts/get-network-ip.js"
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
     "@mercadopago/sdk-js": "^0.0.3",
@@ -73,9 +74,11 @@
     "express-session": "^1.18.1",
     "express-validator": "^7.2.1",
     "framer-motion": "^11.13.1",
+    "gsap": "^3.13.0",
     "helmet": "^8.1.0",
     "input-otp": "^1.4.2",
     "jsonwebtoken": "^9.0.2",
+    "lenis": "^1.3.8",
     "lucide-react": "^0.453.0",
     "memorystore": "^1.6.7",
     "mercadopago": "^2.8.0",

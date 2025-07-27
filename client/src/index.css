@@ -703,3 +703,54 @@
   background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
   border-top: 2px solid #e2e8f0;
 }
+
+/* Text Reveal Animation Styles */
+.line {
+  transform: translateY(100%);
+  will-change: transform;
+  overflow: hidden;
+}
+
+/* Smooth scrolling enhancement */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Text highlight in orange - simple color without gradient */
+.text-highlight {
+  color: #E55A2B;
+}
+
+/* Additional glassmorphism and gradient styles for better integration */
+.text-gradient {
+  color: #E55A2B;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.btn-glow {
+  box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-glow:hover {
+  box-shadow: 0 0 30px rgba(var(--primary-rgb), 0.5);
+}
+
+.hero-pattern {
+  background-image: radial-gradient(circle at 25% 25%, rgba(var(--primary-rgb), 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 75% 75%, rgba(var(--accent-rgb), 0.1) 0%, transparent 50%);
+}
