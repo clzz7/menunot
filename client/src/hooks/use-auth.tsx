@@ -8,8 +8,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  token: string | null;
-  login: (token: string, user: User) => void;
+  login: (user: User) => void;
   logout: () => void;
   isLoading: boolean;
   isAuthenticated: boolean;
@@ -19,71 +18,59 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [, setLocation] = useLocation();
 
   useEffect(() => {
-    // Verificar se há token salvo no localStorage
-    const savedToken = localStorage.getItem("auth_token");
-    const savedUser = localStorage.getItem("user");
-
-    if (savedToken && savedUser) {
-      try {
-        const parsedUser = JSON.parse(savedUser);
-        setToken(savedToken);
-        setUser(parsedUser);
-        
-        // Verificar se o token ainda é válido
-        verifyToken(savedToken);
-      } catch (error) {
-        console.error("Error parsing saved user:", error);
-        logout();
-      }
-    }
-    
-    setIsLoading(false);
+    // Verificar se o usuário está autenticado através de uma chamada à API
+    // que dependerá do cookie HttpOnly
+    verifyAuthentication();
   }, []);
 
-  const verifyToken = async (tokenToVerify: string) => {
+  const verifyAuthentication = async () => {
     try {
       const response = await fetch("/api/auth/verify", {
-        headers: {
-          "Authorization": `Bearer ${tokenToVerify}`
-        }
+        credentials: 'include' // Importante para incluir cookies
       });
 
-      if (!response.ok) {
-        logout();
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
+      } else {
+        setUser(null);
       }
     } catch (error) {
-      console.error("Token verification failed:", error);
-      logout();
+      console.error("Authentication verification failed:", error);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const login = (newToken: string, newUser: User) => {
-    setToken(newToken);
+  const login = (newUser: User) => {
     setUser(newUser);
-    localStorage.setItem("auth_token", newToken);
-    localStorage.setItem("user", JSON.stringify(newUser));
   };
 
-  const logout = () => {
-    setToken(null);
+  const logout = async () => {
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: 'include'
+      });
+    } catch (error) {
+      console.error("Logout request failed:", error);
+    }
+    
     setUser(null);
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("user");
     setLocation("/login");
   };
 
   const value = {
     user,
-    token,
     login,
     logout,
     isLoading,
-    isAuthenticated: !!user && !!token
+    isAuthenticated: !!user
   };
 
   return (

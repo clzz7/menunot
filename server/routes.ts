@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { WebSocketServer, WebSocket } from "ws";
+import { WebSocketManager } from "./websocket";
 import { storage } from "./storage";
 import { z } from "zod";
 import { mercadoPagoService } from "./mercadopago";
@@ -18,301 +18,579 @@ import {
   hashPassword, 
   verifyPassword, 
   requireAuth,
+  requireAdmin,
+  validateLoginData,
+  validateUserCreation,
   type AuthRequest 
-} from "./auth.js";
+} from "./auth";
+import { config } from "./config";
+import {
+  loginRateLimit,
+  adminRateLimit,
+  logSecurityEvent,
+  detectBruteForceLogin,
+  securityLogger
+} from "./security";
 
-export async function registerRoutes(app: Express): Promise<Server> {
-  const httpServer = createServer(app);
-
-  // WebSocket server for real-time updates
-  const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
+export function registerRoutes(app: Express): Promise<Server> {
+  const server = createServer(app);
   
-  wss.on('connection', (ws) => {
-    console.log('Client connected to WebSocket');
-    
-    ws.on('close', () => {
-      console.log('Client disconnected from WebSocket');
-    });
-  });
-
-  // Broadcast function for real-time updates
+  // Inicializar WebSocket Manager com path específico
+  const wsManager = new WebSocketManager(server);
+  
+  // Função para broadcast (mantém compatibilidade)
   function broadcast(message: any) {
-    wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify(message));
-      }
-    });
+    wsManager.broadcast(message);
   }
+
+  // Rota para estatísticas do WebSocket
+  app.get("/api/ws/stats", requireAuth, (req, res) => {
+    res.json(wsManager.getStats());
+  });
 
   // ==================== ROTAS DE AUTENTICAÇÃO ====================
   
-  // Login
-  app.post("/api/auth/login", async (req, res) => {
-    try {
-      const { username, password } = loginSchema.parse(req.body);
-      
-      // Buscar usuário no banco
-      const user = await storage.getUserByUsername(username);
-      if (!user) {
-        return res.status(401).json({ error: "Credenciais inválidas" });
+  // Login com validação de força bruta específica
+  app.post("/api/auth/login", 
+    loginRateLimit,
+    detectBruteForceLogin, // Usar o middleware específico para login
+    logSecurityEvent('LOGIN_ATTEMPT'),
+    async (req, res) => {
+      try {
+        // Validar dados de entrada
+        const validation = validateLoginData(req.body);
+        if (!validation.isValid) {
+          securityLogger.log(req, 'LOGIN_VALIDATION_FAILED', false, undefined, {
+            errors: validation.errors
+          });
+          return res.status(400).json({ 
+            error: "Dados inválidos",
+            details: validation.errors 
+          });
+        }
+
+        const { username, password } = req.body;
+        
+        // Buscar usuário
+        const user = await storage.getUserByUsername(username);
+        if (!user) {
+          securityLogger.log(req, 'LOGIN_USER_NOT_FOUND', false, username);
+          return res.status(401).json({ error: "Credenciais inválidas" });
+        }
+        
+        // Verificar senha
+        const isValidPassword = await verifyPassword(password, user.password);
+        if (!isValidPassword) {
+          securityLogger.log(req, 'LOGIN_INVALID_PASSWORD', false, username);
+          return res.status(401).json({ error: "Credenciais inválidas" });
+        }
+        
+        // Gerar token
+        const token = generateToken({ id: user.id, username: user.username });
+        
+        // Definir cookie HttpOnly com flags de segurança
+        res.cookie('auth_token', token, {
+          httpOnly: config.COOKIE_HTTP_ONLY,
+          secure: config.COOKIE_SECURE,
+          sameSite: config.COOKIE_SAME_SITE as 'strict' | 'lax' | 'none',
+          maxAge: 24 * 60 * 60 * 1000 // 24 horas
+        });
+        
+        securityLogger.log(req, 'LOGIN_SUCCESS', true, username);
+        
+        // Notificar via WebSocket sobre login bem-sucedido
+        broadcast({
+          type: 'user_login',
+          username: user.username,
+          timestamp: new Date().toISOString()
+        });
+        
+        res.json({
+          success: true,
+          user: {
+            id: user.id,
+            username: user.username
+          }
+        });
+      } catch (error) {
+        console.error("Error during login:", error);
+        securityLogger.log(req, 'LOGIN_ERROR', false, undefined, { error: error.message });
+        res.status(500).json({ error: "Erro interno do servidor" });
       }
-      
-      // Verificar senha
-      const isValidPassword = await verifyPassword(password, user.password);
-      if (!isValidPassword) {
-        return res.status(401).json({ error: "Credenciais inválidas" });
-      }
-      
-      // Gerar token
-      const token = generateToken({ id: user.id, username: user.username });
-      
+    }
+  );
+
+  // Verificar token com logs
+  app.get("/api/auth/verify", 
+    logSecurityEvent('TOKEN_VERIFICATION'),
+    requireAuth, 
+    async (req: AuthRequest, res) => {
       res.json({
         success: true,
-        token,
-        user: {
-          id: user.id,
-          username: user.username
-        }
+        user: req.user
       });
-    } catch (error) {
-      console.error("Error during login:", error);
-      res.status(400).json({ error: "Dados de login inválidos" });
     }
-  });
+  );
 
-  // Verificar token
-  app.get("/api/auth/verify", requireAuth, async (req: AuthRequest, res) => {
-    res.json({
-      success: true,
-      user: req.user
-    });
-  });
-
-  // Logout (apenas retorna sucesso, pois JWT é stateless)
-  app.post("/api/auth/logout", (req, res) => {
-    res.json({ success: true, message: "Logout realizado com sucesso" });
-  });
-
-  // Criar usuário admin (apenas para setup inicial)
-  app.post("/api/auth/setup", async (req, res) => {
-    try {
-      // Verificar se já existe algum usuário
-      const existingUser = await storage.getUserByUsername("admin");
-      if (existingUser) {
-        return res.status(400).json({ error: "Sistema já foi configurado" });
+  // Logout com logs
+  app.post("/api/auth/logout", 
+    logSecurityEvent('LOGOUT'),
+    (req, res) => {
+      const token = req.cookies?.auth_token;
+      
+      if (token) {
+        try {
+          const decoded = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+          securityLogger.log(req, 'LOGOUT_SUCCESS', true, decoded.username);
+        } catch (error) {
+          securityLogger.log(req, 'LOGOUT_INVALID_TOKEN', false);
+        }
       }
-
-      const { username, password } = loginSchema.parse(req.body);
       
-      // Hash da senha
-      const hashedPassword = await hashPassword(password);
-      
-      // Criar usuário
-      const user = await storage.createUser({
-        username,
-        password: hashedPassword
+      // Limpar o cookie de autenticação
+      res.clearCookie('auth_token', {
+        httpOnly: config.COOKIE_HTTP_ONLY,
+        secure: config.COOKIE_SECURE,
+        sameSite: config.COOKIE_SAME_SITE as 'strict' | 'lax' | 'none'
       });
       
-      res.status(201).json({
-        success: true,
-        message: "Usuário admin criado com sucesso",
-        user: {
-          id: user.id,
-          username: user.username
-        }
-      });
-    } catch (error) {
-      console.error("Error creating admin user:", error);
-      res.status(400).json({ error: "Erro ao criar usuário admin" });
+      res.json({ success: true, message: "Logout realizado com sucesso" });
     }
-  });
+  );
 
-  // ==================== ROTAS PROTEGIDAS ====================
+  // Criar usuário admin com validação de senha forte
+  app.post("/api/auth/setup", 
+    loginRateLimit,
+    logSecurityEvent('ADMIN_SETUP'),
+    async (req, res) => {
+      try {
+        // Verificar se já existe algum usuário
+        const existingUser = await storage.getUserByUsername("admin");
+        if (existingUser) {
+          securityLogger.log(req, 'ADMIN_SETUP_ALREADY_EXISTS', false);
+          return res.status(400).json({ error: "Sistema já foi configurado" });
+        }
+
+        // Validar dados com senha forte
+        const validation = validateUserCreation(req.body);
+        if (!validation.isValid) {
+          securityLogger.log(req, 'ADMIN_SETUP_VALIDATION_FAILED', false, undefined, {
+            errors: validation.errors
+          });
+          return res.status(400).json({ 
+            error: "Dados inválidos",
+            details: validation.errors 
+          });
+        }
+
+        const { username, password } = req.body;
+        
+        // Hash da senha
+        const hashedPassword = await hashPassword(password);
+        
+        // Criar usuário
+        const user = await storage.createUser({
+          username,
+          password: hashedPassword
+        });
+        
+        securityLogger.log(req, 'ADMIN_SETUP_SUCCESS', true, username);
+        
+        res.status(201).json({
+          success: true,
+          message: "Usuário admin criado com sucesso",
+          user: {
+            id: user.id,
+            username: user.username
+          }
+        });
+      } catch (error) {
+        console.error("Error creating admin user:", error);
+        securityLogger.log(req, 'ADMIN_SETUP_ERROR', false, undefined, { error: error.message });
+        res.status(500).json({ error: "Erro interno do servidor" });
+      }
+    }
+  );
+
+  // ==================== ROTAS DE SEGURANÇA ====================
+
+  // Endpoint para visualizar logs de segurança (apenas admin)
+  app.get("/api/security/logs", 
+    adminRateLimit,
+    requireAdmin,
+    logSecurityEvent('SECURITY_LOGS_ACCESS'),
+    async (req: AuthRequest, res) => {
+      try {
+        const limit = parseInt(req.query.limit as string) || 50;
+        const logs = securityLogger.getRecentLogs(limit);
+        
+        res.json({
+          success: true,
+          logs,
+          total: logs.length
+        });
+      } catch (error) {
+        console.error("Error fetching security logs:", error);
+        res.status(500).json({ error: "Erro ao buscar logs de segurança" });
+      }
+    }
+  );
+
+  // Endpoint para atividade suspeita
+  app.get("/api/security/suspicious", 
+    adminRateLimit,
+    requireAdmin,
+    logSecurityEvent('SUSPICIOUS_ACTIVITY_CHECK'),
+    async (req: AuthRequest, res) => {
+      try {
+        const suspicious = securityLogger.getSuspiciousActivity();
+        
+        res.json({
+          success: true,
+          suspicious,
+          count: suspicious.length
+        });
+      } catch (error) {
+        console.error("Error fetching suspicious activity:", error);
+        res.status(500).json({ error: "Erro ao buscar atividade suspeita" });
+      }
+    }
+  );
+
+  // Endpoint para tentativas de login falhadas
+  app.get("/api/security/failed-logins", 
+    adminRateLimit,
+    requireAdmin,
+    logSecurityEvent('FAILED_LOGINS_CHECK'),
+    async (req: AuthRequest, res) => {
+      try {
+        const timeWindow = parseInt(req.query.window as string) || 60 * 60 * 1000; // 1 hora
+        const failedLogins = securityLogger.getFailedLoginAttempts(timeWindow);
+        
+        res.json({
+          success: true,
+          failedLogins,
+          count: failedLogins.length,
+          timeWindow
+        });
+      } catch (error) {
+        console.error("Error fetching failed logins:", error);
+        res.status(500).json({ error: "Erro ao buscar tentativas de login falhadas" });
+      }
+    }
+  );
+
+  // ==================== ROTAS PROTEGIDAS COM RATE LIMITING ====================
 
   // Dashboard statistics (PROTEGIDA)
-  app.get("/api/dashboard/stats", requireAuth, async (req: AuthRequest, res) => {
-    try {
-      const establishment = await storage.getEstablishment();
-      if (!establishment) {
-        return res.status(404).json({ error: "Establishment not found" });
+  app.get("/api/dashboard/stats", 
+    adminRateLimit,
+    requireAdmin,
+    logSecurityEvent('DASHBOARD_STATS_ACCESS'),
+    async (req: AuthRequest, res) => {
+      try {
+        const establishment = await storage.getEstablishment();
+        if (!establishment) {
+          return res.status(404).json({ error: "Establishment not found" });
+        }
+        
+        const stats = await storage.getDashboardStats(establishment.id);
+        res.json(stats);
+      } catch (error) {
+        console.error("Error fetching dashboard stats:", error);
+        res.status(500).json({ error: "Failed to fetch dashboard statistics" });
       }
-      
-      const stats = await storage.getDashboardStats(establishment.id);
-      res.json(stats);
-    } catch (error) {
-      console.error("Error fetching dashboard stats:", error);
-      res.status(500).json({ error: "Failed to fetch dashboard statistics" });
     }
-  });
+  );
 
   // Orders management (PROTEGIDAS)
-  app.get("/api/orders", requireAuth, async (req: AuthRequest, res) => {
-    try {
-      const establishment = await storage.getEstablishment();
-      if (!establishment) {
-        return res.status(404).json({ error: "Establishment not found" });
+  app.get("/api/orders", 
+    adminRateLimit,
+    requireAdmin,
+    logSecurityEvent('ORDERS_ACCESS'),
+    async (req: AuthRequest, res) => {
+      try {
+        const establishment = await storage.getEstablishment();
+        if (!establishment) {
+          return res.status(404).json({ error: "Establishment not found" });
+        }
+        
+        const orders = await storage.getOrders(establishment.id);
+        res.json(orders);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        res.status(500).json({ error: "Failed to fetch orders" });
       }
-      
-      const orders = await storage.getOrders(establishment.id);
-      res.json(orders);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-      res.status(500).json({ error: "Failed to fetch orders" });
     }
-  });
+  );
 
-  app.put("/api/orders/:id/status", requireAuth, async (req: AuthRequest, res) => {
-    try {
-      const { id } = req.params;
-      const { status } = req.body;
-      
-      const updated = await storage.updateOrderStatus(id, status, new Date());
-      
-      // Broadcast status update
-      broadcast({
-        type: 'ORDER_STATUS_UPDATE',
-        orderId: id,
-        status,
-        timestamp: new Date()
-      });
-      
-      res.json(updated);
-    } catch (error) {
-      console.error("Error updating order status:", error);
-      res.status(500).json({ error: "Failed to update order status" });
+  app.put("/api/orders/:id/status", 
+    adminRateLimit,
+    requireAdmin,
+    logSecurityEvent('ORDER_STATUS_UPDATE'),
+    async (req: AuthRequest, res) => {
+      try {
+        const { id } = req.params;
+        const { status } = req.body;
+        
+        const updated = await storage.updateOrderStatus(id, status, new Date());
+        
+        // Broadcast status update
+        broadcast({
+          type: 'ORDER_STATUS_UPDATE',
+          orderId: id,
+          status,
+          timestamp: new Date()
+        });
+        
+        res.json(updated);
+      } catch (error) {
+        console.error("Error updating order status:", error);
+        res.status(500).json({ error: "Failed to update order status" });
+      }
     }
-  });
+  );
 
   // Products management (PROTEGIDAS)
-  app.post("/api/products", requireAuth, async (req: AuthRequest, res) => {
-    try {
-      const product = await storage.createProduct(req.body as any);
-      res.status(201).json(product);
-    } catch (error) {
-      console.error("Error creating product:", error);
-      res.status(400).json({ error: "Invalid product data" });
-    }
-  });
+  app.post("/api/products", 
+    adminRateLimit,
+    requireAdmin,
+    logSecurityEvent('PRODUCT_CREATE'),
+    async (req: AuthRequest, res) => {
+      try {
+        const establishment = await storage.getEstablishment();
+        if (!establishment) {
+          return res.status(404).json({ error: "Establishment not found" });
+        }
 
-  app.put("/api/products/:id", requireAuth, async (req: AuthRequest, res) => {
-    try {
-      const { id } = req.params;
-      const updated = await storage.updateProduct(id, req.body);
-      res.json(updated);
-    } catch (error) {
-      console.error("Error updating product:", error);
-      res.status(500).json({ error: "Failed to update product" });
+        const productData = {
+          ...req.body,
+          id: req.body.id || `prod-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          establishment_id: establishment.id,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+
+        const validatedData = insertProductSchema.parse(productData);
+        const product = await storage.createProduct(validatedData);
+        res.status(201).json(product);
+      } catch (error) {
+        console.error("Error creating product:", error);
+        res.status(400).json({ error: "Invalid product data" });
+      }
     }
-  });
+  );
+
+  app.put("/api/products/:id", 
+    adminRateLimit,
+    requireAdmin,
+    logSecurityEvent('PRODUCT_UPDATE'),
+    async (req: AuthRequest, res) => {
+      try {
+        const { id } = req.params;
+        const updated = await storage.updateProduct(id, req.body);
+        res.json(updated);
+      } catch (error) {
+        console.error("Error updating product:", error);
+        res.status(500).json({ error: "Failed to update product" });
+      }
+    }
+  );
+
+  // DELETE product (PROTEGIDA)
+  app.delete("/api/products/:id", 
+    adminRateLimit,
+    requireAdmin,
+    logSecurityEvent('PRODUCT_DELETE'),
+    async (req: AuthRequest, res) => {
+      try {
+        const { id } = req.params;
+        await storage.deleteProduct(id);
+        res.json({ success: true, message: "Product deleted successfully" });
+      } catch (error) {
+        console.error("Error deleting product:", error);
+        res.status(500).json({ error: "Failed to delete product" });
+      }
+    }
+  );
 
   // Categories management (PROTEGIDAS)
-  app.post("/api/categories", requireAuth, async (req: AuthRequest, res) => {
-    try {
-      const validatedData = insertCategorySchema.parse(req.body);
-      const category = await storage.createCategory(validatedData);
-      res.status(201).json(category);
-    } catch (error) {
-      console.error("Error creating category:", error);
-      res.status(400).json({ error: "Invalid category data" });
+  app.post("/api/categories", 
+    adminRateLimit,
+    requireAdmin,
+    logSecurityEvent('CATEGORY_CREATE'),
+    async (req: AuthRequest, res) => {
+      try {
+        const validatedData = insertCategorySchema.parse(req.body);
+        const category = await storage.createCategory(validatedData);
+        res.status(201).json(category);
+      } catch (error) {
+        console.error("Error creating category:", error);
+        res.status(400).json({ error: "Invalid category data" });
+      }
     }
-  });
+  );
+
+  // UPDATE category (PROTEGIDA)
+  app.put("/api/categories/:id", 
+    adminRateLimit,
+    requireAdmin,
+    logSecurityEvent('CATEGORY_UPDATE'),
+    async (req: AuthRequest, res) => {
+      try {
+        const { id } = req.params;
+        const updated = await storage.updateCategory(id, req.body);
+        res.json(updated);
+      } catch (error) {
+        console.error("Error updating category:", error);
+        res.status(500).json({ error: "Failed to update category" });
+      }
+    }
+  );
+
+  // DELETE category (PROTEGIDA)
+  app.delete("/api/categories/:id", 
+    adminRateLimit,
+    requireAdmin,
+    logSecurityEvent('CATEGORY_DELETE'),
+    async (req: AuthRequest, res) => {
+      try {
+        const { id } = req.params;
+        await storage.deleteCategory(id);
+        res.json({ success: true, message: "Category deleted successfully" });
+      } catch (error) {
+        console.error("Error deleting category:", error);
+        res.status(500).json({ error: "Failed to delete category" });
+      }
+    }
+  );
 
   // Coupons management (PROTEGIDAS)
-  app.get("/api/coupons", requireAuth, async (req: AuthRequest, res) => {
-    try {
-      const establishment = await storage.getEstablishment();
-      if (!establishment) {
-        return res.status(404).json({ error: "Establishment not found" });
+  app.get("/api/coupons", 
+    adminRateLimit,
+    requireAdmin,
+    logSecurityEvent('COUPONS_ACCESS'),
+    async (req: AuthRequest, res) => {
+      try {
+        const establishment = await storage.getEstablishment();
+        if (!establishment) {
+          return res.status(404).json({ error: "Establishment not found" });
+        }
+        
+        const coupons = await storage.getCoupons(establishment.id);
+        res.json(coupons);
+      } catch (error) {
+        console.error("Error fetching coupons:", error);
+        res.status(500).json({ error: "Failed to fetch coupons" });
       }
-      
-      const coupons = await storage.getCoupons(establishment.id);
-      res.json(coupons);
-    } catch (error) {
-      console.error("Error fetching coupons:", error);
-      res.status(500).json({ error: "Failed to fetch coupons" });
     }
-  });
+  );
 
-  app.post("/api/coupons", requireAuth, async (req: AuthRequest, res) => {
-    try {
-      const establishment = await storage.getEstablishment();
-      if (!establishment) {
-        return res.status(404).json({ error: "Establishment not found" });
+  app.post("/api/coupons", 
+    adminRateLimit,
+    requireAdmin,
+    logSecurityEvent('COUPON_CREATE'),
+    async (req: AuthRequest, res) => {
+      try {
+        const establishment = await storage.getEstablishment();
+        if (!establishment) {
+          return res.status(404).json({ error: "Establishment not found" });
+        }
+
+        // Transform data to match database schema
+        const couponData = {
+          id: req.body.id || `coupon-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          code: req.body.code?.toUpperCase(),
+          name: req.body.name,
+          description: req.body.description,
+          establishment_id: establishment.id,
+          type: req.body.type || 'percentage',
+          value: Number(req.body.value) || 0,
+          minimum_order: Number(req.body.minimumOrder) || 0,
+          maximum_discount: req.body.maxDiscount ? Number(req.body.maxDiscount) : null,
+          usage_limit: req.body.usageLimit ? Number(req.body.usageLimit) : null,
+          usage_count: 0,
+          valid_from: new Date(req.body.validFrom),
+          valid_until: req.body.validUntil ? new Date(req.body.validUntil) : null,
+          is_active: req.body.isActive !== false,
+          free_delivery: req.body.freeDelivery === true || req.body.free_delivery === true
+        };
+
+        const validatedData = insertCouponSchema.parse(couponData);
+        const coupon = await storage.createCoupon(validatedData);
+        res.status(201).json(coupon);
+      } catch (error) {
+        console.error("Error creating coupon:", error);
+        res.status(400).json({ error: "Invalid coupon data" });
       }
-
-      // Transform data to match database schema
-      const couponData = {
-        id: req.body.id || `coupon-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        code: req.body.code?.toUpperCase(),
-        name: req.body.name,
-        description: req.body.description,
-        establishment_id: establishment.id,
-        type: req.body.type || 'percentage',
-        value: Number(req.body.value) || 0,
-        minimum_order: Number(req.body.minimumOrder) || 0,
-        maximum_discount: req.body.maxDiscount ? Number(req.body.maxDiscount) : null,
-        usage_limit: req.body.usageLimit ? Number(req.body.usageLimit) : null,
-        usage_count: 0,
-        valid_from: new Date(req.body.validFrom),
-        valid_until: req.body.validUntil ? new Date(req.body.validUntil) : null,
-        is_active: req.body.isActive !== false,
-        free_delivery: req.body.freeDelivery === true || req.body.free_delivery === true
-      };
-
-      const validatedData = insertCouponSchema.parse(couponData);
-      const coupon = await storage.createCoupon(validatedData);
-      res.status(201).json(coupon);
-    } catch (error) {
-      console.error("Error creating coupon:", error);
-      res.status(400).json({ error: "Invalid coupon data" });
     }
-  });
+  );
 
-  app.put("/api/coupons/:id", requireAuth, async (req: AuthRequest, res) => {
-    try {
-      const { id } = req.params;
-      const updated = await storage.updateCoupon(id, req.body);
-      res.json(updated);
-    } catch (error) {
-      console.error("Error updating coupon:", error);
-      res.status(500).json({ error: "Failed to update coupon" });
+  app.put("/api/coupons/:id", 
+    adminRateLimit,
+    requireAdmin,
+    logSecurityEvent('COUPON_UPDATE'),
+    async (req: AuthRequest, res) => {
+      try {
+        const { id } = req.params;
+        const updated = await storage.updateCoupon(id, req.body);
+        res.json(updated);
+      } catch (error) {
+        console.error("Error updating coupon:", error);
+        res.status(500).json({ error: "Failed to update coupon" });
+      }
     }
-  });
+  );
 
-  app.delete("/api/coupons/:id", requireAuth, async (req: AuthRequest, res) => {
-    try {
-      const { id } = req.params;
-      // Note: We don't have a delete method in storage, so we'll mark as inactive
-      const updated = await storage.updateCoupon(id, { isActive: false });
-      res.json({ success: true });
-    } catch (error) {
-      console.error("Error deleting coupon:", error);
-      res.status(500).json({ error: "Failed to delete coupon" });
+  app.delete("/api/coupons/:id", 
+    adminRateLimit,
+    requireAdmin,
+    logSecurityEvent('COUPON_DELETE'),
+    async (req: AuthRequest, res) => {
+      try {
+        const { id } = req.params;
+        // Note: We don't have a delete method in storage, so we'll mark as inactive
+        const updated = await storage.updateCoupon(id, { isActive: false });
+        res.json({ success: true });
+      } catch (error) {
+        console.error("Error deleting coupon:", error);
+        res.status(500).json({ error: "Failed to delete coupon" });
+      }
     }
-  });
+  );
 
   // Customers management (PROTEGIDA)
-  app.get("/api/customers", requireAuth, async (req: AuthRequest, res) => {
-    try {
-      const customers = await storage.getCustomers();
-      res.json(customers);
-    } catch (error) {
-      console.error("Error fetching customers:", error);
-      res.status(500).json({ error: "Failed to fetch customers" });
+  app.get("/api/customers", 
+    adminRateLimit,
+    requireAdmin,
+    logSecurityEvent('CUSTOMERS_ACCESS'),
+    async (req: AuthRequest, res) => {
+      try {
+        const customers = await storage.getCustomers();
+        res.json(customers);
+      } catch (error) {
+        console.error("Error fetching customers:", error);
+        res.status(500).json({ error: "Failed to fetch customers" });
+      }
     }
-  });
+  );
 
   // Establishment management (PROTEGIDA)
-  app.put("/api/establishment/:id", requireAuth, async (req: AuthRequest, res) => {
-    try {
-      const { id } = req.params;
-      const updated = await storage.updateEstablishment(id, req.body);
-      res.json(updated);
-    } catch (error) {
-      console.error("Error updating establishment:", error);
-      res.status(500).json({ error: "Failed to update establishment" });
+  app.put("/api/establishment/:id", 
+    adminRateLimit,
+    requireAdmin,
+    logSecurityEvent('ESTABLISHMENT_UPDATE'),
+    async (req: AuthRequest, res) => {
+      try {
+        const { id } = req.params;
+        const updated = await storage.updateEstablishment(id, req.body);
+        res.json(updated);
+      } catch (error) {
+        console.error("Error updating establishment:", error);
+        res.status(500).json({ error: "Failed to update establishment" });
+      }
     }
-  });
+  );
 
   // ==================== ROTAS PÚBLICAS ====================
 
@@ -1125,5 +1403,5 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  return httpServer;
+  return Promise.resolve(server);
 }

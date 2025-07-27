@@ -33,5 +33,18 @@ export default defineConfig({
       strict: true,
       deny: ["**/.*"],
     },
+    // Configurar HMR para usar porta diferente e evitar conflito
+    hmr: {
+      port: 24678,
+      host: 'localhost'
+    },
+    // Configurar proxy para WebSocket da aplicação
+    proxy: {
+      '/api/ws': {
+        target: 'ws://localhost:5000',
+        ws: true,
+        changeOrigin: true
+      }
+    }
   },
 });

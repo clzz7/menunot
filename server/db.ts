@@ -1,3 +1,4 @@
+import { config } from "./config";
 import { Pool, neonConfig } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
 import { drizzle as drizzleSqlite } from 'drizzle-orm/better-sqlite3';
@@ -11,13 +12,13 @@ neonConfig.webSocketConstructor = ws;
 // For development, use SQLite if no DATABASE_URL is provided
 let db: any;
 
-if (!process.env.DATABASE_URL) {
+if (!config.DATABASE_URL) {
   console.log('No DATABASE_URL found, using SQLite for development');
   const sqlite = new Database('replit_db.sqlite');
   db = drizzleSqlite(sqlite, { schema: schemaSqlite });
 } else {
   console.log('Using PostgreSQL with DATABASE_URL');
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const pool = new Pool({ connectionString: config.DATABASE_URL });
   db = drizzle({ client: pool, schema });
 }
 

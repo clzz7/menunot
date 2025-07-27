@@ -1,34 +1,37 @@
-### Fase 1: Implementação do Sistema de Autenticação (Prioridade Alta) 1.1 Criar Sistema de Login no Backend
-- Implementar rotas de autenticação ( /api/auth/login , /api/auth/logout , /api/auth/verify )
-- Adicionar middleware de autenticação usando JWT ou sessions
-- Implementar hash de senhas com bcrypt
-- Criar sistema de verificação de tokens 1.2 Criar Middleware de Proteção
-- Middleware para verificar autenticação em rotas administrativas
-- Proteção de todas as rotas /api/dashboard/* , /api/orders/* , etc.
-- Sistema de autorização baseado em roles (admin) 1.3 Implementar Frontend de Login
-- Página de login ( /login )
-- Componente de autenticação
-- Redirecionamento automático para login quando não autenticado
-- Gerenciamento de estado de autenticação
-### Fase 2: Proteção de Rotas (Prioridade Alta) 2.1 Proteção da Rota /admin
-- Criar componente ProtectedRoute
-- Verificar autenticação antes de renderizar página admin
-- Redirecionamento automático para /login se não autenticado 2.2 Proteção das APIs Administrativas
-- Middleware em todas as rotas de dashboard
-- Proteção de rotas de gerenciamento (produtos, pedidos, cupons)
-- Validação de token em cada requisição
-### Fase 3: Melhorias de Segurança (Prioridade Média) 3.1 Configurações de Segurança
-- Rate limiting para tentativas de login
-- Timeout de sessão
-- Logs de acesso administrativo
-- Validação de força de senha 3.2 Configuração de Ambiente
-- Variáveis de ambiente para JWT secret
-- Configuração de cookies seguros
-- Headers de segurança
-### Fase 4: Funcionalidades Avançadas (Prioridade Baixa) 4.1 Gerenciamento de Usuários
-- CRUD de usuários administrativos
-- Sistema de roles e permissões
-- Recuperação de senha 4.2 Auditoria e Monitoramento
-- Logs de ações administrativas
-- Dashboard de segurança
-- Alertas de tentativas de acesso não autorizado
+  Passo 1: Mover o Token de Autenticação (JWT) para Cookies `HttpOnly`
+
+   * Problema a ser resolvido: Risco de roubo de token de autenticação através de ataques XSS, pois o token está atualmente no
+     localStorage.
+   * Por que é crítico: Se um token for roubado, um invasor pode se passar por um usuário autenticado, ganhando acesso total à
+     sua conta, especialmente contas de administrador.
+   * Ações propostas:
+       1. No Backend (`server`):
+           * Instalar a dependência cookie-parser para facilitar o manejo de cookies no Express.
+           * Modificar a rota de login (/api/auth/login) para, em vez de retornar o token no corpo da resposta, enviá-lo como
+             um cookie com as flags HttpOnly, Secure e SameSite=Strict.
+           * Ajustar o middleware de autenticação (requireAuth) para extrair o token dos cookies da requisição, em vez do
+             cabeçalho Authorization.
+           * Atualizar a rota de logout para limpar o cookie de autenticação no navegador.
+       2. No Frontend (`client`):
+           * Remover toda a lógica de salvar, ler e apagar o token do localStorage no hook useAuth.
+           * Ajustar as chamadas de API para não enviar mais o cabeçalho Authorization, pois o navegador enviará o cookie
+             automaticamente.
+           * A lógica de "usuário autenticado" passará a ser validada por uma chamada à API que dependerá do cookie, e não da
+             existência do token no localStorage.
+
+  ---
+
+  Passo 2: Adicionar Validação de Entrada em Todas as Rotas de Modificação de Dados
+
+   * Problema a ser resolvido: Falta de validação de dados nas rotas POST/PUT, o que pode levar à corrupção de dados ou a
+     vulnerabilidades de injeção.
+   * Por que é crítico: Sem validação, um usuário (ou um script malicioso) pode enviar dados malformados que quebram a aplicação
+     ou, em cenários piores, exploram falhas na lógica de negócio.
+   * Ações propostas:
+       1. No Backend (`server/routes.ts`):
+           * Revisar todas as rotas que recebem dados no corpo da requisição (ex: criar/atualizar produtos, cupons, categorias,
+             pedidos).
+           * Utilizar os schemas da biblioteca zod (já presente no projeto em shared/schema.ts) para validar o req.body no
+             início de cada rota.
+           * Retornar um erro 400 Bad Request com detalhes claros se a validação falhar, impedindo que dados inválidos cheguem à
+             lógica de negócio ou ao banco de dados.

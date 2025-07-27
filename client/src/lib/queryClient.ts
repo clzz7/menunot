@@ -7,24 +7,12 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
-function getAuthHeaders(): Record<string, string> {
-  const token = localStorage.getItem("auth_token");
-  const headers: Record<string, string> = {};
-  
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-  
-  return headers;
-}
-
 export async function apiRequest(
   method: string,
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const headers = {
-    ...getAuthHeaders(),
+  const headers: Record<string, string> = {
     ...(data ? { "Content-Type": "application/json" } : {})
   };
 
@@ -32,7 +20,7 @@ export async function apiRequest(
     method,
     headers,
     body: data ? JSON.stringify(data) : undefined,
-    credentials: "include",
+    credentials: "include", // Importante para incluir cookies
   });
 
   await throwIfResNotOk(res);
@@ -45,11 +33,8 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const headers = getAuthHeaders();
-    
     const res = await fetch(queryKey[0] as string, {
-      headers,
-      credentials: "include",
+      credentials: "include", // Importante para incluir cookies
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {

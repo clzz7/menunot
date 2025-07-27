@@ -1,7 +1,9 @@
+import 'dotenv/config';
+import { config } from "./config";
 import { MercadoPagoConfig, Preference, Payment } from 'mercadopago';
 
 // Initialize MercadoPago with access token
-const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN || process.env.MERCADO_PAGO_ACCESS_TOKEN;
+const accessToken = config.MERCADOPAGO_ACCESS_TOKEN;
 
 if (!accessToken) {
   console.error('MERCADOPAGO_ACCESS_TOKEN not found in environment variables');

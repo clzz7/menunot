@@ -22,7 +22,11 @@ export function log(message: string, source = "express") {
 export async function setupVite(app: Express, server: Server) {
   const serverOptions = {
     middlewareMode: true,
-    hmr: { server },
+    hmr: { 
+      server,
+      port: 24678, // Porta específica para HMR
+      host: 'localhost'
+    },
     allowedHosts: true,
   };
 
@@ -32,9 +36,21 @@ export async function setupVite(app: Express, server: Server) {
     customLogger: {
       ...viteLogger,
       error: (msg, options) => {
+        // Filtrar erros de WebSocket que não são críticos
+        if (msg.includes('WebSocket') || msg.includes('ws:')) {
+          console.warn(`[Vite WebSocket Warning] ${msg}`);
+          return;
+        }
         viteLogger.error(msg, options);
         process.exit(1);
       },
+      warn: (msg, options) => {
+        // Filtrar avisos de WebSocket
+        if (msg.includes('WebSocket') || msg.includes('ws:')) {
+          return;
+        }
+        viteLogger.warn(msg, options);
+      }
     },
     server: serverOptions,
     appType: "custom",
@@ -43,6 +59,11 @@ export async function setupVite(app: Express, server: Server) {
   app.use(vite.middlewares);
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
+
+    // Ignorar requisições WebSocket
+    if (url.includes('/api/ws')) {
+      return next();
+    }
 
     try {
       const clientTemplate = path.resolve(
