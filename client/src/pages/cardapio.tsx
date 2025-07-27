@@ -131,38 +131,8 @@ export default function Cardapio() {
 
       {/* Main Content */}
       <div className="max-w-md lg:max-w-7xl mx-auto px-6 pb-10 bg-gradient-to-b from-gray-50 to-white">
-        {/* Featured Section - Mais Pedidos Hoje */}
-        <div className="mb-8 pt-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Flame className="w-5 h-5 text-red-500" />
-            <h2 className="text-lg font-bold text-gray-900">MAIS PEDIDOS HOJE</h2>
-          </div>
-          
-          {/* Grid responsivo para produtos em destaque */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
-            {productsArray.slice(0, 4).map((product: Product) => (
-              <div key={product.id} className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm featured-card cursor-pointer btn-interactive"
-                onClick={() => handleAddToCart(product)}>
-                <div className="relative">
-                  <img 
-                    src={product.image || "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=80&h=80&fit=crop"}
-                    alt={product.name}
-                    className="w-20 h-20 lg:w-24 lg:h-24 rounded-lg object-cover mx-auto"
-                  />
-                </div>
-                <div className="mt-3 text-center">
-                  <h3 className="font-semibold text-gray-900 text-sm line-clamp-1">{product.name}</h3>
-                  <p className="text-lg font-bold text-primary mt-1">
-                    R$ {product.price.toFixed(2).replace('.', ',')}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Category Navigation */}
-        <div className="mb-8">
+        <div className="mb-8 pt-8">
           <div className="flex space-x-3 overflow-x-auto pb-2">
             <Button
               variant={selectedCategory === "all" ? "default" : "outline"}
