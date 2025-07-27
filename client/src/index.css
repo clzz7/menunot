@@ -60,15 +60,17 @@
 /* Hamburger Menu Animation */
 .hamburger-line {
   display: block;
-  width: 24px;
+  width: 16px; /* Reduzido ainda mais para 16px */
   height: 2px;
   background-color: currentColor;
   transition: all 0.3s ease;
-  transform-origin: center;
+  transform-origin: center center; /* Garantindo que a rotação seja no centro */
+  margin: 0 auto; /* Centraliza as linhas */
+  position: relative; /* Para melhor controle de posicionamento */
 }
 
 .hamburger-line:nth-child(1) {
-  transform: translateY(-6px);
+  transform: translateY(-4px); /* Reduzido para -4px */
 }
 
 .hamburger-line:nth-child(2) {
@@ -76,7 +78,7 @@
 }
 
 .hamburger-line:nth-child(3) {
-  transform: translateY(6px);
+  transform: translateY(4px); /* Reduzido para 4px */
 }
 
 /* When menu is open, transform to X */
@@ -700,5 +702,3 @@
   background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
   border-top: 2px solid #e2e8f0;
 }
-
-/* ... existing code ... */

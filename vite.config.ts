@@ -29,17 +29,24 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
+    host: '0.0.0.0', // Permite acesso de qualquer IP da rede local
+    port: 5173, // Porta padrão do Vite
     fs: {
       strict: true,
       deny: ["**/.*"],
     },
-    // Configurar HMR para usar porta diferente e evitar conflito
+    // Configurar HMR para aceitar conexões da rede local
     hmr: {
       port: 24678,
-      host: 'localhost'
+      host: '0.0.0.0' // Mudança aqui para aceitar conexões da rede local
     },
     // Configurar proxy para WebSocket da aplicação
     proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false
+      },
       '/api/ws': {
         target: 'ws://localhost:5000',
         ws: true,

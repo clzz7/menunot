@@ -56,11 +56,11 @@ export default function Layout({ children }: LayoutProps) {
               {/* Mobile menu button */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className={`lg:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100 transition-all duration-300 ${
+                className={`lg:hidden p-3 rounded-md text-gray-600 hover:bg-gray-100 transition-all duration-300 ${
                   isMobileMenuOpen ? 'hamburger-open' : ''
                 }`}
               >
-                <div className="w-6 h-6 flex flex-col justify-center items-center">
+                <div className="w-4 h-4 flex flex-col justify-center items-center relative">
                   <span className="hamburger-line"></span>
                   <span className="hamburger-line"></span>
                   <span className="hamburger-line"></span>
