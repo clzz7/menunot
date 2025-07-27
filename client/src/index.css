@@ -60,7 +60,7 @@
 /* Hamburger Menu Animation */
 .hamburger-line {
   display: block;
-  width: 16px; /* Reduzido ainda mais para 16px */
+  width: 12px; /* Reduzido para 12px para caber no container quando rotacionado */
   height: 2px;
   background-color: currentColor;
   transition: all 0.3s ease;
@@ -70,7 +70,7 @@
 }
 
 .hamburger-line:nth-child(1) {
-  transform: translateY(-4px); /* Reduzido para -4px */
+  transform: translateY(-3px); /* Ajustado para -3px para melhor proporção */
 }
 
 .hamburger-line:nth-child(2) {
@@ -78,7 +78,7 @@
 }
 
 .hamburger-line:nth-child(3) {
-  transform: translateY(4px); /* Reduzido para 4px */
+  transform: translateY(3px); /* Ajustado para 3px para melhor proporção */
 }
 
 /* When menu is open, transform to X */
