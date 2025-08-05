@@ -96,6 +96,89 @@
   transform: translateX(-50%) translateY(-50%) rotate(-45deg);
 }
 
+/* Epic Menu Transition Animations */
+@keyframes epic-header-entrance {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes epic-footer-entrance {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes bottom-nav-slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes nav-button-bounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.epic-header-entrance {
+  animation: epic-header-entrance 0.6s ease-out forwards;
+}
+
+.epic-footer-entrance {
+  animation: epic-footer-entrance 0.6s ease-out forwards;
+}
+
+.bottom-nav-slide-up {
+  animation: bottom-nav-slide-up 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+/* Bottom navigation hover effects */
+.bottom-nav-item {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bottom-nav-item:hover {
+  transform: translateY(-2px);
+}
+
+.bottom-nav-item:active {
+  transform: translateY(0) scale(0.95);
+}
+
+/* Glass morphism effect for bottom nav */
+.bottom-nav-glass {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Safe area padding for iOS devices */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .bottom-nav-safe {
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  }
+}
+
 .animate-toast-in {
   animation: toast-slide-in-from-bottom 0.3s ease-out, toast-fade-in 0.3s ease-out;
 }

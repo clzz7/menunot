@@ -6,6 +6,7 @@ import { ShoppingCart, Menu, Home, UtensilsCrossed, Package, History, X, User, P
 import { useCart } from "@/hooks/use-cart.js";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api.js";
+import BottomNavigation from "@/components/bottom-navigation.js";
 
 interface LayoutProps {
   children: ReactNode;
@@ -23,6 +24,14 @@ export default function Layout({ children }: LayoutProps) {
 
   const isAdminPage = location.startsWith('/admin');
   const isPaymentPage = location.startsWith('/payment');
+  
+  // Pages that use bottom navigation instead of header navigation
+  const isBottomNavPage = ['/cardapio', '/pedidos', '/checkout'].includes(location);
+  const isHomePage = location === '/';
+  
+  // Hide header completely on bottom nav pages, show footer on home page
+  const showHeader = !isBottomNavPage;
+  const showFooter = !isBottomNavPage;
   
   // Don't render layout for admin and payment pages
   if (isAdminPage || isPaymentPage) {
@@ -46,8 +55,9 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-lg border-b-2 border-gray-100">
+      {/* Header - Only show on landing and other non-bottom-nav pages */}
+      {showHeader && (
+        <header className="bg-white shadow-lg border-b-2 border-gray-100 epic-header-entrance">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             
@@ -182,15 +192,20 @@ export default function Layout({ children }: LayoutProps) {
             </div>
           </div>
         )}
-      </header>
+        </header>
+      )}
 
       {/* Main Content */}
-      <main className="flex-1">
+      <main className={`flex-1 ${isBottomNavPage ? 'pb-20' : 'pb-0'}`}>
         {children}
       </main>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200">
+      {/* Bottom Navigation - Only show on specific pages */}
+      {isBottomNavPage && <BottomNavigation />}
+
+      {/* Footer - Only show on landing and other non-bottom-nav pages */}
+      {showFooter && (
+        <footer className="bg-white border-t border-gray-200 epic-footer-entrance">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Restaurant Info */}
@@ -231,7 +246,8 @@ export default function Layout({ children }: LayoutProps) {
             </div>
           </div>
         </div>
-      </footer>
+        </footer>
+      )}
     </div>
   );
 }
