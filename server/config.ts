@@ -24,9 +24,9 @@ export const config = {
   
   // Rate Limiting
   LOGIN_RATE_LIMIT_WINDOW: parseInt(process.env.LOGIN_RATE_LIMIT_WINDOW || '900000'),
-  LOGIN_RATE_LIMIT_MAX: parseInt(process.env.LOGIN_RATE_LIMIT_MAX || '5'),
-  ADMIN_RATE_LIMIT_MAX: parseInt(process.env.ADMIN_RATE_LIMIT_MAX || '100'),
-  PUBLIC_RATE_LIMIT_MAX: parseInt(process.env.PUBLIC_RATE_LIMIT_MAX || '200'),
+  LOGIN_RATE_LIMIT_MAX: parseInt(process.env.LOGIN_RATE_LIMIT_MAX || '10'),
+  ADMIN_RATE_LIMIT_MAX: parseInt(process.env.ADMIN_RATE_LIMIT_MAX || '500'),
+  PUBLIC_RATE_LIMIT_MAX: parseInt(process.env.PUBLIC_RATE_LIMIT_MAX || '1000'),
   
   // Security
   ENABLE_SECURITY_LOGS: process.env.ENABLE_SECURITY_LOGS === 'true',

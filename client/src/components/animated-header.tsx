@@ -14,7 +14,7 @@ export default function AnimatedHeader({ onNavigate }: AnimatedHeaderProps) {
   const menuOverlayRef = useRef<HTMLDivElement>(null);
   const menuToggleIconRef = useRef<HTMLDivElement>(null);
   const menuLinksRef = useRef<HTMLDivElement[]>([]);
-  const menuMediaRef = useRef<HTMLImageElement>(null);
+
   const menuContentRef = useRef<HTMLDivElement>(null);
 
   const { data: establishment } = useQuery({
@@ -37,12 +37,7 @@ export default function AnimatedHeader({ onNavigate }: AnimatedHeaderProps) {
       });
     }
 
-    if (menuMediaRef.current) {
-      gsap.set(menuMediaRef.current, {
-        scale: 1.2,
-        opacity: 0
-      });
-    }
+
 
     if (menuContentRef.current) {
       gsap.set(menuContentRef.current, {
@@ -74,12 +69,7 @@ export default function AnimatedHeader({ onNavigate }: AnimatedHeaderProps) {
         duration: 0.8,
         ease: "power2.inOut"
       })
-      .to(menuMediaRef.current, {
-        scale: 1,
-        opacity: 1,
-        duration: 0.6,
-        ease: "power2.out"
-      }, "-=0.4")
+
       .to(menuContentRef.current, {
         x: 0,
         opacity: 1,
@@ -116,12 +106,7 @@ export default function AnimatedHeader({ onNavigate }: AnimatedHeaderProps) {
         duration: 0.4,
         ease: "power2.in"
       }, "-=0.2")
-      .to(menuMediaRef.current, {
-        scale: 1.2,
-        opacity: 0,
-        duration: 0.4,
-        ease: "power2.in"
-      }, "-=0.3")
+
       .to(menuOverlayRef.current, {
         clipPath: "circle(0% at 100% 0%)",
         duration: 0.6,
@@ -247,41 +232,42 @@ export default function AnimatedHeader({ onNavigate }: AnimatedHeaderProps) {
         }
 
         .menu-overlay-content {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          height: 100%;
-        }
-
-        .menu-media-wrapper {
           display: flex;
           align-items: center;
           justify-content: center;
+          height: 100%;
           padding: 2rem;
         }
 
-        .menu-media-wrapper img {
-          width: 100%;
-          height: 80vh;
-          object-fit: cover;
-          border-radius: 1rem;
+        .menu-media-wrapper {
+          display: none;
         }
 
         .menu-content-wrapper {
           display: flex;
           flex-direction: column;
-          justify-content: space-between;
+          justify-content: center;
+          align-items: flex-end;
+          text-align: right;
           padding: 4rem 2rem 2rem;
+          width: 100%;
+          max-width: 600px;
+          margin-left: auto;
+          padding-right: 4rem;
         }
 
         .menu-content-main {
           display: flex;
           gap: 4rem;
+          align-items: flex-start;
+          justify-content: flex-end;
         }
 
         .menu-footer {
           display: flex;
           gap: 4rem;
           margin-top: 2rem;
+          justify-content: flex-end;
         }
 
         .menu-content-main,
@@ -293,6 +279,8 @@ export default function AnimatedHeader({ onNavigate }: AnimatedHeaderProps) {
           display: flex;
           flex-direction: column;
           gap: 1.5rem;
+          align-items: flex-end;
+          text-align: right;
         }
 
         .menu-col:nth-child(1) {
@@ -325,29 +313,26 @@ export default function AnimatedHeader({ onNavigate }: AnimatedHeaderProps) {
         }
 
         @media (max-width: 1000px) {
-          .menu-media-wrapper {
-            display: none;
+          .menu-content-wrapper {
+            padding-right: 2rem;
+            align-items: center;
+            text-align: center;
           }
 
           .menu-content-main,
           .menu-footer {
             flex-direction: column;
             gap: 2rem;
+            justify-content: center;
           }
 
-          .menu-content-main {
-            justify-content: center;
+          .menu-col {
             align-items: center;
             text-align: center;
           }
 
           .menu-link a {
             font-size: 2.5rem;
-          }
-
-          .menu-overlay-content {
-            grid-template-columns: 1fr;
-            padding: 2rem;
           }
 
           .menu-toggle-label {
@@ -387,22 +372,15 @@ export default function AnimatedHeader({ onNavigate }: AnimatedHeaderProps) {
           </button>
         </div>
 
-        <div 
-          className="menu-overlay"
-          ref={menuOverlayRef}
-        >
-          <div className="menu-overlay-content">
-            <div className="menu-media-wrapper">
-              <img 
-                ref={menuMediaRef}
-                src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop&crop=center" 
-                alt="Restaurant interior" 
-              />
-            </div>
-            <div 
-              className="menu-content-wrapper"
-              ref={menuContentRef}
-            >
+                 <div 
+           className="menu-overlay"
+           ref={menuOverlayRef}
+         >
+           <div className="menu-overlay-content">
+             <div 
+               className="menu-content-wrapper"
+               ref={menuContentRef}
+             >
               <div className="menu-content-main">
                 <div className="menu-col">
                   {menuItems.map((item, index) => (

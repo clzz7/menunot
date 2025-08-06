@@ -48,7 +48,7 @@ export default function Layout({ children }: LayoutProps) {
 
         .main-content.with-bottom-nav {
           padding-top: 0;
-          padding-bottom: 7rem;
+          padding-bottom: 70px;
         }
 
         .transition-overlay {

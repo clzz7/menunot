@@ -122,20 +122,7 @@ export default function Checkout() {
     window.location.href = '/cardapio';
   };
 
-  if (cart.items.length === 0) {
-    return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="text-center py-12">
-          <ShoppingCart className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Seu carrinho está vazio</h2>
-          <p className="text-gray-600 mb-6">Adicione produtos do cardápio para continuar</p>
-          <Button onClick={handleContinueShopping} className="bg-primary hover:bg-orange-600">
-            Ver Cardápio
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  const isEmpty = cart.items.length === 0;
 
   return (
     <>
@@ -181,12 +168,22 @@ export default function Checkout() {
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <ShoppingCart className="w-5 h-5" />
-                  <span>Seus Itens ({cart.itemCount})</span>
+                  <span>Seus Itens ({isEmpty ? 0 : cart.itemCount})</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {cart.items.map((item) => (
+                  {isEmpty ? (
+                    <div className="text-center py-12">
+                      <ShoppingCart className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                      <h3 className="text-xl font-semibold text-gray-900 mb-2">Seu carrinho está vazio</h3>
+                      <p className="text-gray-600 mb-6">Adicione produtos do cardápio para continuar</p>
+                      <Button onClick={handleContinueShopping} className="bg-primary hover:bg-orange-600">
+                        Ver Cardápio
+                      </Button>
+                    </div>
+                  ) : (
+                    cart.items.map((item) => (
                     <div key={item.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
                       <div className="flex-shrink-0">
                         {item.image && (
@@ -259,7 +256,7 @@ export default function Checkout() {
                         </div>
                       </div>
                     </div>
-                  ))}
+                  )))}
                 </div>
               </CardContent>
             </Card>
@@ -272,43 +269,58 @@ export default function Checkout() {
                 <CardTitle>Resumo do Pedido</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex justify-between text-sm">
-                  <span>Subtotal</span>
-                  <span>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cart.subtotal)}</span>
-                </div>
-                
-                {cart.couponCode && (
-                  <div className="flex justify-between text-sm text-green-600">
-                    <span>Desconto ({cart.couponCode})</span>
-                    <span>-{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cart.discount)}</span>
+                {isEmpty ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500 mb-4">Adicione itens ao carrinho para ver o resumo</p>
+                    <Button
+                      onClick={handleContinueShopping}
+                      className="w-full bg-primary hover:bg-orange-600"
+                      size="lg"
+                    >
+                      Ir para Cardápio
+                    </Button>
                   </div>
-                )}
-                
-                <div className="flex justify-between text-sm">
-                  <span>Taxa de entrega</span>
-                  <span>
-                    {cart.freeDelivery ? (
-                      <span className="text-green-600">Grátis</span>
-                    ) : (
-                      new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cart.deliveryFee)
+                ) : (
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span>Subtotal</span>
+                      <span>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cart.subtotal)}</span>
+                    </div>
+                    
+                    {cart.couponCode && (
+                      <div className="flex justify-between text-sm text-green-600">
+                        <span>Desconto ({cart.couponCode})</span>
+                        <span>-{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cart.discount)}</span>
+                      </div>
                     )}
-                  </span>
-                </div>
-                
-                <Separator />
-                
-                <div className="flex justify-between font-medium">
-                  <span>Total</span>
-                  <span>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cart.total)}</span>
-                </div>
-                
-                <Button
-                  onClick={handleCheckout}
-                  className="w-full bg-primary hover:bg-orange-600"
-                  size="lg"
-                >
-                  Finalizar Pedido
-                </Button>
+                    
+                    <div className="flex justify-between text-sm">
+                      <span>Taxa de entrega</span>
+                      <span>
+                        {cart.freeDelivery ? (
+                          <span className="text-green-600">Grátis</span>
+                        ) : (
+                          new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cart.deliveryFee)
+                        )}
+                      </span>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div className="flex justify-between font-medium">
+                      <span>Total</span>
+                      <span>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cart.total)}</span>
+                    </div>
+                    
+                    <Button
+                      onClick={handleCheckout}
+                      className="w-full bg-primary hover:bg-orange-600"
+                      size="lg"
+                    >
+                      Finalizar Pedido
+                    </Button>
+                  </>
+                )}
               </CardContent>
             </Card>
           </div>

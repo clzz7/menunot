@@ -8,6 +8,8 @@ export default function AppNavigation() {
   const [location] = useLocation();
   const { cart, isCartAnimating } = useCart();
 
+  const isCartActive = location === '/checkout';
+
   const navigationItems = [
     { 
       name: 'Cardápio', 
@@ -28,16 +30,19 @@ export default function AppNavigation() {
       <style>{`
         .app-navigation {
           position: fixed;
-          bottom: 0;
-          left: 0;
-          right: 0;
+          bottom: 20px;
+          left: 50%;
+          transform: translateX(-50%);
           z-index: 1000;
           background: rgba(255, 255, 255, 0.95);
           backdrop-filter: blur(20px);
-          border-top: 1px solid rgba(0, 0, 0, 0.1);
-          padding: 1rem;
-          transform: translateY(0);
-          transition: transform 0.3s ease;
+          border: 1px solid rgba(0, 0, 0, 0.08);
+          border-radius: 20px;
+          padding: 8px 12px;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+          width: auto;
+          max-width: 300px;
         }
 
         .app-navigation.hidden {
@@ -45,12 +50,9 @@ export default function AppNavigation() {
         }
 
         .nav-container {
-          max-width: 1200px;
-          margin: 0 auto;
-          display: grid;
-          grid-template-columns: 1fr 1fr 1fr;
-          gap: 1rem;
+          display: flex;
           align-items: center;
+          gap: 8px;
         }
 
         .nav-item {
@@ -58,35 +60,59 @@ export default function AppNavigation() {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          padding: 0.75rem;
-          border-radius: 1rem;
+          padding: 10px 12px;
+          border-radius: 12px;
           text-decoration: none;
-          transition: all 0.3s ease;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           color: #6b7280;
           background: transparent;
-          border: 2px solid transparent;
-          min-height: 4rem;
+          border: none;
+          min-height: 48px;
+          min-width: 60px;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .nav-item::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, #ea580c, #f97316);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          border-radius: 12px;
+        }
+
+        .nav-item > * {
+          position: relative;
+          z-index: 1;
         }
 
         .nav-item.active {
-          background: #ea580c;
           color: white;
-          transform: translateY(-4px);
-          box-shadow: 0 8px 25px rgba(234, 88, 12, 0.3);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 15px rgba(234, 88, 12, 0.3);
+        }
+
+        .nav-item.active::before {
+          opacity: 1;
         }
 
         .nav-item:hover:not(.active) {
-          background: rgba(234, 88, 12, 0.1);
+          background: rgba(234, 88, 12, 0.08);
           color: #ea580c;
           transform: translateY(-2px);
         }
 
         .nav-item-icon {
-          margin-bottom: 0.25rem;
+          margin-bottom: 0.125rem;
         }
 
         .nav-item-label {
-          font-size: 0.75rem;
+          font-size: 0.65rem;
           font-weight: 600;
           text-transform: uppercase;
           letter-spacing: 0.05em;
@@ -98,22 +124,51 @@ export default function AppNavigation() {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          padding: 0.75rem;
-          border-radius: 1rem;
-          background: #ea580c;
-          color: white;
+          padding: 10px 12px;
+          border-radius: 12px;
+          background: transparent;
+          color: #6b7280;
           border: none;
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           text-decoration: none;
-          min-height: 4rem;
+          min-height: 48px;
+          min-width: 60px;
+          overflow: hidden;
+        }
+
+        .cart-button::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, #ea580c, #f97316);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          border-radius: 12px;
+        }
+
+        .cart-button > * {
+          position: relative;
+          z-index: 1;
+        }
+
+        .cart-button.active {
+          color: white;
+          transform: translateY(-2px);
           box-shadow: 0 4px 15px rgba(234, 88, 12, 0.3);
         }
 
-        .cart-button:hover {
-          background: #dc2626;
+        .cart-button.active::before {
+          opacity: 1;
+        }
+
+        .cart-button:hover:not(.active) {
+          background: rgba(234, 88, 12, 0.08);
+          color: #ea580c;
           transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(234, 88, 12, 0.4);
         }
 
         .cart-button.shake {
@@ -122,19 +177,19 @@ export default function AppNavigation() {
 
         .cart-badge {
           position: absolute;
-          top: 0.25rem;
-          right: 0.25rem;
+          top: 0.125rem;
+          right: 0.125rem;
           background: #dc2626;
           color: white;
-          font-size: 0.625rem;
+          font-size: 0.5rem;
           font-weight: 700;
           border-radius: 50%;
-          width: 1.25rem;
-          height: 1.25rem;
+          width: 1rem;
+          height: 1rem;
           display: flex;
           align-items: center;
           justify-content: center;
-          border: 2px solid white;
+          border: 1px solid white;
         }
 
         @keyframes cartShake {
@@ -144,18 +199,25 @@ export default function AppNavigation() {
         }
 
         @media (max-width: 768px) {
+          .app-navigation {
+            bottom: 16px;
+            max-width: 280px;
+            padding: 6px 10px;
+          }
+
           .nav-container {
-            padding: 0 1rem;
+            gap: 6px;
           }
           
           .nav-item,
           .cart-button {
-            min-height: 3.5rem;
-            padding: 0.5rem;
+            min-height: 44px;
+            min-width: 55px;
+            padding: 8px 10px;
           }
           
           .nav-item-label {
-            font-size: 0.625rem;
+            font-size: 0.6rem;
           }
         }
       `}</style>
@@ -178,7 +240,7 @@ export default function AppNavigation() {
 
           <Link
             href="/checkout"
-            className={`cart-button ${isCartAnimating ? 'shake' : ''}`}
+            className={`cart-button ${isCartActive ? 'active' : ''} ${isCartAnimating ? 'shake' : ''}`}
           >
             <ShoppingCart size={20} />
             <span className="nav-item-label">Carrinho</span>
