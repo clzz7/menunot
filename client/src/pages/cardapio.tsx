@@ -131,59 +131,232 @@ export default function Cardapio() {
 
       {/* Main Content */}
       <div className="max-w-md lg:max-w-7xl mx-auto px-6 pb-10 bg-gradient-to-b from-gray-50 to-white">
-        {/* Category Navigation */}
-        <div className="mb-8 pt-8">
-          <div className="flex space-x-3 overflow-x-auto pb-2">
-            <Button
-              variant={selectedCategory === "all" ? "default" : "outline"}
-              onClick={() => setSelectedCategory("all")}
-              className={`flex-shrink-0 h-12 px-4 flex items-center gap-2 btn-interactive ${
-                selectedCategory === "all" 
-                  ? 'bg-primary text-white shadow-md' 
-                  : 'bg-gray-50 hover:bg-gray-100 border-gray-200'
-              }`}
-            >
-              <Grid3X3 className="w-4 h-4" />
-              Todos
-            </Button>
-            {categories.map((category: Category) => {
-              const isActive = selectedCategory === category.name;
-              const getCategoryIcon = (name: string) => {
-                if (name.toLowerCase().includes('hambúrguer')) return <Sandwich className="w-4 h-4" />;
-                if (name.toLowerCase().includes('batata') || name.toLowerCase().includes('porção')) return <Beef className="w-4 h-4" />;
-                return <Grid3X3 className="w-4 h-4" />;
-              };
+        {/* Category Navigation - Only visible on mobile */}
+        <div className="mb-8 pt-8 lg:hidden">
+          <style>{`
+            .category-nav {
+              position: sticky;
+              top: 0;
+              z-index: 50;
+              background: rgba(255, 255, 255, 0.95);
+              backdrop-filter: blur(20px);
+              border-radius: 16px;
+              padding: 6px;
+              box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+              border: 1px solid rgba(0, 0, 0, 0.05);
+              display: inline-block;
+              max-width: 100%;
+            }
+
+            .category-nav-container {
+              display: flex;
+              justify-content: center;
+              width: 100%;
+            }
+
+            .category-scroll {
+              display: flex;
+              gap: 4px;
+              overflow-x: auto;
+              scrollbar-width: none;
+              -ms-overflow-style: none;
+              padding: 0 4px;
+              justify-content: flex-start;
+              flex-wrap: nowrap;
+            }
+
+            .category-scroll::-webkit-scrollbar {
+              display: none;
+            }
+
+            .category-btn {
+              flex-shrink: 0;
+              display: flex;
+              align-items: center;
+              gap: 6px;
+              padding: 8px 14px;
+              border-radius: 12px;
+              font-weight: 600;
+              font-size: 13px;
+              transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+              border: none;
+              cursor: pointer;
+              background: transparent;
+              color: #6b7280;
+              position: relative;
+              overflow: hidden;
+            }
+
+            .category-btn::before {
+              content: '';
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background: linear-gradient(135deg, #ea580c, #f97316);
+              opacity: 0;
+              transition: opacity 0.3s ease;
+              border-radius: 12px;
+            }
+
+            .category-btn > * {
+              position: relative;
+              z-index: 1;
+            }
+
+            .category-btn:hover {
+              transform: translateY(-1px);
+              box-shadow: 0 4px 15px rgba(234, 88, 12, 0.15);
+              color: #ea580c;
+            }
+
+            .category-btn.active {
+              color: white;
+              transform: translateY(-1px);
+              box-shadow: 0 4px 15px rgba(234, 88, 12, 0.3);
+            }
+
+            .category-btn.active::before {
+              opacity: 1;
+            }
+
+            .category-icon {
+              width: 16px;
+              height: 16px;
+              transition: transform 0.3s ease;
+            }
+
+            .category-btn:hover .category-icon {
+              transform: scale(1.1);
+            }
+
+            @media (max-width: 768px) {
+              .category-nav-container {
+                margin: 0 -24px;
+              }
               
-              return (
-                <Button
-                  key={category.id}
-                  variant={isActive ? "default" : "outline"}
-                  onClick={() => setSelectedCategory(category.name)}
-                  className={`flex-shrink-0 h-12 px-4 flex items-center gap-2 whitespace-nowrap btn-interactive ${
-                    isActive 
-                      ? 'bg-primary text-white shadow-md' 
-                      : 'bg-gray-50 hover:bg-gray-100 border-gray-200'
-                  }`}
-                >
-                  {getCategoryIcon(category.name)}
-                  {category.name}
-                </Button>
-              );
-            })}
+              .category-nav {
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+                width: 100%;
+                display: block;
+              }
+              
+              .category-scroll {
+                justify-content: flex-start;
+              }
+            }
+          `}</style>
+          
+          <div className="category-nav-container">
+            <div className="category-nav">
+              <div className="category-scroll">
+              <button
+                onClick={() => setSelectedCategory("all")}
+                className={`category-btn ${selectedCategory === "all" ? 'active' : ''}`}
+              >
+                <Grid3X3 className="category-icon" />
+                <span>Todos</span>
+              </button>
+              
+              {categories.map((category: Category) => {
+                const isActive = selectedCategory === category.name;
+                const getCategoryIcon = (name: string) => {
+                  if (name.toLowerCase().includes('hambúrguer')) return <Sandwich className="category-icon" />;
+                  if (name.toLowerCase().includes('batata') || name.toLowerCase().includes('porção')) return <Beef className="category-icon" />;
+                  if (name.toLowerCase().includes('bebida')) return <Star className="category-icon" />;
+                  if (name.toLowerCase().includes('sobremesa')) return <Sparkles className="category-icon" />;
+                  if (name.toLowerCase().includes('salada')) return <Leaf className="category-icon" />;
+                  if (name.toLowerCase().includes('promoção')) return <Tag className="category-icon" />;
+                  return <Grid3X3 className="category-icon" />;
+                };
+                
+                return (
+                  <button
+                    key={category.id}
+                    onClick={() => setSelectedCategory(category.name)}
+                    className={`category-btn ${isActive ? 'active' : ''}`}
+                  >
+                    {getCategoryIcon(category.name)}
+                    <span>{category.name}</span>
+                  </button>
+                );
+              })}
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Search Bar */}
         <div className="mb-8">
-          <div className="relative lg:max-w-md">
-            <Input
+          <style>{`
+            .search-container {
+              position: relative;
+              max-width: 400px;
+            }
+
+            .search-input {
+              width: 100%;
+              height: 44px;
+              padding: 0 20px 0 44px;
+              border-radius: 22px;
+              border: 1px solid rgba(0, 0, 0, 0.06);
+              background: rgba(255, 255, 255, 0.9);
+              backdrop-filter: blur(20px);
+              font-size: 14px;
+              font-weight: 500;
+              color: #374151;
+              transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+              box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            }
+
+            .search-input:focus {
+              outline: none;
+              border-color: #ea580c;
+              background: #ffffff;
+              box-shadow: 0 4px 20px rgba(234, 88, 12, 0.15);
+              transform: translateY(-1px);
+            }
+
+            .search-input::placeholder {
+              color: #9ca3af;
+              font-weight: 400;
+            }
+
+            .search-icon {
+              position: absolute;
+              left: 16px;
+              top: 50%;
+              transform: translateY(-50%);
+              color: #9ca3af;
+              width: 16px;
+              height: 16px;
+              transition: all 0.3s ease;
+            }
+
+            .search-container:focus-within .search-icon {
+              color: #ea580c;
+              transform: translateY(-50%) scale(1.1);
+            }
+
+            @media (max-width: 768px) {
+              .search-container {
+                max-width: 100%;
+              }
+            }
+          `}</style>
+          
+          <div className="search-container">
+            <input
               type="text"
               placeholder="Busque por hambúrgueres, bebidas, sobremesas..."
               value={searchTerm}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-              className="h-11 pl-10 pr-4 bg-gray-50 border-gray-200 focus:border-primary focus:bg-white transition-all duration-200 placeholder:text-gray-400"
+              className="search-input"
             />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="search-icon" />
           </div>
         </div>
 

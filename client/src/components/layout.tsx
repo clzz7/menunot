@@ -1,11 +1,8 @@
-import { ReactNode, useState } from "react";
-import { Link, useLocation } from "wouter";
-import { Button } from "@/components/ui/button.js";
-import { Badge } from "@/components/ui/badge.js";
-import { ShoppingCart, Menu, Home, UtensilsCrossed, Package, History, X, User, Phone, MapPin, Clock } from "lucide-react";
-import { useCart } from "@/hooks/use-cart.js";
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api.js";
+import { ReactNode } from "react";
+import { useLocation } from "wouter";
+import AnimatedHeader from "@/components/animated-header.js";
+import AppNavigation from "@/components/app-navigation.js";
+import { useNavigation } from "@/hooks/use-navigation.js";
 
 interface LayoutProps {
   children: ReactNode;
@@ -13,225 +10,203 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const [location] = useLocation();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { cart, isCartAnimating } = useCart();
+  const { 
+    showAnimatedHeader, 
+    showAppNavigation, 
+    isTransitioning, 
+    navigateWithTransition,
+    isNoNavigationPage 
+  } = useNavigation();
 
-  const { data: establishment } = useQuery({
-    queryKey: ["/api/establishment"],
-    queryFn: api.establishment.get
-  });
-
-  const isAdminPage = location.startsWith('/admin');
-  const isPaymentPage = location.startsWith('/payment');
-  
-  // Don't render layout for admin and payment pages
-  if (isAdminPage || isPaymentPage) {
+  // Don't render navigation for certain pages
+  if (isNoNavigationPage) {
     return <>{children}</>;
   }
 
-  // Navegação principal expandida
-  const mainNavigation = [
-    { name: 'MENU', href: '/cardapio', icon: UtensilsCrossed },
-    { name: 'ABOUT', href: '/sobre', icon: Home },
-    { name: 'CONTACT', href: '/contato', icon: Phone },
-  ];
-
-  // Navegação mobile (simplificada)
-  const mobileNavigation = [
-    { name: 'Início', href: '/', icon: Home },
-    { name: 'Cardápio', href: '/cardapio', icon: UtensilsCrossed },
-    { name: 'Meus Pedidos', href: '/pedidos', icon: Package },
-    { name: 'Contato', href: '/contato', icon: Phone },
-  ];
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-lg border-b-2 border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            
-            {/* Left Section - Navigation */}
-            <div className="flex items-center space-x-8">
-              {/* Mobile menu button */}
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className={`lg:hidden p-4 rounded-md text-gray-600 hover:bg-gray-100 transition-all duration-300 ${
-                  isMobileMenuOpen ? 'hamburger-open' : ''
-                }`}
-              >
-                <div className="w-6 h-6 flex flex-col justify-center items-center relative overflow-visible">
-                  <span className="hamburger-line"></span>
-                  <span className="hamburger-line"></span>
-                  <span className="hamburger-line"></span>
-                </div>
-              </button>
+    <>
+      <style>{`
+        .layout-container {
+          min-height: 100vh;
+          background: #ffffff;
+          transition: all 0.3s ease;
+        }
 
-              {/* Desktop Navigation */}
-              <nav className="hidden lg:flex items-center space-x-8">
-                {mainNavigation.map((item) => {
-                  const isActive = location === item.href;
-                  return (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className={`text-sm font-medium tracking-wide transition-all duration-300 hover:text-primary relative group ${
-                        isActive 
-                          ? 'text-primary' 
-                          : 'text-gray-700 hover:text-primary'
-                      }`}
-                    >
-                      {item.name}
-                      <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full ${
-                        isActive ? 'w-full' : ''
-                      }`}></span>
-                    </Link>
-                  );
-                })}
-              </nav>
-            </div>
+        .layout-container.transitioning {
+          opacity: 0.95;
+        }
 
-            {/* Center Section - Restaurant Name */}
-            <div className="flex-1 flex justify-center">
-              <Link href="/" className="flex items-center space-x-3 group">
-                {establishment?.logo && (
-                  <img 
-                    src={establishment.logo}
-                    alt={`Logo ${establishment.name}`}
-                    className="h-12 w-12 rounded-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                )}
-                <div className="text-center">
-                  <h1 className="text-2xl font-bold text-gray-900 tracking-wide title-gradient">
-                    {establishment?.name || 'The Riverside'}
-                  </h1>
-                </div>
-              </Link>
-            </div>
+        .main-content {
+          width: 100%;
+          min-height: 100vh;
+          transition: all 0.3s ease;
+        }
 
-            {/* Right Section - Actions */}
-            <div className="flex items-center space-x-4">
-              {/* Status Indicator */}
-              <div className="hidden md:flex items-center space-x-2">
-                <div className={`h-2 w-2 rounded-full ${establishment?.is_open ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                <span className={`text-xs font-medium ${establishment?.is_open ? 'text-green-600' : 'text-red-600'}`}>
-                  {establishment?.is_open ? 'ABERTO' : 'FECHADO'}
-                </span>
-              </div>
+        .main-content.with-header {
+          padding-top: 0;
+        }
 
-              {/* Login Button */}
-              <Button 
-                variant="ghost" 
-                className="hidden md:flex items-center space-x-2 text-gray-700 hover:text-primary transition-colors duration-300"
-              >
-                <User className="w-4 h-4" />
-                <span className="font-medium">Log In</span>
-              </Button>
+        .main-content.with-bottom-nav {
+          padding-top: 0;
+          padding-bottom: 70px;
+        }
 
-              {/* Cart Button */}
-              <Link href="/checkout">
-                <Button 
-                  variant="outline"
-                  className={`relative border-2 border-gray-300 hover:border-primary text-gray-700 hover:text-primary transition-all duration-300 flex items-center justify-center h-12 w-12 rounded-full ${
-                    isCartAnimating ? 'cart-shake' : ''
-                  }`}
-                >
-                  <ShoppingCart className="w-5 h-5" />
-                  {cart.itemCount > 0 && (
-                    <Badge className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center p-0 font-bold">
-                      {cart.itemCount}
-                    </Badge>
-                  )}
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
+        .transition-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(255, 255, 255, 0.8);
+          z-index: 9999;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.3s ease;
+        }
 
-        {/* Mobile Navigation */}
-        {isMobileMenuOpen && (
-          <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg">
-            <div className="px-4 pt-4 pb-6 space-y-2">
-              {mobileNavigation.map((item) => {
-                const Icon = item.icon;
-                const isActive = location === item.href;
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-base font-medium transition-all duration-300 ${
-                      isActive 
-                        ? 'bg-primary text-white shadow-md' 
-                        : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    <Icon className="h-5 w-5" />
-                    <span>{item.name}</span>
-                  </Link>
-                );
-              })}
-              
-              {/* Mobile Status */}
-              <div className="flex items-center justify-center space-x-2 pt-4 border-t border-gray-200 mt-4">
-                <div className={`h-3 w-3 rounded-full ${establishment?.is_open ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                <span className={`text-sm font-medium ${establishment?.is_open ? 'text-green-600' : 'text-red-600'}`}>
-                  {establishment?.is_open ? 'Restaurante Aberto' : 'Restaurante Fechado'}
-                </span>
-              </div>
-            </div>
-          </div>
+        .transition-overlay.active {
+          opacity: 1;
+          pointer-events: all;
+        }
+
+        .footer {
+          background: #f8fafc;
+          border-top: 1px solid #e2e8f0;
+          padding: 2rem 0;
+          margin-top: auto;
+        }
+
+        .footer.hidden {
+          display: none;
+        }
+
+        .footer-content {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 1rem;
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 2rem;
+        }
+
+        .footer-section h3 {
+          font-size: 1.125rem;
+          font-weight: 600;
+          color: #374151;
+          margin-bottom: 1rem;
+        }
+
+        .footer-section p {
+          font-size: 0.875rem;
+          color: #6b7280;
+          line-height: 1.6;
+        }
+
+        .footer-contact {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 0.5rem;
+          font-size: 0.875rem;
+          color: #6b7280;
+        }
+
+        @media (max-width: 768px) {
+          .footer-content {
+            grid-template-columns: 1fr;
+            text-align: center;
+          }
+        }
+      `}</style>
+
+      <div className={`layout-container ${isTransitioning ? 'transitioning' : ''}`}>
+        {/* Animated Header - only on landing page */}
+        {showAnimatedHeader && (
+          <AnimatedHeader onNavigate={navigateWithTransition} />
         )}
-      </header>
 
-      {/* Main Content */}
-      <main className="flex-1">
-        {children}
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Restaurant Info */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {establishment?.name || 'Restaurante'}
-              </h3>
-              <p className="text-gray-600 text-sm">
-                {establishment?.description || 'Experiência gastronômica única'}
-              </p>
-            </div>
-
-            {/* Contact Info */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900">Contato</h3>
-              <div className="space-y-2">
-                {establishment?.phone && (
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
-                    <Phone className="w-4 h-4" />
-                    <span>{establishment.phone}</span>
-                  </div>
-                )}
-                {establishment?.address && (
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
-                    <MapPin className="w-4 h-4" />
-                    <span>{establishment.address}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Copyright */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900">Informações</h3>
-              <p className="text-sm text-gray-600">
-                © 2024 {establishment?.name || 'Restaurante'}. Todos os direitos reservados.
-              </p>
-            </div>
+        {/* Transition Overlay */}
+        <div className={`transition-overlay ${isTransitioning ? 'active' : ''}`}>
+          <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            color: '#374151'
+          }}>
+            <div style={{
+              width: '20px',
+              height: '20px',
+              border: '2px solid #ea580c',
+              borderTop: '2px solid transparent',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite'
+            }}></div>
+            Carregando...
           </div>
         </div>
-      </footer>
-    </div>
+
+        {/* Main Content */}
+        <main className={`main-content ${showAnimatedHeader ? 'with-header' : ''} ${showAppNavigation ? 'with-bottom-nav' : ''}`}>
+          {children}
+        </main>
+
+        {/* Footer - only show on landing page */}
+        {showAnimatedHeader && <Footer />}
+
+        {/* App Navigation - only on app pages */}
+        {showAppNavigation && <AppNavigation />}
+      </div>
+
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
+    </>
+  );
+}
+
+// Footer component
+function Footer() {
+  return (
+    <footer className="footer">
+      <div className="footer-content">
+        <div className="footer-section">
+          <h3>Sobre Nós</h3>
+          <p>
+            Proporcionamos uma experiência gastronômica única, onde a tradição 
+            encontra a inovação em cada prato cuidadosamente preparado.
+          </p>
+        </div>
+
+        <div className="footer-section">
+          <h3>Contato</h3>
+          <div className="footer-contact">
+            <span>📍</span>
+            <span>Rua das Flores, 123 - Centro</span>
+          </div>
+          <div className="footer-contact">
+            <span>📞</span>
+            <span>+55 (11) 99999-9999</span>
+          </div>
+          <div className="footer-contact">
+            <span>✉️</span>
+            <span>contato@restaurant.com</span>
+          </div>
+        </div>
+
+        <div className="footer-section">
+          <h3>Horário de Funcionamento</h3>
+          <p style={{ marginBottom: '0.5rem' }}>Segunda a Sexta: 11h - 23h</p>
+          <p style={{ marginBottom: '0.5rem' }}>Sábado: 12h - 24h</p>
+          <p>Domingo: 12h - 22h</p>
+        </div>
+      </div>
+    </footer>
   );
 }

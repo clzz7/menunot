@@ -18,8 +18,8 @@ app.set('trust proxy', 1);
 // Aplicar headers de segurança globalmente
 app.use(securityHeaders);
 
-// Rate limiting público
-app.use(publicRateLimit);
+// Rate limiting público - DESABILITADO TEMPORARIAMENTE PARA DESENVOLVIMENTO
+// app.use(publicRateLimit);
 
 // Configurar cookie parser
 app.use(cookieParser());
