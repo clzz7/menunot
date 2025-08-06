@@ -432,7 +432,7 @@ export default function Pedidos() {
   const totalSpent = Array.isArray(orders) ? orders.reduce((sum, order) => sum + Number(order.total), 0) : 0;
 
   return (
-    <>
+    <div className="pt-6">
       {/* Hero Banner */}
       <section
         className="relative w-full h-44 sm:h-56 md:h-64 lg:h-72 flex items-center justify-center text-center text-white mb-10"
@@ -693,6 +693,6 @@ export default function Pedidos() {
           </>
         )}
       </div>
-    </>
+    </div>
   );
 }

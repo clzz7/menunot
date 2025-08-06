@@ -78,7 +78,7 @@ export default function Cardapio() {
   };
 
   return (
-    <>
+    <div className="pt-6">
       {/* Header Section */}
       <section className="w-full bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-6 py-6">
@@ -254,6 +254,6 @@ export default function Cardapio() {
           }}
         />
       </div>
-    </>
+    </div>
   );
 }
