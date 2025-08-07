@@ -716,42 +716,6 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Mobile performance optimizations */
-@media (max-width: 768px) {
-  /* Reduz motion em dispositivos com preferência por menos movimento */
-  @media (prefers-reduced-motion: reduce) {
-    .line,
-    .nav-item,
-    .cart-button,
-    .category-btn {
-      transition-duration: 0.2s !important;
-      animation-duration: 0.2s !important;
-    }
-  }
-
-  /* Otimizações específicas para mobile */
-  .line,
-  .nav-item,
-  .cart-button,
-  .category-btn {
-    will-change: transform;
-    transform: translateZ(0); /* Force hardware acceleration when needed */
-  }
-
-  /* Reduz complexidade de animações em mobile */
-  .btn-glow::before,
-  .parallax-bg {
-    display: none; /* Remove animações pesadas em mobile */
-  }
-  
-  /* Simplifica sombras em mobile */
-  .card-hover:hover,
-  .product-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-    transform: translateY(-2px) !important;
-  }
-}
-
 /* Text highlight in orange - simple color without gradient */
 .text-highlight {
   color: #E55A2B;
