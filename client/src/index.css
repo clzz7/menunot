@@ -866,3 +866,46 @@ html {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
+
+@layer utilities {
+  /* Formas personalizadas via clip-path */
+  .clip-diagonal { clip-path: polygon(0 6%, 94% 0, 100% 94%, 6% 100%); }
+  .clip-arch { clip-path: path('M0,20 Q0,0 20,0 L80,0 Q100,0 100,20 L100,80 Q100,100 80,100 L20,100 Q0,100 0,80 Z'); }
+  .clip-hex { clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%); }
+  .clip-slope { clip-path: polygon(0 10%, 100% 0, 100% 90%, 0% 100%); }
+
+  /* Leves inclinações para dinamismo */
+  .tilt-right { transform: rotate(0.8deg); }
+  .tilt-left { transform: rotate(-0.8deg); }
+
+  /* Pill de preço com leve sombra suave */
+  .price-pill {
+    @apply text-xs font-semibold px-3 py-1 rounded-full;
+    background: rgba(0,0,0,0.75);
+    color: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    backdrop-filter: saturate(120%);
+  }
+
+  /* Sombra sutil para badges flutuantes */
+  .badge-shadow { box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+
+  /* Newsletter com diagonal superior para quebrar simetria */
+  .newsletter-diagonal { position: relative; overflow: hidden; }
+  .newsletter-diagonal::before {
+    content: "";
+    position: absolute;
+    top: 0; left: -20%; right: -20%; height: 60%;
+    background: linear-gradient(180deg, rgba(0,0,0,0.035), transparent);
+    transform: skewY(-2.5deg);
+    pointer-events: none;
+  }
+}
+
+/* Melhoria de performance para imagens transformadas */
+.photo-tile img { will-change: transform; backface-visibility: hidden; }
+
+/* Ajuste responsivo leve para tilts em mobile */
+@media (max-width: 768px) {
+  .tilt-right, .tilt-left { transform: none; }
+}

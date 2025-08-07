@@ -57,15 +57,15 @@ function Home() {
   return (
     <ReactLenis root>
       <div className="min-h-screen bg-background overflow-x-hidden" style={{ paddingTop: '5rem' }}>
-        {/* Hero Section - editorial, sem gradientes clichês */}
-        <section className="relative min-h-[80vh] flex items-center">
+        {/* Hero Section - editorial, assimétrico e com formas personalizadas */}
+        <section className="relative min-h-[82vh] flex items-center">
           <div className="absolute inset-0 bg-micro-grid pointer-events-none" />
 
           <div className="relative z-10 max-w-7xl mx-auto px-4 py-14 w-full">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16 items-center">
               {/* Hero Copy */}
-              <div>
-                <Badge className="mb-4 px-4 py-1 text-xs border-dashed border-2 border-primary/40 bg-transparent text-primary">
+              <div className="md:col-span-6">
+                <Badge className="mb-4 px-4 py-1 text-xs border-dashed border-2 border-primary/40 bg-transparent text-primary rounded-full">
                   {establishment.name}
                 </Badge>
 
@@ -118,22 +118,43 @@ function Home() {
                 </div>
               </div>
 
-              {/* Hero Collage - imagens com máscara em arco */}
-              <div className="hero-collage grid grid-cols-2 gap-4 md:gap-6">
+              {/* Hero Collage – assimétrica com clip-path e leve rotação */}
+              <div className="md:col-span-6">
                 {heroImages.length === 0 ? (
-                  <div className="col-span-2 h-64 md:h-[420px] bg-muted/50 rounded-3xl border border-foreground/10 flex items-center justify-center text-muted-foreground">
+                  <div className="h-64 md:h-[460px] bg-muted/50 rounded-3xl border border-foreground/10 flex items-center justify-center text-muted-foreground">
                     Imagens do cardápio em breve
                   </div>
                 ) : (
-                  heroImages.map((p: any, idx: number) => (
-                    <div key={p.id || idx} className={`photo-tile ${idx % 3 === 0 ? 'col-span-2 h-56 md:h-72' : 'h-40 md:h-48'}`}>
-                      <img
-                        src={p.imageUrl}
-                        alt={p.name}
-                        className="w-full h-full object-cover"
-                      />
+                  <div className="relative grid grid-cols-12 gap-4 md:gap-6">
+                    {/* Peça principal */}
+                    <div className="col-span-12 sm:col-span-8 relative">
+                      <div className="photo-tile clip-diagonal tilt-right h-56 md:h-[360px]">
+                        <img src={heroImages[0]?.imageUrl} alt={heroImages[0]?.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="absolute -bottom-4 -left-4 hidden sm:block">
+                        <div className="badge-shadow rounded-full px-3 py-1 text-xs bg-background border border-foreground/10">
+                          {heroImages[0]?.name}
+                        </div>
+                      </div>
                     </div>
-                  ))
+
+                    {/* Pilha lateral */}
+                    <div className="col-span-12 sm:col-span-4 flex flex-col gap-4 md:gap-6">
+                      <div className="photo-tile clip-arch tilt-left h-40 md:h-[170px] -mt-6 sm:mt-0">
+                        <img src={heroImages[1]?.imageUrl} alt={heroImages[1]?.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="photo-tile clip-hex tilt-right h-40 md:h-[170px]">
+                        <img src={heroImages[2]?.imageUrl} alt={heroImages[2]?.name} className="w-full h-full object-cover" />
+                      </div>
+                    </div>
+
+                    {/* Tile inferior amplo */}
+                    <div className="col-span-12 sm:col-span-8 sm:ml-auto">
+                      <div className="photo-tile clip-slope tilt-right h-40 md:h-[140px]">
+                        <img src={heroImages[3]?.imageUrl || heroImages[0]?.imageUrl} alt={heroImages[3]?.name || heroImages[0]?.name} className="w-full h-full object-cover" />
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
@@ -152,48 +173,85 @@ function Home() {
           </div>
         </section>
 
-        {/* Tríade de valor – editorial minimalista */}
+        {/* Seção de valor – mosaico assimétrico */}
         <section className="py-16 md:py-20 px-4">
           <div className="max-w-7xl mx-auto">
-            <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-              {[
-                {
-                  icon: <Leaf className="w-6 h-6" />, 
-                  title: "Origem e Estação",
-                  description: "Produtos frescos de pequenos produtores, colheita pensada para o menu."
-                },
-                {
-                  icon: <ChefHat className="w-6 h-6" />, 
-                  title: "Técnica e Precisão",
-                  description: "Execução cirúrgica: menos pirotecnia, mais sabor e textura no ponto."
-                },
-                {
-                  icon: <Award className="w-6 h-6" />, 
-                  title: "Sala e Ritual",
-                  description: "Ritmo de serviço que respeita a conversa e o apetite de cada mesa."
-                }
-              ].map((item, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                >
-                  <div className="note-card h-full border border-foreground/10 rounded-2xl p-6">
-                    <div className="w-10 h-10 rounded-full border border-foreground/10 flex items-center justify-center mb-4">
-                      {item.icon}
-                    </div>
-                    <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
-                    <p className="text-muted-foreground">{item.description}</p>
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-stretch">
+              {/* Editorial card grande */}
+              <motion.div 
+                className="md:col-span-7"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+              >
+                <div className="relative note-card h-full border border-foreground/10 rounded-2xl p-6 md:p-8 overflow-hidden">
+                  <div className="absolute -right-20 -top-20 w-64 h-64 rounded-full bg-accent/5" />
+                  <div className="absolute -left-24 -bottom-24 w-80 h-80 rounded-full bg-primary/5" />
+                  <h3 className="text-2xl md:text-3xl font-semibold mb-4">
+                    A assinatura da casa
+                  </h3>
+                  <p className="text-muted-foreground mb-6 max-w-prose">
+                    Cozinha de autor com técnica e precisão, aliando ingredientes sazonais a métodos clássicos. Um percurso que respeita o tempo da mesa e a conversa.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {[{
+                      icon: <Leaf className="w-5 h-5" />,
+                      title: "Origem e Estação",
+                      description: "Produtos frescos de pequenos produtores"
+                    }, {
+                      icon: <ChefHat className="w-5 h-5" />,
+                      title: "Técnica e Precisão",
+                      description: "Execução cirúrgica, sabor no ponto"
+                    }, {
+                      icon: <Award className="w-5 h-5" />,
+                      title: "Sala e Ritual",
+                      description: "Ritmo que respeita cada mesa"
+                    }].map((item, idx) => (
+                      <div key={idx} className="border border-foreground/10 rounded-xl p-4 hover:bg-foreground/[0.02] transition-colors">
+                        <div className="w-9 h-9 rounded-full border border-foreground/10 flex items-center justify-center mb-3">
+                          {item.icon}
+                        </div>
+                        <div className="font-semibold mb-1">{item.title}</div>
+                        <div className="text-sm text-muted-foreground">{item.description}</div>
+                      </div>
+                    ))}
                   </div>
-                </motion.div>
-              ))}
+                </div>
+              </motion.div>
+
+              {/* Cartões menores empilhados */}
+              <div className="md:col-span-5 grid grid-rows-2 gap-6 md:gap-8">
+                {[0,1].map((i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.1 * i }}
+                    viewport={{ once: true }}
+                    className={i === 0 ? "tilt-right" : "tilt-left"}
+                  >
+                    <div className="note-card h-full border border-foreground/10 rounded-2xl p-6 flex items-center justify-between gap-6">
+                      <div>
+                        <div className="text-sm text-muted-foreground mb-1">{i === 0 ? 'Menu de estação' : 'Carta de vinhos'}</div>
+                        <div className="text-xl font-semibold">{i === 0 ? 'Sabores que mudam com o tempo' : 'Seleção autoral, serviço à taça'}</div>
+                      </div>
+                      <div className={`w-20 h-20 shrink-0 photo-tile ${i === 0 ? 'clip-hex' : 'clip-arch'} overflow-hidden`}>
+                        <img 
+                          src={heroImages[i]?.imageUrl || heroImages[0]?.imageUrl}
+                          alt={heroImages[i]?.name || 'Imagem'}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Destaques do Cardápio – sem vidro/gradiente, foco no produto */}
+        {/* Destaques do Cardápio – foco no produto com formas e sobreposição */}
         <section className="py-16 md:py-20 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-end justify-between mb-8">
@@ -219,20 +277,24 @@ function Home() {
                   transition={{ duration: 0.5, delay: index * 0.06 }}
                   viewport={{ once: true }}
                 >
-                  <Card className="overflow-hidden border border-foreground/10 rounded-2xl group">
+                  <Card className="relative overflow-hidden border border-foreground/10 rounded-2xl group">
                     {product.imageUrl && (
-                      <div className="relative h-56 overflow-hidden">
-                        <img 
-                          src={product.imageUrl} 
-                          alt={product.name}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                        />
+                      <div className="relative h-56 overflow-visible">
+                        <div className={`photo-tile ${index % 3 === 0 ? 'clip-diagonal tilt-right' : index % 3 === 1 ? 'clip-arch tilt-left' : 'clip-hex tilt-right'} w-[calc(100%+16px)] -ml-2 h-full`}>
+                          <img 
+                            src={product.imageUrl} 
+                            alt={product.name}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                          />
+                        </div>
+                        <div className="absolute top-3 right-3">
+                          <span className="price-pill">R$ {product.price.toFixed(2)}</span>
+                        </div>
                       </div>
                     )}
                     <div className="p-5">
                       <div className="flex justify-between items-start mb-2">
                         <h3 className="text-lg font-semibold leading-snug max-w-[75%]">{product.name}</h3>
-                        <span className="text-base font-semibold">R$ {product.price.toFixed(2)}</span>
                       </div>
                       <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
                         {product.description}
@@ -250,23 +312,25 @@ function Home() {
           </div>
         </section>
 
-        {/* Newsletter discreta */}
+        {/* Newsletter – bloco escuro mínimo e elegante */}
         <section className="py-14 px-4">
-          <div className="max-w-3xl mx-auto border border-foreground/10 rounded-2xl p-6 md:p-8">
-            <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
-              <div className="flex-1">
-                <h3 className="text-2xl font-semibold">Receba o menu da semana</h3>
-                <p className="text-muted-foreground mt-1">Uma mensagem, uma vez por semana. Sem spam.</p>
+          <div className="max-w-4xl mx-auto">
+            <div className="newsletter-diagonal border border-foreground/10 rounded-2xl p-6 md:p-8">
+              <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
+                <div className="flex-1">
+                  <h3 className="text-2xl font-semibold">Receba o menu da semana</h3>
+                  <p className="text-muted-foreground mt-1">Uma mensagem, uma vez por semana. Sem spam.</p>
+                </div>
+                <form onSubmit={handleNewsletterSubmit} className="flex-1 flex gap-2">
+                  <Input 
+                    placeholder="seu@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="h-12"
+                  />
+                  <Button type="submit" className="h-12 px-6">Assinar</Button>
+                </form>
               </div>
-              <form onSubmit={handleNewsletterSubmit} className="flex-1 flex gap-2">
-                <Input 
-                  placeholder="seu@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="h-12"
-                />
-                <Button type="submit" className="h-12 px-6">Assinar</Button>
-              </form>
             </div>
           </div>
         </section>
