@@ -246,33 +246,45 @@ export default function Cardapio() {
                 right: 50%;
                 margin-left: -50vw;
                 margin-right: -50vw;
+                overflow-x: auto;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+              }
+
+              .category-nav-container::-webkit-scrollbar {
+                display: none;
               }
               
               .category-nav {
                 border-radius: 0;
                 border-left: none;
                 border-right: none;
-                width: 100%;
+                width: auto;
+                min-width: 100%;
                 max-width: none;
                 margin: 0;
                 padding: 8px 24px;
                 position: relative;
+                display: inline-block;
               }
               
               .category-scroll {
-                gap: 4px;
+                gap: 8px;
                 padding: 2px 0;
                 justify-content: flex-start;
-                width: 100%;
-                overflow-x: auto;
+                width: auto;
+                min-width: max-content;
+                overflow: visible;
                 padding-bottom: 4px;
+                white-space: nowrap;
               }
               
               .category-btn {
-                padding: 8px 12px;
+                padding: 8px 14px;
                 font-size: 13px;
                 gap: 6px;
                 flex-shrink: 0;
+                white-space: nowrap;
               }
               
               .category-icon {
