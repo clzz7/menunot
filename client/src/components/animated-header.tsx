@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { gsap } from "gsap";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api.js";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface AnimatedHeaderProps {
   onNavigate?: (href: string) => void;
@@ -14,8 +15,8 @@ export default function AnimatedHeader({ onNavigate }: AnimatedHeaderProps) {
   const menuOverlayRef = useRef<HTMLDivElement>(null);
   const menuToggleIconRef = useRef<HTMLDivElement>(null);
   const menuLinksRef = useRef<HTMLDivElement[]>([]);
-
   const menuContentRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   const { data: establishment } = useQuery({
     queryKey: ["/api/establishment"],
@@ -26,23 +27,27 @@ export default function AnimatedHeader({ onNavigate }: AnimatedHeaderProps) {
     if (menuOverlayRef.current) {
       gsap.set(menuOverlayRef.current, {
         clipPath: "circle(0% at 100% 0%)",
-        visibility: "hidden"
+        visibility: "hidden",
+        force3D: true,
+        willChange: 'clip-path, visibility'
       });
     }
 
     if (menuLinksRef.current.length > 0) {
       gsap.set(menuLinksRef.current, {
         y: 100,
-        opacity: 0
+        opacity: 0,
+        force3D: true,
+        willChange: 'transform, opacity'
       });
     }
-
-
 
     if (menuContentRef.current) {
       gsap.set(menuContentRef.current, {
         x: 100,
-        opacity: 0
+        opacity: 0,
+        force3D: true,
+        willChange: 'transform, opacity'
       });
     }
   }, []);
@@ -62,26 +67,31 @@ export default function AnimatedHeader({ onNavigate }: AnimatedHeaderProps) {
     }
 
     const tl = gsap.timeline();
+    const overlayDuration = isMobile ? 0.5 : 0.8;
+    const contentDuration = isMobile ? 0.4 : 0.6;
+    const staggerDelay = isMobile ? 0.06 : 0.1;
 
     tl.set(menuOverlayRef.current, { visibility: "visible" })
       .to(menuOverlayRef.current, {
         clipPath: "circle(150% at 100% 0%)",
-        duration: 0.8,
-        ease: "power2.inOut"
+        duration: overlayDuration,
+        ease: "power2.inOut",
+        force3D: true
       })
-
       .to(menuContentRef.current, {
         x: 0,
         opacity: 1,
-        duration: 0.6,
-        ease: "power2.out"
+        duration: contentDuration,
+        ease: "power2.out",
+        force3D: true
       }, "-=0.4")
       .to(menuLinksRef.current, {
         y: 0,
         opacity: 1,
-        duration: 0.6,
-        stagger: 0.1,
-        ease: "power2.out"
+        duration: contentDuration,
+        stagger: staggerDelay,
+        ease: "power2.out",
+        force3D: true
       }, "-=0.3");
   };
 
@@ -92,27 +102,39 @@ export default function AnimatedHeader({ onNavigate }: AnimatedHeaderProps) {
     }
 
     const tl = gsap.timeline();
+    const linksDuration = isMobile ? 0.2 : 0.3;
+    const contentDuration = isMobile ? 0.3 : 0.4;
+    const overlayDuration = isMobile ? 0.4 : 0.6;
+    const linksStagger = isMobile ? 0.03 : 0.05;
 
     tl.to(menuLinksRef.current, {
         y: -50,
         opacity: 0,
-        duration: 0.3,
-        stagger: 0.05,
-        ease: "power2.in"
+        duration: linksDuration,
+        stagger: linksStagger,
+        ease: "power2.in",
+        force3D: true
       })
       .to(menuContentRef.current, {
         x: 100,
         opacity: 0,
-        duration: 0.4,
-        ease: "power2.in"
+        duration: contentDuration,
+        ease: "power2.in",
+        force3D: true
       }, "-=0.2")
-
       .to(menuOverlayRef.current, {
         clipPath: "circle(0% at 100% 0%)",
-        duration: 0.6,
-        ease: "power2.inOut"
+        duration: overlayDuration,
+        ease: "power2.inOut",
+        force3D: true
       }, "-=0.2")
-      .set(menuOverlayRef.current, { visibility: "hidden" });
+      .set(menuOverlayRef.current, { 
+        visibility: "hidden",
+        willChange: 'auto'
+      })
+      .set([menuContentRef.current, menuLinksRef.current], {
+        willChange: 'auto'
+      });
   };
 
   const handleMenuClick = (href: string) => {

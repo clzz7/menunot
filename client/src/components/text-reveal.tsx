@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { SplitText } from "gsap/SplitText";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
@@ -33,6 +34,12 @@ export default function TextReveal({
   const elementRefs = useRef<HTMLElement[]>([]);
   const splitRefs = useRef<any[]>([]);
   const lines = useRef<HTMLElement[]>([]);
+  const isMobile = useIsMobile();
+
+  // Otimizações para mobile
+  const mobileOptimizedDuration = isMobile ? duration * 0.7 : duration;
+  const mobileOptimizedStagger = isMobile ? stagger * 0.8 : stagger;
+  const mobileOptimizedEase = isMobile ? "power2.out" : ease;
 
   useGSAP(
     () => {
@@ -79,6 +86,15 @@ export default function TextReveal({
           
           // Apply original styles to ensure consistency
           Object.assign(line.style, originalStyles);
+
+          // Hardware acceleration e otimizações
+          if (isMobile) {
+            Object.assign(line.style, {
+              willChange: 'transform',
+              backfaceVisibility: 'hidden',
+              perspective: '1000px'
+            });
+          }
         });
 
         const computedStyle = window.getComputedStyle(element);
@@ -94,14 +110,18 @@ export default function TextReveal({
         lines.current.push(...split.lines);
       });
 
-      gsap.set(lines.current, { y: "100%" });
+      gsap.set(lines.current, { 
+        y: "100%",
+        force3D: true
+      });
 
       const animationProps = {
         y: "0%",
-        duration: duration,
-        stagger: stagger,
-        ease: ease,
+        duration: mobileOptimizedDuration,
+        stagger: mobileOptimizedStagger,
+        ease: mobileOptimizedEase,
         delay: delay,
+        force3D: true
       };
 
       if (animateOnScroll) {
@@ -118,6 +138,17 @@ export default function TextReveal({
       }
 
       return () => {
+        // Cleanup das otimizações móveis
+        if (isMobile) {
+          lines.current.forEach((line) => {
+            if (line && line.style) {
+              line.style.willChange = 'auto';
+              line.style.backfaceVisibility = 'visible';
+              line.style.perspective = 'none';
+            }
+          });
+        }
+
         splitRefs.current.forEach((split) => {
           if (split) {
             split.revert();
@@ -125,7 +156,7 @@ export default function TextReveal({
         });
       };
     },
-    { scope: containerRef, dependencies: [animateOnScroll, delay, stagger, duration, ease, triggerStart] }
+    { scope: containerRef, dependencies: [animateOnScroll, delay, stagger, duration, ease, triggerStart, isMobile, mobileOptimizedDuration, mobileOptimizedStagger, mobileOptimizedEase] }
   );
 
   if (React.Children.count(children) === 1) {

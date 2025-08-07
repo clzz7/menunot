@@ -216,7 +216,7 @@
   --cream-50: hsl(45, 29%, 97%);
   --green-800: hsl(155, 45%, 22%);
   --green-500: hsl(134, 61%, 41%);
-  
+
   /* Custom Product Card Colors */
   --card-bg: hsl(0, 0%, 100%); /* #FFFFFF */
   --card-title: hsl(0, 0%, 13%); /* #212121 */
@@ -229,10 +229,6 @@
   --warning-foreground: hsl(0,0%,0%);
   --ring: hsl(24.6, 95%, 53.1%);
   --radius: 1rem;
-  
-  /* Info cards styling */
-  --info-card-bg: hsl(0, 0%, 96%); /* #F5F5F5 */
-  --info-card-radius: 12px;
 }
 
 .dark {
@@ -432,7 +428,7 @@
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
-  
+
   .glass-card {
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(10px);
@@ -440,73 +436,73 @@
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 8px 32px 0 rgba(249, 115, 22, 0.1);
   }
-  
+
   .dark .glass-card {
     background: rgba(32, 18, 10, 0.7);
     border: 1px solid rgba(249, 115, 22, 0.2);
   }
-  
+
   /* Hero gradient background */
   .hero-gradient {
     background: linear-gradient(135deg, hsl(24.6, 95%, 53.1%) 0%, hsl(36, 100%, 57%) 100%);
   }
-  
+
   .hero-pattern {
     background-image: 
       radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
   }
-  
+
   /* Smooth animations */
   .cart-item-enter {
     opacity: 0;
     transform: translateY(-10px);
   }
-  
+
   .cart-item-enter-active {
     opacity: 1;
     transform: translateY(0);
     transition: all 0.3s ease;
   }
-  
+
   .fade-in {
     animation: fadeIn 0.5s ease-out;
   }
-  
+
   .fade-up {
     animation: fadeUp 0.8s ease-out;
   }
-  
+
   .scale-in {
     animation: scaleIn 0.5s ease-out;
   }
-  
+
   /* Card hover effects */
   .card-hover {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   .card-hover:hover {
     transform: translateY(-8px);
     box-shadow: 0 20px 40px -12px rgba(249, 115, 22, 0.25);
   }
-  
+
   .product-card:hover {
     transform: translateY(-4px) scale(1.02);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   .order-status-animate {
     animation: pulse 2s infinite;
   }
-  
+
   /* Button effects */
   .btn-glow {
     position: relative;
     overflow: hidden;
   }
-  
+
   .btn-glow::before {
     content: '';
     position: absolute;
@@ -522,11 +518,11 @@
     transition: opacity 0.3s;
     z-index: -1;
   }
-  
+
   .btn-glow:hover::before {
     opacity: 1;
   }
-  
+
   /* Text effects */
   .text-gradient {
     background: linear-gradient(135deg, hsl(24.6, 95%, 53.1%) 0%, hsl(36, 100%, 57%) 100%);
@@ -534,13 +530,13 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
+
   /* Parallax sections */
   .parallax {
     position: relative;
     overflow: hidden;
   }
-  
+
   .parallax-bg {
     position: absolute;
     top: -20%;
@@ -754,3 +750,80 @@ html {
   background-image: radial-gradient(circle at 25% 25%, rgba(var(--primary-rgb), 0.1) 0%, transparent 50%),
                     radial-gradient(circle at 75% 75%, rgba(var(--accent-rgb), 0.1) 0%, transparent 50%);
 }
+
+/* Text Reveal Component Optimizations */
+.text-reveal-item {
+  will-change: transform, opacity;
+}
+
+/* Animated Header Optimizations */
+.animated-header-element {
+  will-change: transform, opacity;
+}
+
+/* Global CSS Optimizations for Mobile */
+@media (max-width: 768px) {
+  .text-reveal-item {
+    animation-duration: 0.7s; /* Reduced from 1s */
+  }
+
+  .animated-header-element {
+    animation-duration: 0.5s; /* Reduced from 0.8s for overlay */
+  }
+  
+  .animated-header-stagger {
+    animation-delay: 0.06s; /* Reduced from 0.1s */
+  }
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .text-reveal-item,
+  .animated-header-element {
+    animation-duration: 0ms !important;
+    transition-duration: 0ms !important;
+  }
+  .animated-header-stagger {
+    animation-delay: 0ms !important;
+  }
+}
+
+/* Specific element optimizations */
+.optimize-element {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+/* General mobile hardware acceleration */
+@media (max-width: 768px) {
+  body, html, * {
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+  }
+}
+
+.menu-hamburger-icon {
+          width: 2rem;
+          height: 2rem;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          gap: 0.25rem;
+          cursor: pointer;
+        }
+
+        .menu-hamburger-icon span {
+          width: 100%;
+          height: 2px;
+          background-color: #374151;
+          transition: all 0.3s ease;
+          transform-origin: center;
+          will-change: transform;
+          backface-visibility: hidden;
+        }
+
+        @media (max-width: 768px) {
+          .menu-hamburger-icon span {
+            transition: all 0.2s ease;
+          }
+        }
