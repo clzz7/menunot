@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { SplitText } from "gsap/SplitText";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
@@ -33,6 +34,7 @@ export default function TextReveal({
   const elementRefs = useRef<HTMLElement[]>([]);
   const splitRefs = useRef<any[]>([]);
   const lines = useRef<HTMLElement[]>([]);
+  const isMobile = useIsMobile();
 
   useGSAP(
     () => {
@@ -96,12 +98,25 @@ export default function TextReveal({
 
       gsap.set(lines.current, { y: "100%" });
 
+      // Configurações otimizadas para mobile
+      const mobileOptimizations = isMobile ? {
+        duration: Math.min(duration * 0.7, 0.8), // Reduz duração em 30% mas não menos que 0.8s
+        stagger: Math.max(stagger * 0.6, 0.05), // Reduz stagger mas mantém mínimo
+        ease: "power2.out", // Ease mais leve para mobile
+        force3D: false, // Desabilita aceleração 3D que pode causar lag
+        lazy: false, // Força cálculo imediato
+      } : {
+        force3D: true,
+        lazy: true,
+      };
+
       const animationProps = {
         y: "0%",
         duration: duration,
         stagger: stagger,
         ease: ease,
         delay: delay,
+        ...mobileOptimizations,
       };
 
       if (animateOnScroll) {
@@ -111,6 +126,8 @@ export default function TextReveal({
             trigger: containerRef.current,
             start: triggerStart,
             once: true,
+            invalidateOnRefresh: !isMobile, // Desabilita refresh em mobile
+            fastScrollEnd: isMobile, // Otimização para scroll rápido
           },
         });
       } else {

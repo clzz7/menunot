@@ -22,6 +22,16 @@ export default function AnimatedHeader({ onNavigate }: AnimatedHeaderProps) {
     queryFn: api.establishment.get
   });
 
+  // Detectar se o dispositivo é mobile
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 1000;
+
+  // Configurações otimizadas para mobile
+  const mobileSettings = {
+    duration: 0.5, // Duração geral das animações em mobile
+    ease: "power2.out", // Ease mais suave para mobile
+    force3D: false, // Desativar force3D em mobile para melhor performance
+  };
+
   useEffect(() => {
     if (menuOverlayRef.current) {
       gsap.set(menuOverlayRef.current, {
@@ -66,53 +76,73 @@ export default function AnimatedHeader({ onNavigate }: AnimatedHeaderProps) {
     tl.set(menuOverlayRef.current, { visibility: "visible" })
       .to(menuOverlayRef.current, {
         clipPath: "circle(150% at 100% 0%)",
-        duration: 0.8,
-        ease: "power2.inOut"
+        duration: mobileSettings.duration,
+        ease: mobileSettings.ease,
+        force3D: mobileSettings.force3D
       })
-
-      .to(menuContentRef.current, {
-        x: 0,
-        opacity: 1,
-        duration: 0.6,
-        ease: "power2.out"
-      }, "-=0.4")
       .to(menuLinksRef.current, {
         y: 0,
         opacity: 1,
-        duration: 0.6,
-        stagger: 0.1,
-        ease: "power2.out"
+        duration: mobileSettings.duration * 0.7,
+        stagger: isMobile ? 0.05 : 0.1, // Stagger reduzido em mobile
+        ease: mobileSettings.ease,
+        force3D: mobileSettings.force3D
+      }, "-=0.2")
+      .to(menuContentRef.current, {
+        x: 0,
+        opacity: 1,
+        duration: mobileSettings.duration * 0.8,
+        ease: mobileSettings.ease,
+        force3D: mobileSettings.force3D
       }, "-=0.3");
   };
 
   const closeMenu = () => {
-    setIsMenuOpen(false);
     if (menuToggleIconRef.current) {
       menuToggleIconRef.current.classList.remove('active');
     }
 
-    const tl = gsap.timeline();
+    // Configurações otimizadas para mobile
+    const closeMobileSettings = isMobile ? {
+      duration: 0.3, // Mais rápido para fechar em mobile
+      ease: "power2.out",
+      force3D: false,
+    } : {
+      duration: 0.5,
+      ease: "power4.out",
+      force3D: true,
+    };
 
-    tl.to(menuLinksRef.current, {
-        y: -50,
-        opacity: 0,
-        duration: 0.3,
-        stagger: 0.05,
-        ease: "power2.in"
-      })
-      .to(menuContentRef.current, {
-        x: 100,
-        opacity: 0,
-        duration: 0.4,
-        ease: "power2.in"
-      }, "-=0.2")
+    const tl = gsap.timeline({
+      onComplete: () => {
+        setIsMenuOpen(false);
+        if (menuOverlayRef.current) {
+          gsap.set(menuOverlayRef.current, { visibility: "hidden" });
+        }
+      }
+    });
 
-      .to(menuOverlayRef.current, {
-        clipPath: "circle(0% at 100% 0%)",
-        duration: 0.6,
-        ease: "power2.inOut"
-      }, "-=0.2")
-      .set(menuOverlayRef.current, { visibility: "hidden" });
+    tl.to(menuContentRef.current, {
+      x: 100,
+      opacity: 0,
+      duration: closeMobileSettings.duration * 0.6,
+      ease: closeMobileSettings.ease,
+      force3D: closeMobileSettings.force3D
+    })
+    .to(menuLinksRef.current, {
+      y: 100,
+      opacity: 0,
+      duration: closeMobileSettings.duration * 0.6,
+      stagger: isMobile ? 0.03 : 0.05, // Stagger ainda menor para fechar
+      ease: closeMobileSettings.ease,
+      force3D: closeMobileSettings.force3D
+    }, "-=0.2")
+    .to(menuOverlayRef.current, {
+      clipPath: "circle(0% at 100% 0%)",
+      duration: closeMobileSettings.duration,
+      ease: closeMobileSettings.ease,
+      force3D: closeMobileSettings.force3D
+    }, "-=0.1");
   };
 
   const handleMenuClick = (href: string) => {
