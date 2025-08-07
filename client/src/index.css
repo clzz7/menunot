@@ -546,6 +546,40 @@
     object-fit: cover;
     will-change: transform;
   }
+
+  /* Micro grid background: sutil, sem gradiente */
+  .bg-micro-grid {
+    background-image: radial-gradient(circle at 1px 1px, rgba(0,0,0,0.06) 1px, transparent 0);
+    background-size: 14px 14px;
+  }
+
+  /* Editorial note card */
+  .note-card {
+    background: #fff;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.03);
+  }
+
+  /* Photo tiles com bordas arredondadas e máscara em arco sutil */
+  .photo-tile {
+    border-radius: 1.25rem;
+    overflow: hidden;
+    position: relative;
+    isolation: isolate;
+  }
+  .photo-tile::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  /* Marquee sutil */
+  .marquee {
+    display: inline-block;
+    animation: marquee-left 22s linear infinite;
+  }
 }
 
 @keyframes fadeIn {
@@ -827,3 +861,8 @@ html {
             transition: all 0.2s ease;
           }
         }
+
+@keyframes marquee-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
