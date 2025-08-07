@@ -130,7 +130,7 @@ export default function Cardapio() {
       </section>
 
       {/* Main Content */}
-      <div className="w-full max-w-md lg:max-w-7xl mx-auto px-6 pb-10 bg-gradient-to-b from-gray-50 to-white">
+      <div className="max-w-md lg:max-w-7xl mx-auto px-6 pb-10 bg-gradient-to-b from-gray-50 to-white">
         {/* Category Navigation */}
         <div className="mb-8 pt-8">
           <style>{`
@@ -239,52 +239,28 @@ export default function Cardapio() {
             @media (max-width: 1024px) {
               .category-nav-container {
                 margin: 0 -24px;
-                padding: 0;
-                width: 100vw;
-                position: relative;
-                left: 50%;
-                right: 50%;
-                margin-left: -50vw;
-                margin-right: -50vw;
-                overflow-x: auto;
-                scrollbar-width: none;
-                -ms-overflow-style: none;
-              }
-
-              .category-nav-container::-webkit-scrollbar {
-                display: none;
+                padding: 0 24px;
               }
               
               .category-nav {
                 border-radius: 0;
                 border-left: none;
                 border-right: none;
-                width: auto;
-                min-width: 100%;
+                width: 100vw;
                 max-width: none;
-                margin: 0;
+                margin: 0 -24px;
                 padding: 8px 24px;
-                position: relative;
-                display: inline-block;
               }
               
               .category-scroll {
-                gap: 8px;
+                gap: 4px;
                 padding: 2px 0;
-                justify-content: flex-start;
-                width: auto;
-                min-width: max-content;
-                overflow: visible;
-                padding-bottom: 4px;
-                white-space: nowrap;
               }
               
               .category-btn {
-                padding: 8px 14px;
+                padding: 8px 12px;
                 font-size: 13px;
                 gap: 6px;
-                flex-shrink: 0;
-                white-space: nowrap;
               }
               
               .category-icon {
