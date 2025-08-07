@@ -130,7 +130,7 @@ export default function Cardapio() {
       </section>
 
       {/* Main Content */}
-      <div className="max-w-md lg:max-w-7xl mx-auto px-6 pb-10 bg-gradient-to-b from-gray-50 to-white">
+      <div className="w-full max-w-md lg:max-w-7xl mx-auto px-6 pb-10 bg-gradient-to-b from-gray-50 to-white">
         {/* Category Navigation */}
         <div className="mb-8 pt-8">
           <style>{`
@@ -239,28 +239,40 @@ export default function Cardapio() {
             @media (max-width: 1024px) {
               .category-nav-container {
                 margin: 0 -24px;
-                padding: 0 24px;
+                padding: 0;
+                width: 100vw;
+                position: relative;
+                left: 50%;
+                right: 50%;
+                margin-left: -50vw;
+                margin-right: -50vw;
               }
               
               .category-nav {
                 border-radius: 0;
                 border-left: none;
                 border-right: none;
-                width: 100vw;
+                width: 100%;
                 max-width: none;
-                margin: 0 -24px;
+                margin: 0;
                 padding: 8px 24px;
+                position: relative;
               }
               
               .category-scroll {
                 gap: 4px;
                 padding: 2px 0;
+                justify-content: flex-start;
+                width: 100%;
+                overflow-x: auto;
+                padding-bottom: 4px;
               }
               
               .category-btn {
                 padding: 8px 12px;
                 font-size: 13px;
                 gap: 6px;
+                flex-shrink: 0;
               }
               
               .category-icon {
