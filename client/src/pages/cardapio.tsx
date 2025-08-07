@@ -131,8 +131,8 @@ export default function Cardapio() {
 
       {/* Main Content */}
       <div className="max-w-md lg:max-w-7xl mx-auto px-6 pb-10 bg-gradient-to-b from-gray-50 to-white">
-        {/* Category Navigation - Only visible on mobile */}
-        <div className="mb-8 pt-8 lg:hidden">
+        {/* Category Navigation */}
+        <div className="mb-8 pt-8">
           <style>{`
             .category-nav {
               position: sticky;
@@ -141,43 +141,44 @@ export default function Cardapio() {
               background: rgba(255, 255, 255, 0.95);
               backdrop-filter: blur(20px);
               border-radius: 16px;
-              padding: 6px;
+              padding: 8px;
               box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
               border: 1px solid rgba(0, 0, 0, 0.05);
-              display: inline-block;
-              max-width: 100%;
+              margin: 0 auto;
+              max-width: fit-content;
             }
 
             .category-nav-container {
               display: flex;
               justify-content: center;
               width: 100%;
+              overflow-x: auto;
+              scrollbar-width: none;
+              -ms-overflow-style: none;
+            }
+
+            .category-nav-container::-webkit-scrollbar {
+              display: none;
             }
 
             .category-scroll {
               display: flex;
-              gap: 4px;
-              overflow-x: auto;
-              scrollbar-width: none;
-              -ms-overflow-style: none;
-              padding: 0 4px;
-              justify-content: flex-start;
-              flex-wrap: nowrap;
-            }
-
-            .category-scroll::-webkit-scrollbar {
-              display: none;
+              gap: 6px;
+              padding: 2px;
+              min-width: fit-content;
+              align-items: center;
             }
 
             .category-btn {
               flex-shrink: 0;
               display: flex;
               align-items: center;
-              gap: 6px;
-              padding: 8px 14px;
+              justify-content: center;
+              gap: 8px;
+              padding: 10px 16px;
               border-radius: 12px;
               font-weight: 600;
-              font-size: 13px;
+              font-size: 14px;
               transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
               border: none;
               cursor: pointer;
@@ -185,6 +186,8 @@ export default function Cardapio() {
               color: #6b7280;
               position: relative;
               overflow: hidden;
+              white-space: nowrap;
+              min-width: fit-content;
             }
 
             .category-btn::before {
@@ -222,30 +225,61 @@ export default function Cardapio() {
             }
 
             .category-icon {
-              width: 16px;
-              height: 16px;
+              width: 18px;
+              height: 18px;
               transition: transform 0.3s ease;
+              flex-shrink: 0;
             }
 
             .category-btn:hover .category-icon {
               transform: scale(1.1);
             }
 
-            @media (max-width: 768px) {
+            /* Mobile specific styles */
+            @media (max-width: 1024px) {
               .category-nav-container {
                 margin: 0 -24px;
+                padding: 0 24px;
               }
               
               .category-nav {
                 border-radius: 0;
                 border-left: none;
                 border-right: none;
-                width: 100%;
-                display: block;
+                width: 100vw;
+                max-width: none;
+                margin: 0 -24px;
+                padding: 8px 24px;
               }
               
               .category-scroll {
-                justify-content: flex-start;
+                gap: 4px;
+                padding: 2px 0;
+              }
+              
+              .category-btn {
+                padding: 8px 12px;
+                font-size: 13px;
+                gap: 6px;
+              }
+              
+              .category-icon {
+                width: 16px;
+                height: 16px;
+              }
+            }
+
+            /* Extra small screens */
+            @media (max-width: 480px) {
+              .category-btn {
+                padding: 6px 10px;
+                font-size: 12px;
+                gap: 4px;
+              }
+              
+              .category-icon {
+                width: 14px;
+                height: 14px;
               }
             }
           `}</style>
@@ -253,37 +287,37 @@ export default function Cardapio() {
           <div className="category-nav-container">
             <div className="category-nav">
               <div className="category-scroll">
-              <button
-                onClick={() => setSelectedCategory("all")}
-                className={`category-btn ${selectedCategory === "all" ? 'active' : ''}`}
-              >
-                <Grid3X3 className="category-icon" />
-                <span>Todos</span>
-              </button>
-              
-              {categories.map((category: Category) => {
-                const isActive = selectedCategory === category.name;
-                const getCategoryIcon = (name: string) => {
-                  if (name.toLowerCase().includes('hambúrguer')) return <Sandwich className="category-icon" />;
-                  if (name.toLowerCase().includes('batata') || name.toLowerCase().includes('porção')) return <Beef className="category-icon" />;
-                  if (name.toLowerCase().includes('bebida')) return <Star className="category-icon" />;
-                  if (name.toLowerCase().includes('sobremesa')) return <Sparkles className="category-icon" />;
-                  if (name.toLowerCase().includes('salada')) return <Leaf className="category-icon" />;
-                  if (name.toLowerCase().includes('promoção')) return <Tag className="category-icon" />;
-                  return <Grid3X3 className="category-icon" />;
-                };
+                <button
+                  onClick={() => setSelectedCategory("all")}
+                  className={`category-btn ${selectedCategory === "all" ? 'active' : ''}`}
+                >
+                  <Grid3X3 className="category-icon" />
+                  <span>Todos</span>
+                </button>
                 
-                return (
-                  <button
-                    key={category.id}
-                    onClick={() => setSelectedCategory(category.name)}
-                    className={`category-btn ${isActive ? 'active' : ''}`}
-                  >
-                    {getCategoryIcon(category.name)}
-                    <span>{category.name}</span>
-                  </button>
-                );
-              })}
+                {categories.map((category: Category) => {
+                  const isActive = selectedCategory === category.name;
+                  const getCategoryIcon = (name: string) => {
+                    if (name.toLowerCase().includes('hambúrguer')) return <Sandwich className="category-icon" />;
+                    if (name.toLowerCase().includes('batata') || name.toLowerCase().includes('porção')) return <Beef className="category-icon" />;
+                    if (name.toLowerCase().includes('bebida')) return <Star className="category-icon" />;
+                    if (name.toLowerCase().includes('sobremesa')) return <Sparkles className="category-icon" />;
+                    if (name.toLowerCase().includes('salada')) return <Leaf className="category-icon" />;
+                    if (name.toLowerCase().includes('promoção')) return <Tag className="category-icon" />;
+                    return <Grid3X3 className="category-icon" />;
+                  };
+                  
+                  return (
+                    <button
+                      key={category.id}
+                      onClick={() => setSelectedCategory(category.name)}
+                      className={`category-btn ${isActive ? 'active' : ''}`}
+                    >
+                      {getCategoryIcon(category.name)}
+                      <span>{category.name}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
