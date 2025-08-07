@@ -32,7 +32,7 @@ function Home() {
   });
 
   const featuredProducts = Array.isArray(products) ? products.slice(0, 6) : [];
-  const heroImages = Array.isArray(products) ? products.slice(0, 4) : [];
+  const heroImages = Array.isArray(products) ? products.filter((p: any) => p?.image).slice(0, 4) : [];
 
   const handleCheckout = () => {
     window.location.href = "/checkout";
@@ -62,7 +62,7 @@ function Home() {
           <div className="absolute inset-0 bg-micro-grid pointer-events-none" />
 
           <div className="relative z-10 max-w-7xl mx-auto px-4 py-14 w-full">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 items-center">
               {/* Hero Copy */}
               <div>
                 <Badge className="mb-4 px-4 py-1 text-xs border-dashed border-2 border-primary/40 bg-transparent text-primary">
@@ -76,12 +76,12 @@ function Home() {
                 </TextReveal>
 
                 <TextReveal delay={0.6}>
-                  <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-xl">
+                  <p className="mt-2 text-lg md:text-xl text-muted-foreground max-w-xl">
                     Uma casa de sabores pensada prato a prato, sem pressa, sem truques. Ingredientes de origem, técnica precisa e respeito ao tempo.
                   </p>
                 </TextReveal>
 
-                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-8">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6">
                   <Link href="/cardapio">
                     <Button 
                       size="lg"
@@ -102,7 +102,7 @@ function Home() {
                   </Link>
                 </div>
 
-                <div className="mt-8 flex items-center gap-6 text-sm text-muted-foreground">
+                <div className="mt-6 flex items-center gap-6 text-sm text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <Star className="w-4 h-4" />
                     <span>Avaliação 4.9</span>
@@ -126,9 +126,9 @@ function Home() {
                   </div>
                 ) : (
                   heroImages.map((p: any, idx: number) => (
-                    <div key={p.id || idx} className={`photo-tile ${idx % 3 === 0 ? 'col-span-2 h-56 md:h-72' : 'h-40 md:h-48'}`}>
+                    <div key={p.id || idx} className={`photo-tile ${idx % 3 === 0 ? 'col-span-2 h-52 md:h-64' : 'h-36 md:h-44'}`}>
                       <img
-                        src={p.imageUrl}
+                        src={p.image}
                         alt={p.name}
                         className="w-full h-full object-cover"
                       />
@@ -139,7 +139,7 @@ function Home() {
             </div>
 
             {/* Marquee sutil com manifesto */}
-            <div className="mt-10 md:mt-14 border-y border-foreground/10 py-3 overflow-hidden">
+            <div className="mt-6 md:mt-10 border-y border-foreground/10 py-3 overflow-hidden">
               <div className="marquee whitespace-nowrap text-sm tracking-wide">
                 <span className="mr-8">Ingredientes de origem</span>
                 <span className="mr-8">Fogo controlado</span>
@@ -153,7 +153,7 @@ function Home() {
         </section>
 
         {/* Tríade de valor – editorial minimalista */}
-        <section className="py-16 md:py-20 px-4">
+        <section className="py-12 md:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-3 gap-6 md:gap-8">
               {[
@@ -180,8 +180,8 @@ function Home() {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   viewport={{ once: true }}
                 >
-                  <div className="note-card h-full border border-foreground/10 rounded-2xl p-6">
-                    <div className="w-10 h-10 rounded-full border border-foreground/10 flex items-center justify-center mb-4">
+                  <div className="note-card h-full border border-foreground/10 rounded-2xl p-5">
+                    <div className="w-10 h-10 rounded-full border border-foreground/10 flex items-center justify-center mb-3">
                       {item.icon}
                     </div>
                     <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
@@ -194,9 +194,9 @@ function Home() {
         </section>
 
         {/* Destaques do Cardápio – sem vidro/gradiente, foco no produto */}
-        <section className="py-16 md:py-20 px-4">
+        <section className="py-12 md:py-16 px-4">
           <div className="max-w-7xl mx-auto">
-            <div className="flex items-end justify-between mb-8">
+            <div className="flex items-end justify-between mb-6">
               <div>
                 <TextReveal>
                   <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
@@ -220,21 +220,21 @@ function Home() {
                   viewport={{ once: true }}
                 >
                   <Card className="overflow-hidden border border-foreground/10 rounded-2xl group">
-                    {product.imageUrl && (
+                    {product.image && (
                       <div className="relative h-56 overflow-hidden">
                         <img 
-                          src={product.imageUrl} 
+                          src={product.image} 
                           alt={product.name}
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                         />
                       </div>
                     )}
-                    <div className="p-5">
-                      <div className="flex justify-between items-start mb-2">
+                    <div className="p-4">
+                      <div className="flex justify-between items-start mb-1.5">
                         <h3 className="text-lg font-semibold leading-snug max-w-[75%]">{product.name}</h3>
                         <span className="text-base font-semibold">R$ {product.price.toFixed(2)}</span>
                       </div>
-                      <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                         {product.description}
                       </p>
                       <Link href="/cardapio">
@@ -251,7 +251,7 @@ function Home() {
         </section>
 
         {/* Newsletter discreta */}
-        <section className="py-14 px-4">
+        <section className="py-12 px-4">
           <div className="max-w-3xl mx-auto border border-foreground/10 rounded-2xl p-6 md:p-8">
             <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
               <div className="flex-1">
