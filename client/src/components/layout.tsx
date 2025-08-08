@@ -1,8 +1,9 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { useLocation } from "wouter";
 import AnimatedHeader from "@/components/animated-header.js";
 import AppNavigation from "@/components/app-navigation.js";
 import { useNavigation } from "@/hooks/use-navigation.js";
+import { Facebook, Instagram, Twitter, Youtube, MapPin, Phone, Mail, Clock } from "lucide-react";
 
 interface LayoutProps {
   children: ReactNode;
@@ -173,38 +174,101 @@ export default function Layout({ children }: LayoutProps) {
 
 // Footer component
 function Footer() {
+  const [email, setEmail] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setEmail("");
+  };
+
+  const currentYear = new Date().getFullYear();
+
   return (
-    <footer className="footer">
-      <div className="footer-content">
-        <div className="footer-section">
-          <h3>Sobre Nós</h3>
-          <p>
-            Proporcionamos uma experiência gastronômica única, onde a tradição 
-            encontra a inovação em cada prato cuidadosamente preparado.
-          </p>
+    <footer className="relative border-t border-foreground/10 bg-gradient-to-b from-amber-50/60 to-background">
+      <div className="absolute inset-0 bg-micro-grid opacity-40 pointer-events-none" />
+
+      <div className="relative max-w-7xl mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div>
+            <div className="text-2xl font-bold tracking-tight title-gradient">Sabor</div>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Cozinha de autor onde a tradição encontra a técnica. Ingredientes de estação, tempo e cuidado.
+            </p>
+            <div className="mt-5 flex items-center gap-3">
+              <a href="#" aria-label="Instagram" className="w-9 h-9 rounded-full border border-foreground/10 flex items-center justify-center hover:bg-foreground/[0.04] transition-colors">
+                <Instagram className="w-4 h-4" />
+              </a>
+              <a href="#" aria-label="Facebook" className="w-9 h-9 rounded-full border border-foreground/10 flex items-center justify-center hover:bg-foreground/[0.04] transition-colors">
+                <Facebook className="w-4 h-4" />
+              </a>
+              <a href="#" aria-label="Twitter" className="w-9 h-9 rounded-full border border-foreground/10 flex items-center justify-center hover:bg-foreground/[0.04] transition-colors">
+                <Twitter className="w-4 h-4" />
+              </a>
+              <a href="#" aria-label="YouTube" className="w-9 h-9 rounded-full border border-foreground/10 flex items-center justify-center hover:bg-foreground/[0.04] transition-colors">
+                <Youtube className="w-4 h-4" />
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <div className="text-sm font-semibold tracking-wide uppercase text-foreground/80">Navegação</div>
+            <ul className="mt-4 space-y-2 text-sm">
+              <li><a href="/" className="text-muted-foreground hover:text-foreground transition-colors">Início</a></li>
+              <li><a href="/cardapio" className="text-muted-foreground hover:text-foreground transition-colors">Cardápio</a></li>
+              <li><a href="/cardapio" className="text-muted-foreground hover:text-foreground transition-colors">Reservas</a></li>
+              <li><a href="/login" className="text-muted-foreground hover:text-foreground transition-colors">Área do cliente</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <div className="text-sm font-semibold tracking-wide uppercase text-foreground/80">Contato</div>
+            <div className="mt-4 space-y-3 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4" />
+                <span>Rua das Flores, 123 — Centro</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Phone className="w-4 h-4" />
+                <span>+55 (11) 99999‑9999</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Mail className="w-4 h-4" />
+                <span>contato@sabor.com</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                <span>Ter–Dom, 12h–23h</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div className="text-sm font-semibold tracking-wide uppercase text-foreground/80">Newsletter</div>
+            <p className="mt-3 text-sm text-muted-foreground">Receba novidades e o menu da semana.</p>
+            <form onSubmit={handleSubmit} className="mt-4 flex items-center gap-2">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.currentTarget.value)}
+                placeholder="seu@email.com"
+                className="flex-1 h-11 px-3 rounded-md border border-foreground/10 bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+              <button type="submit" className="h-11 px-4 rounded-md bg-foreground text-background hover:bg-foreground/90 transition-colors">
+                Assinar
+              </button>
+            </form>
+            <p className="mt-2 text-xs text-muted-foreground">Prometemos não enviar spam.</p>
+          </div>
         </div>
 
-        <div className="footer-section">
-          <h3>Contato</h3>
-          <div className="footer-contact">
-            <span>📍</span>
-            <span>Rua das Flores, 123 - Centro</span>
+        <div className="mt-10 border-t border-foreground/10 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-sm text-muted-foreground">
+          <div>© {currentYear} Sabor. Todos os direitos reservados.</div>
+          <div className="flex items-center gap-4">
+            <a href="#" className="hover:text-foreground transition-colors">Privacidade</a>
+            <a href="#" className="hover:text-foreground transition-colors">Termos</a>
+            <a href="#" className="hover:text-foreground transition-colors">Cookies</a>
           </div>
-          <div className="footer-contact">
-            <span>📞</span>
-            <span>+55 (11) 99999-9999</span>
-          </div>
-          <div className="footer-contact">
-            <span>✉️</span>
-            <span>contato@restaurant.com</span>
-          </div>
-        </div>
-
-        <div className="footer-section">
-          <h3>Horário de Funcionamento</h3>
-          <p style={{ marginBottom: '0.5rem' }}>Segunda a Sexta: 11h - 23h</p>
-          <p style={{ marginBottom: '0.5rem' }}>Sábado: 12h - 24h</p>
-          <p>Domingo: 12h - 22h</p>
         </div>
       </div>
     </footer>
